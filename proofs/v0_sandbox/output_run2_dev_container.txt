@@ -1,0 +1,100 @@
+LinguaLoom v2 — substrate eating language
+========================================================================
+
+No tokenizer. No embeddings. No gradient. No training.
+Characters in. Motifs out. Habituation by physics.
+
+------------------------------------------------------------------------
+
+TEST 1 — repeated pattern, 92 chars
+  text: 'the cat sat on the mat ' x4
+
+  first quarter : 23 chars
+    structural locks fired:     0/23 (0%)
+    new motifs committed:       9
+    motifs reinforced (recall): 14
+    avg trits collapsed:        7.1/30
+    avg familiarity:            4.0
+    avg match score:            6.6
+  fourth quarter: 23 chars
+    structural locks fired:     0/23 (0%)
+    new motifs committed:       3
+    motifs reinforced (recall): 20
+    avg trits collapsed:        8.0/32
+    avg familiarity:            4.8
+    avg match score:            7.8
+
+  -> If habituation is real: avg familiarity should RISE
+     and reinforcements should outpace new motifs by the
+     fourth quarter (the substrate recognizing the loop).
+
+TEST 2 — novel/random pattern, 24 chars
+  text: 'xqz!vbnm pwlrtj@ zkfhge#'
+  novel exposure: 24 chars
+    structural locks fired:     0/24 (0%)
+    new motifs committed:       8
+    motifs reinforced (recall): 16
+    avg trits collapsed:        6.1/32
+    avg familiarity:            3.5
+    avg match score:            5.9
+
+  krimelack growth: 4 new motifs
+  -> If substrate is honest about novelty: match scores
+     should be LOWER than test 1's fourth quarter.
+
+TEST 3 — return to the original pattern
+  return exposure: 23 chars
+    structural locks fired:     0/23 (0%)
+    new motifs committed:       5
+    motifs reinforced (recall): 18
+    avg trits collapsed:        8.0/32
+    avg familiarity:            4.8
+    avg match score:            7.8
+
+  krimelack growth: -4 new motifs
+  -> Recall by resonance: most of this exposure should
+     hit existing motifs, not create new ones. The
+     substrate remembers without 'loading' anything.
+
+------------------------------------------------------------------------
+
+Final krimelack: 4 motifs total
+
+What ran: the substrate ate 139 chars
+of language, one at a time, with no tokenizer and no model
+file. Whatever it learned lives in the 4 motifs above.
+
+What does a character look like as a strand?
+============================================================
+  't'  ord=116  centered= +20  strand=-+-+0000  reconstructs=  +20
+  'h'  ord=104  centered=  +8  strand=-0+00000  reconstructs=   +8
+  'e'  ord=101  centered=  +5  strand=--+00000  reconstructs=   +5
+  ' '  ord= 32  centered= -64  strand=-0-+-000  reconstructs=  -64
+  'c'  ord= 99  centered=  +3  strand=0+000000  reconstructs=   +3
+  'a'  ord= 97  centered=  +1  strand=+0000000  reconstructs=   +1
+  't'  ord=116  centered= +20  strand=-+-+0000  reconstructs=  +20
+  ' '  ord= 32  centered= -64  strand=-0-+-000  reconstructs=  -64
+
+What's the coupling pressure at each position for a context
+window of 4 of these characters?
+
+  context: 'the '
+    't': -+-+0000
+    'h': -0+00000
+    'e': --+00000
+    ' ': -0-+-000
+
+  Position-by-position coupling sum (sum over context of trit * 3^i):
+    position 0 (weight    1): h =    -4
+    position 1 (weight    3): h =    +0
+    position 2 (weight    9): h =    +0
+    position 3 (weight   27): h =   +54
+    position 4 (weight   81): h =   -81
+    position 5 (weight  243): h =    +0
+    position 6 (weight  729): h =    +0
+    position 7 (weight 2187): h =    +0
+
+If the barrier is 600, ZERO of these positions cross.
+If the barrier is 25, low positions commit and high-order
+positions stay null. THAT is the correct behavior — high-order
+structure simply isn't present in single-character ASCII.

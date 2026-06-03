@@ -16,10 +16,30 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
 
+def compute_chi(state: Tuple[int, ...], trits_per_strand: int = 8) -> int:
+    """Euler characteristic V - E over the motif's coupling graph.
+    Inlined from topology.py — avoids cross-branch dependency.
+    Vertices = committed trits, edges = adjacent-in-strand + same-pos-cross-strand."""
+    verts = [i for i, t in enumerate(state) if t != 0]
+    vset = set(verts)
+    V = len(verts)
+    if V == 0:
+        return 0
+    E = 0
+    for v in verts:
+        neighbor = v + 1
+        if neighbor in vset and neighbor // trits_per_strand == v // trits_per_strand:
+            E += 1
+        cross = v + trits_per_strand
+        if cross in vset:
+            E += 1
+    return V - E
+
+
 class Motif:
     __slots__ = ("fingerprint", "state", "weight", "age",
                  "first_seen", "last_resonated", "successors",
-                 "char_counts", "origin")
+                 "char_counts", "origin", "chi")
 
     def __init__(self, fingerprint: str, state: Tuple[int, ...],
                  weight: int = 1, age: int = 0,
@@ -27,7 +47,8 @@ class Motif:
                  last_resonated: Optional[str] = None,
                  successors: Optional[Dict[str, int]] = None,
                  char_counts: Optional[Dict[str, int]] = None,
-                 origin: str = "commit"):
+                 origin: str = "commit",
+                 chi: Optional[int] = None):
         self.fingerprint = fingerprint
         self.state = state
         self.weight = weight
@@ -36,10 +57,9 @@ class Motif:
         self.first_seen = first_seen or now
         self.last_resonated = last_resonated or now
         self.successors = successors or {}
-        # Which characters were active when this motif committed.
-        # Key = character, value = count. Used by generation.
         self.char_counts = char_counts or {}
-        self.origin = origin  # "commit" or "dream"
+        self.origin = origin
+        self.chi = chi if chi is not None else compute_chi(state)
 
     def to_dict(self) -> dict:
         return {
@@ -52,6 +72,7 @@ class Motif:
             "successors": self.successors,
             "char_counts": self.char_counts,
             "origin": self.origin,
+            "chi": self.chi,
         }
 
     @classmethod
@@ -66,6 +87,7 @@ class Motif:
             successors=d.get("successors", {}),
             char_counts=d.get("char_counts", {}),
             origin=d.get("origin", "commit"),
+            chi=d.get("chi"),
         )
 
 
@@ -122,25 +144,45 @@ class Krimelack:
         return (fp, was_new)
 
     def recall(self, current: Tuple[int, ...]) -> Tuple[Optional[str], int, int]:
-        """Find the most resonant motif for the current settled state.
+        """Topology-first recall: chi filters, geometry ranks.
 
-        Returns (fingerprint, match_score, weight). Match score counts
-        positions where both current and stored are non-null and equal.
+        Only motifs sharing the query's chi are real candidates.
+        Geometry ranks within that pool. Weight breaks ties toward
+        established motifs (but capped at 99 so a 12,000-weight
+        motif can't dominate purely by mass).
+
+        If the chi class is empty (novel topology), fall back to
+        global geometric recall — honestly low-confidence.
+
+        Returns (fingerprint, match_score, weight).
         """
         if not self.motifs:
             return (None, 0, 0)
+
+        qchi = compute_chi(current)
+
+        # Chi-first: filter to topologically compatible motifs
+        pool = [m for m in self.motifs.values() if m.chi == qchi]
+        if not pool:
+            pool = list(self.motifs.values())  # novel topology
 
         best_fp: Optional[str] = None
         best_score = -1
         best_weight = 0
 
-        for fp, m in self.motifs.items():
+        for m in pool:
             score = sum(1 for a, b in zip(current, m.state)
                         if a == b and a != 0)
-            if score > best_score:
-                best_fp, best_score, best_weight = fp, score, m.weight
+            # Weight breaks ties, capped so mass can't dominate
+            combined = score * 100 + min(m.weight, 99)
+            if combined > best_score:
+                best_fp = m.fingerprint
+                best_score = combined
+                best_weight = m.weight
 
-        return (best_fp, best_score, best_weight)
+        # Return the geometric score (not the combined), for threshold checks
+        geo_score = best_score // 100 if best_score >= 0 else 0
+        return (best_fp, geo_score, best_weight)
 
     def successor_of(self, fp: str) -> Optional[str]:
         """Return the most common successor fingerprint of a motif."""

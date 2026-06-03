@@ -1,121 +1,92 @@
 """
 Motif-recall-driven character generation.
 
-Given current loom state, recall the most resonant motif, follow its
-successor chain (avoiding self-loops), and emit a character from the
-successor's char_counts distribution. If nothing resonates strongly
-enough, emit None (honest null — substrate has nothing to say).
+Ported from wC's v1 single-file gualaloom.py generate() which has
+the loop-breaker that the package was missing.
+
+The key mechanism: if we keep landing on the same motif, the substrate
+is looping. Raise the bar — walk to a weaker successor instead of
+the strongest, to escape the attractor. If stuck for 3+ consecutive
+hits on the same motif, stop honestly (the field has nothing new).
 """
 
-import random
-from typing import Optional
+from typing import List, Optional
 
 from .krimelack import Krimelack
 from .loom import Loom
 
 
-# Minimum match score (as fraction of settled length) to attempt generation.
-RECALL_THRESHOLD_FRAC = 0.10
-
-
-def _pick_char(krimelack: Krimelack, fp: str,
-               avoid: Optional[str] = None) -> Optional[str]:
-    """Pick a character from a motif's char_counts.
-
-    Weighted random selection, avoiding the specified character
-    (typically space, to prevent space-only output).
-    """
-    m = krimelack.get_motif(fp)
-    if m is None or not m.char_counts:
-        return None
-
-    # Build weighted candidates, filtering out newlines and
-    # optionally the avoid character
-    candidates = []
-    for ch, cnt in m.char_counts.items():
-        if ch == "\n":
-            continue
-        if avoid and ch == avoid:
-            continue
-        candidates.append((ch, cnt))
-
-    if not candidates:
-        # Fall back to including the avoided character
-        candidates = [(ch, cnt) for ch, cnt in m.char_counts.items()
-                       if ch != "\n"]
-    if not candidates:
-        return None
-
-    # Weighted random pick
-    total = sum(cnt for _, cnt in candidates)
-    r = random.randint(1, total)
-    cumulative = 0
-    for ch, cnt in candidates:
-        cumulative += cnt
-        if r <= cumulative:
-            return ch
-    return candidates[-1][0]
-
-
-def generate_next_char(loom: Loom, krimelack: Krimelack,
-                       last_generated: Optional[str] = None) -> Optional[str]:
-    """Generate one character by motif-recall-driven commit."""
-    if loom.last_settled is None:
-        return None
-
-    current = loom.last_settled
-    best_fp, score, weight = krimelack.recall(current)
-
-    if best_fp is None:
-        return None
-
-    threshold = max(int(len(current) * RECALL_THRESHOLD_FRAC), 1)
-    if score < threshold:
-        return None
-
-    # Follow successor chain, avoiding self-loops
-    m = krimelack.get_motif(best_fp)
-    if m is None:
-        return None
-
-    # Find a successor that isn't the same motif
-    succ_fp = None
-    if m.successors:
-        sorted_succs = sorted(m.successors.items(), key=lambda x: -x[1])
-        for sfp, cnt in sorted_succs:
-            if sfp != best_fp and krimelack.get_motif(sfp) is not None:
-                succ_fp = sfp
-                break
-
-    # Pick from successor's char_counts, or own if no successor
-    target_fp = succ_fp or best_fp
-    # Avoid repeating spaces when we just generated a space
-    avoid = " " if last_generated == " " else None
-    return _pick_char(krimelack, target_fp, avoid=avoid)
-
-
 def generate_response(loom: Loom, krimelack: Krimelack,
-                      max_chars: int = 200) -> str:
-    """Generate characters until the substrate emits null or runs out.
+                      max_chars: int = 120) -> str:
+    """Generate characters by motif-recall + successor walk.
 
     Each generated character is fed back through tick() so the loom
-    state evolves naturally — the substrate hears itself speak.
+    state evolves — the substrate hears itself speak.
+
+    Loop-breaker: tracks recent recalled motif fingerprints. When the
+    same motif appears repeatedly in the last 4 steps, generation
+    skips past the dominant successor to a weaker one. This is the
+    familiarity-raises-the-bar escape from wC's v1, applied at the
+    generation level.
     """
-    out = []
-    null_run = 0
-    last_gen = None
+    out: List[str] = []
+    recent_fps: List[str] = []
+
     for _ in range(max_chars):
-        c = generate_next_char(loom, krimelack, last_generated=last_gen)
-        if c is None:
-            null_run += 1
-            if null_run >= 3:
-                break
-            out.append(" . ")
-            loom.tick(" ")
-            last_gen = " "
-            continue
-        null_run = 0
-        out.append(c)
-        loom.tick(c)
-        last_gen = c
-    return "".join(out).strip(" .")
+        if loom.last_settled is None:
+            break
+
+        best_fp, score, weight = krimelack.recall(loom.last_settled)
+        if best_fp is None:
+            break
+
+        m = krimelack.get_motif(best_fp)
+        if m is None:
+            break
+
+        # Loop detection: how many times has this motif appeared
+        # in the last 4 generation steps?
+        loop_depth = recent_fps[-4:].count(best_fp)
+        recent_fps.append(best_fp)
+
+        # Follow successor chain. If looping, skip past the dominant
+        # successor to a weaker one — escape the attractor.
+        nxt = None
+        if m.successors:
+            ranked = sorted(m.successors.items(), key=lambda kv: -kv[1])
+            # Skip self-loops AND skip past dominant successor when looping
+            candidates = [(fp, cnt) for fp, cnt in ranked
+                          if fp != best_fp and krimelack.get_motif(fp) is not None]
+            if candidates:
+                idx = min(loop_depth, len(candidates) - 1)
+                nxt_fp = candidates[idx][0]
+                nxt = krimelack.get_motif(nxt_fp)
+
+        # Fall back to the recalled motif itself if no successor
+        if nxt is None:
+            nxt = m
+
+        if not nxt.char_counts:
+            break
+
+        # Pick character. If looping, skip past the dominant character
+        # to a less common one — vary the output.
+        chars = sorted(nxt.char_counts.items(), key=lambda kv: -kv[1])
+        # Filter out newlines
+        chars = [(ch, cnt) for ch, cnt in chars if ch != "\n"]
+        if not chars:
+            break
+
+        ch = chars[0][0]
+        if loop_depth > 0 and len(chars) > 1:
+            idx = min(loop_depth, len(chars) - 1)
+            ch = chars[idx][0]
+
+        out.append(ch)
+        loom.tick(ch)
+
+        # Stuck — the field has nothing new to say. Stop honestly.
+        if loop_depth >= 3:
+            break
+
+    return "".join(out).strip()

@@ -4,14 +4,19 @@ Life Daemon — continuous-life loop structure.
 Harvested from Aurelion v9.3a's proven daemon (CorpusLoop + DiaryLoop
 + AutosaveLoop + REPL). Re-implemented on the trit substrate.
 
-Four concurrent loops:
+Five concurrent loops:
   1. INGEST — reads corpus/world in small batches, ticks characters
      through the Loom, commits motifs. Continuous, not one-shot.
-  2. REFLECT — writes timestamped diary entries to the life-log.
+  2. CONSOLIDATE — runs sleep/dream cycles on her own clock.
+     Without this, the krimelack accumulates noise forever.
+  3. REFLECT — writes timestamped diary entries to the life-log.
      Periodic (default: every 15 min).
-  3. PERSIST — saves krimelack + loom state to disk.
+  4. PERSIST — saves krimelack + loom state to disk.
      Periodic (default: every 4 min).
-  4. INTERACT — REPL or API, on demand.
+  5. INTERACT — REPL or API, on demand (external, not a thread here).
+
+Thread safety: a Lock guards krimelack mutation and iteration.
+Aurelion v4 had this lock; the initial harvest dropped it.
 
 STRIPPED from Aurelion:
   - Lattice.stimulate (float EMA) → replaced by Loom.tick (trit settle)
@@ -39,6 +44,7 @@ from .substrate import l6_freedom
 
 INGEST_BATCH_SIZE = 200       # characters per ingest tick
 INGEST_GAP = 2.0              # seconds between batches
+CONSOLIDATE_INTERVAL = 600.0  # 10 minutes — sleep/dream cycle
 REFLECT_INTERVAL = 900.0      # 15 minutes
 PERSIST_INTERVAL = 240.0      # 4 minutes
 
@@ -50,22 +56,32 @@ class LifeDaemon:
     The daemon owns no substrate state — it receives a Loom and
     Krimelack and operates on them. The interact loop is external
     (REPL or API calls into the same loom/krimelack).
+
+    Thread safety: self.lock guards all krimelack mutation and
+    iteration. Every loop acquires the lock before touching motifs.
     """
 
     def __init__(self, loom, krimelack, save_fn: Callable,
+                 sleep_fn: Optional[Callable] = None,
+                 dream_fn: Optional[Callable] = None,
                  world_paths: Optional[List[str]] = None,
                  diary_path: str = "state/diary.jsonl"):
         self.loom = loom
         self.k = krimelack
         self.save_fn = save_fn
+        self.sleep_fn = sleep_fn    # sleep_cycle(k, cycles=N)
+        self.dream_fn = dream_fn    # dream_cycle(k, cycles=N)
         self.world_paths = world_paths or []
         self.diary_path = diary_path
+        self.lock = threading.Lock()
         self._running = False
         self._threads: List[threading.Thread] = []
         # Corpus reading position
         self._corpus_files: List[str] = []
         self._corpus_idx = 0
         self._char_offset = 0
+        # Consolidation stats for the diary
+        self.last_consolidation: Optional[Dict] = None
 
     def start(self) -> None:
         """Start all loops. Non-blocking."""
@@ -76,6 +92,7 @@ class LifeDaemon:
 
         loops = [
             ("ingest", self._ingest_loop),
+            ("consolidate", self._consolidate_loop),
             ("reflect", self._reflect_loop),
             ("persist", self._persist_loop),
         ]
@@ -88,7 +105,8 @@ class LifeDaemon:
     def stop(self) -> None:
         """Stop all loops and persist."""
         self._running = False
-        self.save_fn()
+        with self.lock:
+            self.save_fn()
 
     def is_running(self) -> bool:
         return self._running
@@ -115,7 +133,7 @@ class LifeDaemon:
                 time.sleep(INGEST_GAP * 10)
                 continue
 
-            # Read a batch
+            # Read the batch outside the lock (I/O)
             path = self._corpus_files[self._corpus_idx]
             try:
                 with open(path, encoding="utf-8", errors="ignore") as f:
@@ -125,8 +143,10 @@ class LifeDaemon:
                 batch = ""
 
             if batch:
-                for ch in batch:
-                    self.loom.tick(ch)
+                # Loom.tick mutates krimelack (commit) — hold the lock
+                with self.lock:
+                    for ch in batch:
+                        self.loom.tick(ch)
                 self._char_offset += len(batch)
             else:
                 # End of file — move to next
@@ -134,6 +154,45 @@ class LifeDaemon:
                 self._char_offset = 0
 
             time.sleep(INGEST_GAP)
+
+    # ── Consolidate loop (sleep + dream) ─────────────────────
+
+    def _consolidate_loop(self) -> None:
+        """Periodic sleep/dream — the substrate consolidates on her own
+        clock. Without this, the krimelack accumulates noise forever
+        and never consolidates (the v1 failure).
+
+        Sleep culls weak motifs and reinforces co-resonant ones.
+        Dream free-settles from existing motifs, producing novel
+        dream-tagged states.
+
+        NOT emotion-driven. Runs on a fixed timer. The substrate
+        does not "want" to sleep or "feel" tired.
+        """
+        while self._running:
+            time.sleep(CONSOLIDATE_INTERVAL)
+            if not self._running:
+                break
+
+            stats = {}
+            with self.lock:
+                if self.sleep_fn:
+                    sleep_result = self.sleep_fn(self.k)
+                    if isinstance(sleep_result, tuple):
+                        stats["sleep_reinforced"], stats["sleep_culled"] = sleep_result
+                    elif isinstance(sleep_result, dict):
+                        stats.update(sleep_result)
+
+                if self.dream_fn:
+                    dream_result = self.dream_fn(self.k)
+                    if isinstance(dream_result, list):
+                        stats["dream_motifs"] = len(dream_result)
+                    elif isinstance(dream_result, dict):
+                        stats["dream_motifs"] = len(dream_result.get("dream_motifs", []))
+
+            stats["timestamp"] = datetime.now(timezone.utc).isoformat()
+            stats["motifs_after"] = self.k.size()
+            self.last_consolidation = stats
 
     # ── Reflect loop (diary / life-log) ──────────────────────
 
@@ -152,45 +211,57 @@ class LifeDaemon:
     def _write_diary_entry(self) -> Optional[Dict]:
         """Compose one diary entry from current substrate state.
 
-        Reports: motif count, chi-class diversity, recent dreams,
-        what world she's lived (corpus progress), familiarity.
+        Reports: motif count, chi-class diversity, dream-tagged motifs,
+        what world she's lived (corpus progress), familiarity,
+        last consolidation stats.
 
         STRIPPED: phi, entropy, coherence, emotion metrics.
         """
-        if not self.k.motifs:
-            return None
+        with self.lock:
+            if not self.k.motifs:
+                return None
 
-        # Chi-class diversity
-        chi_classes = set()
-        for m in self.k.motifs.values():
-            chi_classes.add(m.chi)
+            # Chi-class diversity
+            chi_classes = set()
+            for m in self.k.motifs.values():
+                c = getattr(m, "chi", None)
+                if c is not None:
+                    chi_classes.add(c)
 
-        # Dream motifs
-        dream_count = sum(1 for m in self.k.motifs.values()
-                          if m.weight == 1 and m.age == 0)
+            # Dream-tagged motifs (origin == "dream", not weight heuristic)
+            dream_count = sum(
+                1 for m in self.k.motifs.values()
+                if getattr(m, "origin", None) == "dream"
+            )
+
+            motif_count = self.k.size()
+            fam = getattr(self.loom, "fam",
+                          getattr(self.loom, "familiarity", 0))
+
+        # L6 on last settled state (read-only, no lock needed)
+        last = getattr(self.loom, "last",
+                       getattr(self.loom, "last_settled", None))
+        l6_eff, l6_coll, l6_knee = 0, 0, 0
+        if last and any(t != 0 for t in last):
+            l6_eff, l6_coll, l6_knee = l6_freedom(last)
 
         # Corpus progress
         total_files = len(self._corpus_files)
         current_file = (self._corpus_files[self._corpus_idx]
                         if self._corpus_files else "none")
 
-        # L6 on last settled state
-        last = self.loom.last
-        eff, coll, knee, lock = 0, 0, 0, 0
-        if last and any(t != 0 for t in last):
-            from .substrate import l6 as _l6
-            eff, coll, knee, lock = _l6(last)
-
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "motifs": self.k.size(),
+            "motifs": motif_count,
             "chi_classes": len(chi_classes),
-            "dreams_recent": dream_count,
-            "familiarity": self.loom.fam,
+            "dream_motifs": dream_count,
+            "familiarity": fam,
             "corpus_file": os.path.basename(current_file),
             "corpus_progress": f"{self._corpus_idx + 1}/{total_files}",
-            "l6": {"effective": eff, "collapsed": coll,
-                   "knee": knee, "lock": lock},
+            "l6": {"effective": l6_eff, "collapsed": l6_coll,
+                   "knee": l6_knee,
+                   "lock": 1 if l6_eff < l6_knee else 0},
+            "last_consolidation": self.last_consolidation,
         }
         return entry
 
@@ -209,6 +280,7 @@ class LifeDaemon:
             if not self._running:
                 break
             try:
-                self.save_fn()
+                with self.lock:
+                    self.save_fn()
             except Exception:
                 pass  # persist loop must not crash the daemon

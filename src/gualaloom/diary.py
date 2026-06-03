@@ -5,7 +5,7 @@ Harvested from Aurelion's DiaryLoop. Periodic timestamped reflections
 on internal state, written to a durable log.
 
 Reports trit-substrate vitals: motif count, chi-class diversity,
-dreams, corpus progress, familiarity, L6 state.
+dream-tagged motifs, corpus progress, familiarity, L6 state.
 
 STRIPPED: phi/H metrics (cosine coherence, Shannon entropy).
 EMOTION: not present. The diary reports structural state, not mood.
@@ -27,6 +27,9 @@ class Diary:
 
     Append-only JSONL file. Each entry is a timestamped snapshot
     of substrate state. Read by the private window.
+
+    Thread safety: the caller (daemon reflect loop) holds the lock
+    when calling reflect(). The diary itself does no locking.
     """
 
     def __init__(self, path: str = "state/diary.jsonl"):
@@ -37,6 +40,8 @@ class Diary:
 
         Called periodically by the daemon's reflect loop, or
         manually via /reflect command.
+
+        Caller must hold the daemon lock if running concurrently.
         """
         # Chi-class diversity
         chi_counts = defaultdict(int)
@@ -51,9 +56,14 @@ class Diary:
                          reverse=True)
         heavy = sum(1 for w in weights if w >= 100)
 
-        # Dream motifs
-        dream_count = sum(1 for m in krimelack.motifs.values()
-                          if hasattr(m, 'age') and m.weight <= 1 and m.age <= 1)
+        # Dream-tagged motifs — count by origin, not by weight heuristic.
+        # The old "weight <= 1 and age <= 1" was mislabeled: it counted
+        # fresh motifs, not dream motifs. Dream motifs are tagged
+        # origin="dream" at commit time.
+        dream_count = sum(
+            1 for m in krimelack.motifs.values()
+            if getattr(m, 'origin', None) == "dream"
+        )
 
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -61,7 +71,7 @@ class Diary:
             "chi_classes": len(chi_counts),
             "top_chi": top_chi,
             "heavy_motifs": heavy,
-            "dreams_recent": dream_count,
+            "dream_motifs": dream_count,
             "familiarity": getattr(loom, 'fam', getattr(loom, 'familiarity', 0)),
             "note": note,
         }

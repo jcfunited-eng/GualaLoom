@@ -1,0 +1,330 @@
+{
+  "timestamp": "2026-06-04T09:21:20",
+  "config": {
+    "TRITS": 16,
+    "CONTEXT": 16,
+    "POP": 256,
+    "DEAD_ZONE": 15,
+    "P3I": [
+      1,
+      3,
+      9,
+      27,
+      81,
+      243,
+      729,
+      2187,
+      6561,
+      19683,
+      59049,
+      177147,
+      531441,
+      1594323,
+      4782969,
+      14348907
+    ]
+  },
+  "crashes": [],
+  "corpus": {
+    "files": 6,
+    "total_chars": 26794,
+    "total_words": 4008
+  },
+  "word_mosaic_ingestion": {
+    "total_words": 4008,
+    "unique_words": 1676,
+    "motifs_committed": 4008,
+    "new_motifs": 437,
+    "null_collapses": 0,
+    "words_truncated": 70,
+    "errors": [],
+    "time_seconds": 1.07
+  },
+  "chi_distribution": {
+    "-58": 2,
+    "-57": 1,
+    "-52": 1,
+    "-50": 1,
+    "-48": 1,
+    "-44": 1,
+    "-43": 2,
+    "-38": 1,
+    "-36": 3,
+    "-35": 1,
+    "-29": 4,
+    "-28": 2,
+    "-27": 8,
+    "-26": 23,
+    "-25": 46,
+    "-24": 78,
+    "-23": 62,
+    "-22": 16,
+    "-21": 27,
+    "-20": 61,
+    "-19": 28,
+    "-18": 13,
+    "-16": 1,
+    "-14": 4,
+    "-13": 8,
+    "-12": 1,
+    "-11": 2,
+    "-10": 5,
+    "-9": 9,
+    "-8": 6,
+    "-7": 4,
+    "-6": 4,
+    "-5": 5,
+    "-1": 1,
+    "1": 3,
+    "2": 2
+  },
+  "null_fraction": {
+    "mean": 0.8387,
+    "min": 0.625,
+    "max": 0.9883
+  },
+  "words_with_motifs": 437,
+  "successor_stats": {
+    "motifs_with_successors": 436,
+    "total_links": 817
+  },
+  "pressure_landscape_16": {
+    "null_positions_sampled": 4240,
+    "bands": {
+      "0-5": 4144,
+      "15+": 96
+    }
+  },
+  "folding_composition": {
+    "pairs_attempted": 50,
+    "stable_compositions": 50,
+    "collapsed_to_null": 0,
+    "scattered": 0,
+    "errors": [],
+    "time_seconds": 0.02,
+    "sample_compositions": [
+      {
+        "parent_a": "4883e2a6cc8e",
+        "parent_b": "acaae238e9ab",
+        "co_commit_count": 174,
+        "merged_null_fraction": 0.875,
+        "settled_null_fraction": 0.875,
+        "collapsed_to_null": false,
+        "chi_a": -29,
+        "chi_b": -14,
+        "chi_composed": -14,
+        "settled_fp": "acaae238e9ab",
+        "recalls_to": "acaae238e9ab",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "acaae238e9ab",
+        "parent_b": "4883e2a6cc8e",
+        "co_commit_count": 172,
+        "merged_null_fraction": 0.875,
+        "settled_null_fraction": 0.875,
+        "collapsed_to_null": false,
+        "chi_a": -14,
+        "chi_b": -29,
+        "chi_composed": -14,
+        "settled_fp": "acaae238e9ab",
+        "recalls_to": "acaae238e9ab",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "4883e2a6cc8e",
+        "parent_b": "d8d780406d89",
+        "co_commit_count": 37,
+        "merged_null_fraction": 0.875,
+        "settled_null_fraction": 0.875,
+        "collapsed_to_null": false,
+        "chi_a": -29,
+        "chi_b": -14,
+        "chi_composed": -14,
+        "settled_fp": "d8d780406d89",
+        "recalls_to": "d8d780406d89",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "d8d780406d89",
+        "parent_b": "4883e2a6cc8e",
+        "co_commit_count": 35,
+        "merged_null_fraction": 0.875,
+        "settled_null_fraction": 0.875,
+        "collapsed_to_null": false,
+        "chi_a": -14,
+        "chi_b": -29,
+        "chi_composed": -14,
+        "settled_fp": "d8d780406d89",
+        "recalls_to": "d8d780406d89",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "4883e2a6cc8e",
+        "parent_b": "7ac5e28cb773",
+        "co_commit_count": 35,
+        "merged_null_fraction": 0.8125,
+        "settled_null_fraction": 0.8125,
+        "collapsed_to_null": false,
+        "chi_a": -29,
+        "chi_b": -58,
+        "chi_composed": -29,
+        "settled_fp": "4883e2a6cc8e",
+        "recalls_to": "4883e2a6cc8e",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "7ac5e28cb773",
+        "parent_b": "4883e2a6cc8e",
+        "co_commit_count": 31,
+        "merged_null_fraction": 0.8125,
+        "settled_null_fraction": 0.8125,
+        "collapsed_to_null": false,
+        "chi_a": -58,
+        "chi_b": -29,
+        "chi_composed": -29,
+        "settled_fp": "4883e2a6cc8e",
+        "recalls_to": "4883e2a6cc8e",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "f9cd7c7b5965",
+        "parent_b": "4883e2a6cc8e",
+        "co_commit_count": 15,
+        "merged_null_fraction": 0.9375,
+        "settled_null_fraction": 0.9375,
+        "collapsed_to_null": false,
+        "chi_a": 1,
+        "chi_b": -29,
+        "chi_composed": 1,
+        "settled_fp": "f9cd7c7b5965",
+        "recalls_to": "f9cd7c7b5965",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "4883e2a6cc8e",
+        "parent_b": "f9cd7c7b5965",
+        "co_commit_count": 15,
+        "merged_null_fraction": 0.9375,
+        "settled_null_fraction": 0.9375,
+        "collapsed_to_null": false,
+        "chi_a": -29,
+        "chi_b": 1,
+        "chi_composed": 1,
+        "settled_fp": "f9cd7c7b5965",
+        "recalls_to": "f9cd7c7b5965",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "8cba664a2a6c",
+        "parent_b": "4883e2a6cc8e",
+        "co_commit_count": 14,
+        "merged_null_fraction": 0.8125,
+        "settled_null_fraction": 0.8125,
+        "collapsed_to_null": false,
+        "chi_a": -28,
+        "chi_b": -29,
+        "chi_composed": -29,
+        "settled_fp": "4883e2a6cc8e",
+        "recalls_to": "4883e2a6cc8e",
+        "recalls_to_parent": true
+      },
+      {
+        "parent_a": "4883e2a6cc8e",
+        "parent_b": "8cba664a2a6c",
+        "co_commit_count": 14,
+        "merged_null_fraction": 0.8125,
+        "settled_null_fraction": 0.8125,
+        "collapsed_to_null": false,
+        "chi_a": -29,
+        "chi_b": -28,
+        "chi_composed": -29,
+        "settled_fp": "4883e2a6cc8e",
+        "recalls_to": "4883e2a6cc8e",
+        "recalls_to_parent": true
+      }
+    ]
+  },
+  "generation": [
+    {
+      "starter_fp": "4883e2a6cc8e",
+      "starter_word": "gualaloom",
+      "starter_chi": -29,
+      "starter_weight": 2918,
+      "output": "gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent,",
+      "output_length": 430
+    },
+    {
+      "starter_fp": "acaae238e9ab",
+      "starter_word": "descent,",
+      "starter_chi": -14,
+      "starter_weight": 389,
+      "output": "descent, gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback",
+      "output_length": 452
+    },
+    {
+      "starter_fp": "7ac5e28cb773",
+      "starter_word": "\u2014",
+      "starter_chi": -58,
+      "starter_weight": 89,
+      "output": "\u2014 gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
+      "output_length": 423
+    },
+    {
+      "starter_fp": "d8d780406d89",
+      "starter_word": "substrate",
+      "starter_chi": -14,
+      "starter_weight": 52,
+      "output": "substrate gualaloom descent, gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent,",
+      "output_length": 441
+    },
+    {
+      "starter_fp": "f9cd7c7b5965",
+      "starter_word": "architecture",
+      "starter_chi": 1,
+      "starter_weight": 40,
+      "output": "architecture gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
+      "output_length": 434
+    },
+    {
+      "starter_fp": "0895c7653aab",
+      "starter_word": "motif",
+      "starter_chi": -29,
+      "starter_weight": 17,
+      "output": "motif descent, gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent,",
+      "output_length": 449
+    },
+    {
+      "starter_fp": "8cba664a2a6c",
+      "starter_word": "#",
+      "starter_chi": -28,
+      "starter_weight": 16,
+      "output": "# gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
+      "output_length": 423
+    },
+    {
+      "starter_fp": "8464c4ef87b0",
+      "starter_word": "feedback",
+      "starter_chi": -14,
+      "starter_weight": 9,
+      "output": "feedback | gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture",
+      "output_length": 422
+    },
+    {
+      "starter_fp": "6620547dae1f",
+      "starter_word": "\u2192",
+      "starter_chi": -58,
+      "starter_weight": 7,
+      "output": "\u2192 gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
+      "output_length": 423
+    },
+    {
+      "starter_fp": "ed6a845f3651",
+      "starter_word": "ternary",
+      "starter_chi": -26,
+      "starter_weight": 6,
+      "output": "ternary gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
+      "output_length": 429
+    }
+  ]
+}

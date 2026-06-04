@@ -1,17 +1,14 @@
 """
-Experiment 06 — Three-Layer Collision Build (third pass)
+Experiment 06 — Three-Layer Collision Build (pass 4)
 
-Third pass fixes:
-  - Word-mosaic: now snapshots loom settled state at whitespace boundaries
-    instead of encoding fixed windows. Character pipeline runs normally;
-    word motifs are the substrate's state AT the word boundary.
-  - Folding composition: structural union with conflict-nulling instead of
-    destructive intersection. Keeps commitments from either parent unless
-    they actively disagree.
-  - Generation: three perturbation strategies, all settle-based, no
-    successor walking.
-
-NOT a build to ship. We are reading the wreckage.
+Fixes seven cheats from pass 3:
+  1. Word/char fingerprint domains separated
+  2. Word motifs settled from word chars alone (no context contamination)
+  3. Composition pairs selected by chi dissimilarity, not co-commit count
+  4. feed_char sequences by shift-left append-right
+  5. feed_char draws next char from recalled motif's char_counts
+  6. null_pos03 replaced with null_high (positions 13-15)
+  7. Starters sampled across chi distribution, not by weight
 """
 
 import os, sys, json, hashlib, time, traceback, glob, random
@@ -23,10 +20,6 @@ os.chdir(REPO)
 RESULTS_DIR = os.path.join(REPO, "experiments", "exp06_collision")
 RESULTS_FILE = os.path.join(RESULTS_DIR, "results.jsonl")
 os.makedirs(RESULTS_DIR, exist_ok=True)
-
-# ======================================================================
-# LAYER 1 — CONTEXT=16, 256-trit population
-# ======================================================================
 
 TRITS = 16
 CONTEXT = 16
@@ -79,9 +72,23 @@ def chi(state):
     return V - E, V
 
 
-def _fp(state):
-    s = "".join({-1: "-", 0: "0", 1: "+"}[t] for t in state)
-    return hashlib.sha1(s.encode()).hexdigest()[:12]
+def _state_string(state):
+    return "".join({-1: "-", 0: "0", 1: "+"}[t] for t in state)
+
+
+def _fp_char(state):
+    """Fingerprint in the character domain."""
+    return hashlib.sha1(("C:" + _state_string(state)).encode()).hexdigest()[:12]
+
+
+def _fp_word(state):
+    """Fingerprint in the word domain."""
+    return hashlib.sha1(("W:" + _state_string(state)).encode()).hexdigest()[:12]
+
+
+def _fp_raw(state):
+    """Raw fingerprint (no domain prefix) for cross-domain collision check."""
+    return _state_string(state)
 
 
 def count_nulls(state):
@@ -89,58 +96,80 @@ def count_nulls(state):
 
 
 # ======================================================================
-# Krimelack
+# Krimelack with separate char and word motif stores
 # ======================================================================
 
 class Motif:
     __slots__ = ("fp", "state", "weight", "age", "chi", "V",
-                 "char_counts", "successors", "word")
-    def __init__(self, fp, state, c, v):
+                 "char_counts", "successors", "word", "domain")
+    def __init__(self, fp, state, c, v, domain="char"):
         self.fp = fp; self.state = state; self.weight = 1; self.age = 0
         self.chi = c; self.V = v
         self.char_counts = defaultdict(int)
         self.successors = defaultdict(int)
         self.word = None
+        self.domain = domain
 
     def to_dict(self):
         return {"fp": self.fp, "state": list(self.state),
                 "weight": self.weight, "age": self.age, "chi": self.chi,
                 "V": self.V, "char_counts": dict(self.char_counts),
                 "successors": dict(self.successors),
-                "word": self.word}
+                "word": self.word, "domain": self.domain}
 
 
 class Krimelack:
     def __init__(self):
-        self.motifs = OrderedDict()
-        self.last_fp = None
+        self.char_motifs = OrderedDict()
+        self.word_motifs = OrderedDict()
+        self._last_char_fp = None
+        self._last_word_fp = None
 
-    def commit(self, state, active_char=None, word=None):
+    def commit_char(self, state, active_char=None):
         if all(t == 0 for t in state):
             return None, False
-        fp = _fp(state)
-        new = fp not in self.motifs
+        fp = _fp_char(state)
+        new = fp not in self.char_motifs
         if new:
             c, v = chi(state)
-            self.motifs[fp] = Motif(fp, state, c, v)
-        m = self.motifs[fp]
+            self.char_motifs[fp] = Motif(fp, state, c, v, domain="char")
+        m = self.char_motifs[fp]
         m.weight += 1; m.age = 0
         if active_char is not None:
             m.char_counts[active_char] += 1
-        if word is not None and m.word is None:
-            m.word = word
-        if self.last_fp and self.last_fp != fp and self.last_fp in self.motifs:
-            self.motifs[self.last_fp].successors[fp] += 1
-        self.last_fp = fp
+        if self._last_char_fp and self._last_char_fp != fp and self._last_char_fp in self.char_motifs:
+            self.char_motifs[self._last_char_fp].successors[fp] += 1
+        self._last_char_fp = fp
         return fp, new
 
-    def recall(self, state):
-        if not self.motifs:
+    def commit_word(self, state, word=None):
+        if all(t == 0 for t in state):
+            return None, False
+        fp = _fp_word(state)
+        new = fp not in self.word_motifs
+        if new:
+            c, v = chi(state)
+            self.word_motifs[fp] = Motif(fp, state, c, v, domain="word")
+        m = self.word_motifs[fp]
+        m.weight += 1; m.age = 0
+        if word is not None:
+            if m.word is None:
+                m.word = word
+            # Track all words that map here
+            m.char_counts[word] = m.char_counts.get(word, 0) + 1
+        if self._last_word_fp and self._last_word_fp != fp and self._last_word_fp in self.word_motifs:
+            self.word_motifs[self._last_word_fp].successors[fp] += 1
+        self._last_word_fp = fp
+        return fp, new
+
+    def recall_from(self, state, motif_store):
+        """Recall from a specific motif store (char_motifs or word_motifs)."""
+        if not motif_store:
             return None, 0
         qchi, _ = chi(state)
-        pool = [m for m in self.motifs.values() if m.chi == qchi]
+        pool = [m for m in motif_store.values() if m.chi == qchi]
         if not pool:
-            pool = list(self.motifs.values())
+            pool = list(motif_store.values())
         best, best_score = None, -1
         for m in pool:
             score = sum(1 for a, b in zip(state, m.state) if a == b and a != 0)
@@ -149,12 +178,21 @@ class Krimelack:
                 best, best_score = m, score
         return best, best_score
 
-    def size(self):
-        return len(self.motifs)
+    def recall_word(self, state):
+        return self.recall_from(state, self.word_motifs)
+
+    def recall_char(self, state):
+        return self.recall_from(state, self.char_motifs)
+
+    def char_size(self):
+        return len(self.char_motifs)
+
+    def word_size(self):
+        return len(self.word_motifs)
 
 
 # ======================================================================
-# Loom at CONTEXT=16
+# Loom at CONTEXT=16 (commits to char domain only)
 # ======================================================================
 
 class Loom:
@@ -172,9 +210,9 @@ class Loom:
         while len(strands) < CONTEXT:
             strands.insert(0, tuple([0] * TRITS))
         settled = settle(strands, self.fam)
-        m, score = self.k.recall(settled)
+        m, score = self.k.recall_from(settled, self.k.char_motifs)
         self.fam = (score // 100 * 20) // max(len(settled), 1) if score > 0 else 0
-        self.k.commit(settled, active_char=ch)
+        self.k.commit_char(settled, active_char=ch)
         self.last = settled
         return settled
 
@@ -184,19 +222,25 @@ class Loom:
 
 
 # ======================================================================
-# LAYER 3 — Word-Mosaic (REWRITTEN: settled-state snapshot at whitespace)
+# LAYER 3 — Word-Mosaic (word chars settled alone, no context)
 # ======================================================================
 
-def word_mosaic_ingest(k, corpus_text):
-    """Run the normal character Loom through the corpus. At every whitespace
-    boundary, snapshot the current settled state and commit it as a word motif
-    labeled with the word that just completed. Character motifs commit at
-    every tick (normal Loom behavior). Word motifs are an additional commit
-    layer — the substrate's state AT the word boundary, reflecting the actual
-    character cascade in context.
+def settle_word_alone(word):
+    """Settle a word's characters as strands with no context window.
+    Words shorter than CONTEXT get null-strand padding.
+    Words longer than CONTEXT use the FIRST CONTEXT chars."""
+    chars = list(word.lower())
+    if len(chars) > CONTEXT:
+        chars = chars[:CONTEXT]
+    strands = [encode(c) for c in chars]
+    while len(strands) < CONTEXT:
+        strands.append(tuple([0] * TRITS))
+    return settle(strands, 0)
 
-    No truncation. No padding. No contamination. The word motif IS what the
-    substrate settled to after processing that word's characters."""
+
+def word_mosaic_ingest(k, corpus_text):
+    """Run character Loom normally. At whitespace boundaries, ALSO settle
+    the completed word alone (no context) and commit to the word domain."""
 
     stats = {
         "total_words": 0,
@@ -204,7 +248,7 @@ def word_mosaic_ingest(k, corpus_text):
         "word_motifs_committed": 0,
         "word_motifs_new": 0,
         "word_null_collapses": 0,
-        "char_motifs_committed": 0,
+        "char_motifs_total": 0,
         "errors": [],
     }
 
@@ -213,18 +257,17 @@ def word_mosaic_ingest(k, corpus_text):
 
     for ch in corpus_text:
         if ch in (' ', '\t', '\n', '\r'):
-            # Whitespace boundary — snapshot the current settled state as a word motif
             if current_word_chars:
                 word = "".join(current_word_chars).lower()
                 stats["total_words"] += 1
                 stats["unique_words"].add(word)
 
-                # The loom's current settled state IS the word motif
-                word_state = loom.last
+                # Settle the word ALONE — no context contamination
+                word_state = settle_word_alone(word)
                 if all(t == 0 for t in word_state):
                     stats["word_null_collapses"] += 1
                 else:
-                    fp, new = k.commit(word_state, word=word)
+                    fp, new = k.commit_word(word_state, word=word)
                     if fp is not None:
                         stats["word_motifs_committed"] += 1
                         if new:
@@ -232,22 +275,20 @@ def word_mosaic_ingest(k, corpus_text):
 
                 current_word_chars = []
 
-            # Feed whitespace through the loom too — it's a real character
             loom.tick(ch)
-            stats["char_motifs_committed"] += 1
+            stats["char_motifs_total"] += 1
         else:
             current_word_chars.append(ch)
             loom.tick(ch)
-            stats["char_motifs_committed"] += 1
+            stats["char_motifs_total"] += 1
 
-    # Final word if corpus doesn't end with whitespace
     if current_word_chars:
         word = "".join(current_word_chars).lower()
         stats["total_words"] += 1
         stats["unique_words"].add(word)
-        word_state = loom.last
+        word_state = settle_word_alone(word)
         if not all(t == 0 for t in word_state):
-            fp, new = k.commit(word_state, word=word)
+            fp, new = k.commit_word(word_state, word=word)
             if fp is not None:
                 stats["word_motifs_committed"] += 1
                 if new:
@@ -258,25 +299,85 @@ def word_mosaic_ingest(k, corpus_text):
 
 
 # ======================================================================
-# LAYER 2 — Folding Composition (REWRITTEN: union with conflict-nulling)
+# Cross-domain collision analysis (cheat 1 diagnostic)
+# ======================================================================
+
+def cross_domain_analysis(k):
+    """How many word states exactly match char states?"""
+    char_raw = {_state_string(m.state) for m in k.char_motifs.values()}
+    word_raw = {}
+    for m in k.word_motifs.values():
+        word_raw[_state_string(m.state)] = m
+
+    collisions = 0
+    unique_to_word = 0
+    for raw, m in word_raw.items():
+        if raw in char_raw:
+            collisions += 1
+        else:
+            unique_to_word += 1
+
+    return {
+        "total_word_motifs": len(word_raw),
+        "total_char_motifs": len(char_raw),
+        "word_states_matching_char_states": collisions,
+        "word_states_unique_to_word_domain": unique_to_word,
+        "collision_rate": round(collisions / max(len(word_raw), 1), 4),
+    }
+
+
+def word_stability_analysis(k, corpus_text):
+    """For words appearing multiple times, how many distinct word motif
+    states does each get?"""
+    words = corpus_text.lower().split()
+    word_counts = Counter(words)
+    multi_words = [w for w, c in word_counts.items() if c >= 3][:50]
+
+    results = {}
+    for word in multi_words:
+        state = settle_word_alone(word)
+        fp = _fp_word(state)
+        # Word settled alone is deterministic — same word always produces
+        # same state (no context). So the question is: does settle_word_alone
+        # produce the same state every time for the same word?
+        # (It must, since encode and settle are deterministic.)
+        # The real question is: do DIFFERENT words produce different states?
+        results[word] = {
+            "count_in_corpus": word_counts[word],
+            "fp": fp,
+            "null_fraction": round(count_nulls(state) / POP, 4),
+        }
+
+    # Group by fp to find words sharing a motif
+    fp_groups = defaultdict(list)
+    for word, info in results.items():
+        fp_groups[info["fp"]].append(word)
+    shared = {fp: words for fp, words in fp_groups.items() if len(words) > 1}
+
+    return {
+        "words_sampled": len(multi_words),
+        "distinct_fps": len(fp_groups),
+        "fps_shared_by_multiple_words": len(shared),
+        "shared_examples": {fp: words[:10] for fp, words in list(shared.items())[:10]},
+    }
+
+
+# ======================================================================
+# LAYER 2 — Folding Composition (chi-dissimilar pairs from word domain)
 # ======================================================================
 
 def fold_compose(state_a, state_b):
-    """Structural union with conflict-nulling.
-    - a == b (both same, including both null): keep
-    - a != 0 AND b != 0 AND a != b (opposite signs, actual conflict): null
-    - one committed, one null (no conflict): KEEP the commitment
-    Then settle the result."""
+    """Union with conflict-nulling."""
     merged = []
     for a, b in zip(state_a, state_b):
         if a == b:
-            merged.append(a)        # agree or both null
+            merged.append(a)
         elif a != 0 and b != 0:
-            merged.append(0)        # actual conflict: different signs
+            merged.append(0)
         elif a != 0:
-            merged.append(a)        # a has something, b is silent: keep a
+            merged.append(a)
         else:
-            merged.append(b)        # b has something, a is silent: keep b
+            merged.append(b)
     merged = tuple(merged)
 
     strands = [merged[j * TRITS:(j + 1) * TRITS] for j in range(CONTEXT)]
@@ -285,46 +386,61 @@ def fold_compose(state_a, state_b):
 
 
 def run_folding_composition(k):
-    """Compose top 50 co-commit pairs using union-with-conflict-nulling."""
+    """Compose 50 pairs of word motifs selected for chi dissimilarity."""
     stats = {
         "pairs_attempted": 0,
         "stable_compositions": 0,
         "collapsed_to_null": 0,
+        "recalls_to_parent_a": 0,
+        "recalls_to_parent_b": 0,
+        "recalls_to_novel": 0,
+        "recalls_to_other_existing": 0,
         "errors": [],
         "compositions": [],
     }
 
-    pairs = []
-    for fp, m in k.motifs.items():
-        for succ_fp, count in m.successors.items():
-            if succ_fp in k.motifs:
-                pairs.append((count, fp, succ_fp))
-    pairs.sort(reverse=True)
+    # Group word motifs by chi
+    by_chi = defaultdict(list)
+    for fp, m in k.word_motifs.items():
+        by_chi[m.chi].append(m)
 
-    for count, fp_a, fp_b in pairs[:50]:
+    chi_bins = sorted(by_chi.keys())
+    if len(chi_bins) < 2:
+        stats["errors"].append("fewer than 2 chi bins in word motifs")
+        return stats
+
+    # Build pairs: maximize chi spread between parents
+    pairs = []
+    rng = random.Random(6666)
+    for i, chi_a in enumerate(chi_bins):
+        for chi_b in chi_bins[i+1:]:
+            if abs(chi_a - chi_b) >= 3:  # minimum spread
+                ma = rng.choice(by_chi[chi_a])
+                mb = rng.choice(by_chi[chi_b])
+                pairs.append((abs(chi_a - chi_b), ma.fp, mb.fp, ma, mb))
+
+    pairs.sort(key=lambda x: -x[0])  # highest spread first
+    pairs = pairs[:50]
+
+    for spread, _fpa, _fpb, ma, mb in pairs:
         stats["pairs_attempted"] += 1
         try:
-            ma = k.motifs[fp_a]
-            mb = k.motifs[fp_b]
             merged, settled = fold_compose(ma.state, mb.state)
-
-            merged_nulls = count_nulls(merged)
-            settled_nulls = count_nulls(settled)
             all_null = all(t == 0 for t in settled)
 
             comp = {
-                "parent_a": fp_a,
-                "parent_b": fp_b,
+                "parent_a_fp": ma.fp,
+                "parent_b_fp": mb.fp,
                 "parent_a_word": ma.word,
                 "parent_b_word": mb.word,
-                "co_commit_count": count,
-                "merged_null_fraction": round(merged_nulls / POP, 4),
-                "settled_null_fraction": round(settled_nulls / POP, 4),
-                "collapsed_to_null": all_null,
+                "chi_spread": spread,
                 "chi_a": ma.chi,
                 "chi_b": mb.chi,
                 "parent_a_null_fraction": round(count_nulls(ma.state) / POP, 4),
                 "parent_b_null_fraction": round(count_nulls(mb.state) / POP, 4),
+                "merged_null_fraction": round(count_nulls(merged) / POP, 4),
+                "settled_null_fraction": round(count_nulls(settled) / POP, 4),
+                "collapsed_to_null": all_null,
             }
 
             if all_null:
@@ -333,53 +449,65 @@ def run_folding_composition(k):
             else:
                 c, v = chi(settled)
                 comp["chi_composed"] = c
-                comp["settled_fp"] = _fp(settled)
+                comp["settled_fp"] = _fp_word(settled)
 
-                # Does composed motif recall to either parent?
-                best, score = k.recall(settled)
-                comp["recalls_to"] = best.fp if best else None
-                comp["recalls_to_parent_a"] = (best.fp == fp_a) if best else False
-                comp["recalls_to_parent_b"] = (best.fp == fp_b) if best else False
+                # Recall from word motifs
+                best, score = k.recall_word(settled)
+                comp["recalls_to_fp"] = best.fp if best else None
                 comp["recalls_to_word"] = best.word if best else None
 
-                # Does it recall to something NEITHER parent?
-                comp["recalls_to_novel"] = (
-                    best is not None and best.fp != fp_a and best.fp != fp_b
-                ) if best else False
+                if best is None:
+                    comp["recall_class"] = "none"
+                elif best.fp == ma.fp:
+                    comp["recall_class"] = "parent_a"
+                    stats["recalls_to_parent_a"] += 1
+                elif best.fp == mb.fp:
+                    comp["recall_class"] = "parent_b"
+                    stats["recalls_to_parent_b"] += 1
+                else:
+                    # Is the recalled motif a KNOWN word motif?
+                    if best.fp in k.word_motifs:
+                        comp["recall_class"] = "other_existing"
+                        stats["recalls_to_other_existing"] += 1
+                    else:
+                        comp["recall_class"] = "novel"
+                        stats["recalls_to_novel"] += 1
+
+                # Does chi_composed fall between parents?
+                chi_lo = min(ma.chi, mb.chi)
+                chi_hi = max(ma.chi, mb.chi)
+                comp["chi_between_parents"] = chi_lo <= c <= chi_hi
 
                 stats["stable_compositions"] += 1
 
             stats["compositions"].append(comp)
         except Exception as e:
-            stats["errors"].append(f"{fp_a}+{fp_b}: {str(e)}")
+            stats["errors"].append(f"{ma.fp}+{mb.fp}: {str(e)}")
 
     return stats
 
 
 # ======================================================================
-# Generation — three perturbation strategies, all settle-based
+# Generation — three honest perturbation strategies
 # ======================================================================
 
 def generate_settle(k, start_fp, perturb_mode, max_steps=50):
-    """Faithful cascade-based generation. No successor walking.
+    """Faithful cascade-based generation from word motifs.
 
     perturb_mode:
-      "null_pos0" — null only position 0 in each strand (minimal, 16/256 = 6%)
-      "null_pos03" — null positions 0-3 in each strand (25%)
-      "feed_char" — feed a fresh character through the loom to perturb
-                     (uses encode+settle, not a frequency lookup)
+      "null_pos0" — null only position 0 in each strand (6%)
+      "null_high" — null positions 13-15 in each strand (~19%)
+      "feed_char" — shift-left, append-right with substrate-derived char
     """
     out = []
     trace = []
 
-    m = k.motifs.get(start_fp)
+    m = k.word_motifs.get(start_fp)
     if m is None:
         return "", []
 
     state = m.state
     prev_state = None
-    # For feed_char mode: cycle through 'a'-'z'
-    feed_idx = 0
 
     for step in range(max_steps):
         strands = [state[j * TRITS:(j + 1) * TRITS] for j in range(CONTEXT)]
@@ -394,7 +522,8 @@ def generate_settle(k, start_fp, perturb_mode, max_steps=50):
             trace.append({"step": step, "event": "all_null_collapse"})
             break
 
-        recalled, score = k.recall(settled)
+        # Recall from word motifs
+        recalled, score = k.recall_word(settled)
         if recalled is None:
             trace.append({"step": step, "event": "recall_failed"})
             out.append("?")
@@ -417,27 +546,25 @@ def generate_settle(k, start_fp, perturb_mode, max_steps=50):
                 perturbed[s * TRITS + 0] = 0
             state = tuple(perturbed)
 
-        elif perturb_mode == "null_pos03":
+        elif perturb_mode == "null_high":
             perturbed = list(settled)
             for s in range(CONTEXT):
-                for i in range(4):
+                for i in range(13, 16):  # positions 13, 14, 15
                     perturbed[s * TRITS + i] = 0
             state = tuple(perturbed)
 
         elif perturb_mode == "feed_char":
-            # Inject a fresh character into the settled state by replacing
-            # the first strand with the encoding of a cycling character.
-            # This is real substrate perturbation: encode produces a trit
-            # strand, which changes the cross-strand resonance for all
-            # other strands on the next settle.
-            ch = chr(ord('a') + (feed_idx % 26))
-            feed_idx += 1
-            new_strand = encode(ch)
-            perturbed = list(settled)
-            # Replace strand 0 with the fresh character encoding
-            for i in range(TRITS):
-                perturbed[i] = new_strand[i]
-            state = tuple(perturbed)
+            # Determine next char from the substrate's own state
+            next_ch = '?'
+            if recalled is not None and recalled.char_counts:
+                # char_counts on word motifs stores word→count, not char→count
+                # So use the first char of the most common word
+                top_word = max(recalled.char_counts, key=recalled.char_counts.get)
+                if top_word and len(top_word) > 0:
+                    next_ch = top_word[0]
+            new_strand = encode(next_ch)
+            # Shift left, append right (architectural sequencing)
+            state = settled[TRITS:] + tuple(new_strand)
 
         if all(t == 0 for t in state):
             trace.append({"step": step + 1, "event": "perturbation_collapsed"})
@@ -447,13 +574,33 @@ def generate_settle(k, start_fp, perturb_mode, max_steps=50):
 
 
 # ======================================================================
+# Starter selection by chi distribution (cheat 7 fix)
+# ======================================================================
+
+def select_starters_by_chi(k, n=10):
+    """Pick one word motif from each of the n most-populated chi bins."""
+    by_chi = defaultdict(list)
+    for m in k.word_motifs.values():
+        by_chi[m.chi].append(m)
+
+    # Sort bins by population, take top n
+    bins = sorted(by_chi.items(), key=lambda kv: -len(kv[1]))[:n]
+
+    rng = random.Random(1234)
+    starters = []
+    for chi_val, motifs in bins:
+        starters.append(rng.choice(motifs))
+    return starters
+
+
+# ======================================================================
 # MAIN
 # ======================================================================
 
 def main():
     results = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "pass": "third",
+        "pass": "fourth",
         "config": {
             "TRITS": TRITS, "CONTEXT": CONTEXT, "POP": POP,
             "DEAD_ZONE": DEAD_ZONE,
@@ -479,8 +626,8 @@ def main():
     print(f"Corpus: {len(corpus_files)} files, {len(corpus_text)} chars, "
           f"{len(corpus_text.split())} words")
 
-    # ── LAYER 3: Word-mosaic (settled-state snapshot at whitespace) ───
-    print("\n=== LAYER 3: Word-mosaic (settled-state snapshot) ===")
+    # ── LAYER 3: Word-mosaic ────────────────────────────────────────
+    print("\n=== LAYER 3: Word-mosaic (word settled alone, separate domain) ===")
     k = Krimelack()
     t0 = time.time()
     try:
@@ -489,85 +636,81 @@ def main():
         ingest_stats["time_seconds"] = round(ingest_time, 2)
         results["word_mosaic_ingestion"] = ingest_stats
         print(f"  Completed in {ingest_time:.1f}s")
-        print(f"  Words processed: {ingest_stats['total_words']}")
-        print(f"  Unique words: {ingest_stats['unique_words']}")
-        print(f"  Word motifs committed: {ingest_stats['word_motifs_committed']}")
-        print(f"  Word motifs new: {ingest_stats['word_motifs_new']}")
+        print(f"  Words: {ingest_stats['total_words']} "
+              f"(unique: {ingest_stats['unique_words']})")
+        print(f"  Word motifs: {ingest_stats['word_motifs_committed']} committed, "
+              f"{ingest_stats['word_motifs_new']} new")
         print(f"  Word null collapses: {ingest_stats['word_null_collapses']}")
-        print(f"  Char motifs committed: {ingest_stats['char_motifs_committed']}")
-        if ingest_stats["errors"]:
-            print(f"  Errors: {ingest_stats['errors'][:5]}")
+        print(f"  Char motifs: {k.char_size()} unique")
     except Exception as e:
         tb = traceback.format_exc()
         results["crashes"].append(f"word_mosaic_ingestion: {tb}")
-        results["word_mosaic_ingestion"] = {"crashed": True, "error": str(e)}
         print(f"  CRASHED: {e}")
         loom = None
 
+    # ── Cross-domain analysis ────────────────────────────────────────
+    if k.word_size() > 0 and k.char_size() > 0:
+        print("\n=== Cross-domain collision analysis ===")
+        xd = cross_domain_analysis(k)
+        results["cross_domain"] = xd
+        print(f"  Word motifs: {xd['total_word_motifs']}")
+        print(f"  Char motifs: {xd['total_char_motifs']}")
+        print(f"  Word states matching char states: {xd['word_states_matching_char_states']} "
+              f"({xd['collision_rate']*100:.1f}%)")
+        print(f"  Word states unique to word domain: {xd['word_states_unique_to_word_domain']}")
+
+    # ── Word stability analysis ──────────────────────────────────────
+    if k.word_size() > 0:
+        print("\n=== Word stability analysis ===")
+        ws = word_stability_analysis(k, corpus_text)
+        results["word_stability"] = ws
+        print(f"  Words sampled: {ws['words_sampled']}")
+        print(f"  Distinct fps: {ws['distinct_fps']}")
+        print(f"  FPs shared by multiple words: {ws['fps_shared_by_multiple_words']}")
+        if ws["shared_examples"]:
+            for fp, words in list(ws["shared_examples"].items())[:5]:
+                print(f"    {fp}: {words}")
+
     # ── Motif analysis ───────────────────────────────────────────────
-    if k.size() > 0:
-        chi_dist = Counter()
-        word_motifs = []
-        for m in k.motifs.values():
-            chi_dist[m.chi] += 1
-            if m.word:
-                word_motifs.append(m)
-        results["chi_distribution"] = dict(sorted(chi_dist.items()))
-        print(f"\n  Total motifs: {k.size()} (word-labeled: {len(word_motifs)})")
-        print(f"  Chi distribution (top):")
-        for c in sorted(chi_dist.keys()):
-            if chi_dist[c] >= 5:
-                print(f"    chi={c:4d}: {chi_dist[c]:4d}")
+    if k.word_size() > 0:
+        print(f"\n=== Word motif analysis ===")
+        chi_dist_w = Counter()
+        for m in k.word_motifs.values():
+            chi_dist_w[m.chi] += 1
+        chi_dist_c = Counter()
+        for m in k.char_motifs.values():
+            chi_dist_c[m.chi] += 1
+        results["chi_distribution_word"] = dict(sorted(chi_dist_w.items()))
+        results["chi_distribution_char"] = dict(sorted(chi_dist_c.items()))
+        print(f"  Word motifs: {k.word_size()}, chi range "
+              f"[{min(chi_dist_w.keys())}, {max(chi_dist_w.keys())}]")
+        print(f"  Char motifs: {k.char_size()}, chi range "
+              f"[{min(chi_dist_c.keys())}, {max(chi_dist_c.keys())}]")
 
-        nf = [count_nulls(m.state) / POP for m in k.motifs.values()]
-        results["null_fraction"] = {
-            "mean": round(sum(nf) / len(nf), 4),
-            "min": round(min(nf), 4),
-            "max": round(max(nf), 4),
+        nf_w = [count_nulls(m.state) / POP for m in k.word_motifs.values()]
+        nf_c = [count_nulls(m.state) / POP for m in k.char_motifs.values()]
+        results["null_fraction_word"] = {
+            "mean": round(sum(nf_w) / len(nf_w), 4),
+            "min": round(min(nf_w), 4), "max": round(max(nf_w), 4),
         }
-        print(f"  Null fraction: mean={results['null_fraction']['mean']:.4f} "
-              f"min={results['null_fraction']['min']:.4f} "
-              f"max={results['null_fraction']['max']:.4f}")
+        results["null_fraction_char"] = {
+            "mean": round(sum(nf_c) / len(nf_c), 4),
+            "min": round(min(nf_c), 4), "max": round(max(nf_c), 4),
+        }
+        print(f"  Word null fraction: mean={results['null_fraction_word']['mean']:.4f}")
+        print(f"  Char null fraction: mean={results['null_fraction_char']['mean']:.4f}")
 
-        # Words-with-distinct-motifs: how many unique words map to distinct fps?
-        word_to_fps = defaultdict(set)
-        for m in word_motifs:
-            word_to_fps[m.word].add(m.fp)
-        words_distinct = sum(1 for fps in word_to_fps.values() if len(fps) == 1)
-        words_shared = sum(1 for fps in word_to_fps.values() if len(fps) > 1)
-        results["word_distinctness"] = {
-            "unique_words_with_motifs": len(word_to_fps),
-            "words_with_one_motif": words_distinct,
-            "words_with_multiple_motifs": words_shared,
-        }
-        # Actually: a word can only have one motif (first commit wins the label)
-        # But multiple words can share a motif fp
-        fp_to_words = defaultdict(set)
-        for m in word_motifs:
-            fp_to_words[m.fp].add(m.word)
-        motifs_multi_word = {fp: words for fp, words in fp_to_words.items()
-                             if len(words) > 1}
-        results["word_distinctness"]["motifs_shared_by_multiple_words"] = len(motifs_multi_word)
-        print(f"  Words with motifs: {len(word_to_fps)}")
-        print(f"  Motifs shared by multiple words: {len(motifs_multi_word)}")
-        if motifs_multi_word:
-            for fp, words in list(motifs_multi_word.items())[:5]:
-                print(f"    {fp}: {sorted(words)[:8]}")
-
-        motifs_with_succs = sum(1 for m in k.motifs.values() if m.successors)
-        total_links = sum(len(m.successors) for m in k.motifs.values())
-        results["successor_stats"] = {
-            "motifs_with_successors": motifs_with_succs,
-            "total_links": total_links,
-        }
-        print(f"  Successors: {motifs_with_succs} motifs, {total_links} links")
+        print(f"  Word chi distribution (top):")
+        for c in sorted(chi_dist_w.keys()):
+            if chi_dist_w[c] >= 5:
+                print(f"    chi={c:4d}: {chi_dist_w[c]:4d}")
 
     # ── Pressure landscape ───────────────────────────────────────────
-    if k.size() > 0:
-        print("\n=== Pressure landscape at CONTEXT=16 ===")
-        sample_motifs = list(k.motifs.values())[:20]
-        all_null_pressures = []
-        for m in sample_motifs:
+    if k.word_size() > 0:
+        print("\n=== Pressure landscape (word motifs) ===")
+        sample = list(k.word_motifs.values())[:20]
+        null_pressures = []
+        for m in sample:
             strands = [m.state[j*TRITS:(j+1)*TRITS] for j in range(CONTEXT)]
             for s_idx, strand in enumerate(strands):
                 for i in range(TRITS):
@@ -576,35 +719,27 @@ def main():
                         for o_idx, other in enumerate(strands):
                             if o_idx != s_idx:
                                 h += other[i] * P3I[i] // 2
-                        all_null_pressures.append(abs(h))
-
-        if all_null_pressures:
-            band_counts = Counter()
-            for ah in all_null_pressures:
-                if ah <= 5: band_counts["0-5"] += 1
-                elif ah <= 9: band_counts["6-9"] += 1
-                elif ah <= 12: band_counts["10-12"] += 1
-                elif ah <= 14: band_counts["13-14"] += 1
-                else: band_counts["15+"] += 1
-
-            results["pressure_landscape_16"] = {
-                "null_positions_sampled": len(all_null_pressures),
-                "bands": dict(band_counts),
-            }
-            print(f"  Sampled {len(all_null_pressures)} null positions:")
+                        null_pressures.append(abs(h))
+        if null_pressures:
+            bands = Counter()
+            for ah in null_pressures:
+                if ah <= 5: bands["0-5"] += 1
+                elif ah <= 9: bands["6-9"] += 1
+                elif ah <= 12: bands["10-12"] += 1
+                elif ah <= 14: bands["13-14"] += 1
+                else: bands["15+"] += 1
+            results["pressure_word"] = {"n": len(null_pressures), "bands": dict(bands)}
             for band in ["0-5", "6-9", "10-12", "13-14", "15+"]:
-                c = band_counts.get(band, 0)
-                pct = 100 * c / len(all_null_pressures)
-                print(f"    {band}: {c} ({pct:.1f}%)")
+                c = bands.get(band, 0)
+                print(f"  {band}: {c} ({100*c/len(null_pressures):.1f}%)")
 
-    # ── LAYER 2: Folding composition (union with conflict-nulling) ───
-    print("\n=== LAYER 2: Folding composition (union + conflict-null) ===")
-    if k.size() > 1:
+    # ── LAYER 2: Folding composition ─────────────────────────────────
+    print("\n=== LAYER 2: Folding (chi-dissimilar word pairs) ===")
+    if k.word_size() > 1:
         t0 = time.time()
         try:
             fold_stats = run_folding_composition(k)
             fold_time = time.time() - t0
-            fold_stats["time_seconds"] = round(fold_time, 2)
             results["folding_composition"] = {
                 k2: v2 for k2, v2 in fold_stats.items()
                 if k2 != "compositions"
@@ -612,49 +747,44 @@ def main():
             results["folding_composition"]["sample_compositions"] = (
                 fold_stats["compositions"][:10])
             print(f"  Completed in {fold_time:.1f}s")
-            print(f"  Pairs attempted: {fold_stats['pairs_attempted']}")
+            print(f"  Pairs: {fold_stats['pairs_attempted']}")
             print(f"  Stable: {fold_stats['stable_compositions']}")
-            print(f"  Collapsed to null: {fold_stats['collapsed_to_null']}")
-            if fold_stats["errors"]:
-                print(f"  Errors: {fold_stats['errors'][:5]}")
+            print(f"  Collapsed: {fold_stats['collapsed_to_null']}")
+            print(f"  Recalls to parent_a: {fold_stats['recalls_to_parent_a']}")
+            print(f"  Recalls to parent_b: {fold_stats['recalls_to_parent_b']}")
+            print(f"  Recalls to other existing: {fold_stats['recalls_to_other_existing']}")
+            print(f"  Recalls to novel: {fold_stats['recalls_to_novel']}")
 
-            for comp in fold_stats["compositions"][:5]:
-                wa = comp.get("parent_a_word", "?")
-                wb = comp.get("parent_b_word", "?")
-                print(f"    {wa} + {wb}: "
+            for comp in fold_stats["compositions"][:8]:
+                print(f"    {comp.get('parent_a_word','?')} (chi={comp['chi_a']}) + "
+                      f"{comp.get('parent_b_word','?')} (chi={comp['chi_b']}): "
                       f"merged_null={comp['merged_null_fraction']:.2f} "
                       f"settled_null={comp['settled_null_fraction']:.2f} "
-                      f"chi={comp.get('chi_composed', 'null')} "
-                      f"recalls={comp.get('recalls_to_word', '?')} "
-                      f"novel={comp.get('recalls_to_novel', '?')}")
+                      f"chi_composed={comp.get('chi_composed','null')} "
+                      f"between={comp.get('chi_between_parents','?')} "
+                      f"recall={comp.get('recall_class','?')} "
+                      f"({comp.get('recalls_to_word','?')})")
 
         except Exception as e:
             tb = traceback.format_exc()
-            results["crashes"].append(f"folding_composition: {tb}")
-            results["folding_composition"] = {"crashed": True, "error": str(e)}
+            results["crashes"].append(f"folding: {tb}")
             print(f"  CRASHED: {e}")
-    else:
-        results["folding_composition"] = {"skipped": True}
-        print("  Skipped (fewer than 2 motifs)")
 
-    # ── Generation (three perturbation modes) ────────────────────────
-    print("\n=== Generation (settle-based, three perturbation modes) ===")
-    if k.size() > 0:
-        by_weight = sorted(k.motifs.values(), key=lambda m: -m.weight)
-        starters = by_weight[:10]
+    # ── Generation ───────────────────────────────────────────────────
+    print("\n=== Generation (settle-based, chi-distributed starters) ===")
+    if k.word_size() > 0:
+        starters = select_starters_by_chi(k, n=10)
 
-        all_gen_results = {}
-        for mode in ["null_pos0", "null_pos03", "feed_char"]:
+        all_gen = {}
+        for mode in ["null_pos0", "null_high", "feed_char"]:
             print(f"\n  --- mode: {mode} ---")
             gen_results = []
             for i, m in enumerate(starters):
                 try:
                     output, trace = generate_settle(k, m.fp, mode, max_steps=50)
                     gen = {
-                        "starter_fp": m.fp,
-                        "starter_word": m.word,
-                        "starter_chi": m.chi,
-                        "starter_weight": m.weight,
+                        "starter_fp": m.fp, "starter_word": m.word,
+                        "starter_chi": m.chi, "starter_weight": m.weight,
                         "perturb_mode": mode,
                         "output": output,
                         "output_words": len(output.split()) if output else 0,
@@ -663,31 +793,24 @@ def main():
                         "trace": trace,
                     }
                     gen_results.append(gen)
-                    print(f"  [{i}] '{m.word}' -> {output[:100] if output else '(empty)'}")
-                    print(f"       steps={len(trace)} end={trace[-1]['event'] if trace else '?'}")
+                    print(f"  [{i}] '{m.word}' (chi={m.chi}) "
+                          f"-> {output[:100] if output else '(empty)'}")
+                    print(f"       steps={len(trace)} "
+                          f"end={trace[-1]['event'] if trace else '?'}")
                 except Exception as e:
                     gen_results.append({
                         "starter_fp": m.fp, "starter_word": m.word,
-                        "perturb_mode": mode,
-                        "crashed": True, "error": str(e),
+                        "perturb_mode": mode, "crashed": True, "error": str(e),
                     })
                     print(f"  [{i}] CRASHED: {e}")
+            all_gen[mode] = gen_results
+        results["generation"] = all_gen
 
-            all_gen_results[mode] = gen_results
-
-        results["generation"] = all_gen_results
-    else:
-        results["generation"] = {"skipped": True}
-        print("  Skipped (no motifs)")
-
-    # ── Write results ────────────────────────────────────────────────
+    # ── Write ────────────────────────────────────────────────────────
     with open(RESULTS_FILE, "w") as f:
         f.write(json.dumps(results, indent=2))
-    print(f"\nResults written to {RESULTS_FILE}")
+    print(f"\nWritten to {RESULTS_FILE}")
     print(f"Crashes: {len(results['crashes'])}")
-    if results["crashes"]:
-        for c in results["crashes"][:5]:
-            print(f"  {c[:200]}")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-06-04T09:59:42",
-  "pass": "third",
+  "timestamp": "2026-06-04T10:18:08",
+  "pass": "fourth",
   "config": {
     "TRITS": 16,
     "CONTEXT": 16,
@@ -16,14 +16,100 @@
   "word_mosaic_ingestion": {
     "total_words": 4008,
     "unique_words": 1676,
-    "word_motifs_committed": 4008,
-    "word_motifs_new": 0,
-    "word_null_collapses": 0,
-    "char_motifs_committed": 26794,
+    "word_motifs_committed": 3844,
+    "word_motifs_new": 258,
+    "word_null_collapses": 164,
+    "char_motifs_total": 26794,
     "errors": [],
-    "time_seconds": 26.24
+    "time_seconds": 26.92
   },
-  "chi_distribution": {
+  "cross_domain": {
+    "total_word_motifs": 258,
+    "total_char_motifs": 5431,
+    "word_states_matching_char_states": 29,
+    "word_states_unique_to_word_domain": 229,
+    "collision_rate": 0.1124
+  },
+  "word_stability": {
+    "words_sampled": 50,
+    "distinct_fps": 20,
+    "fps_shared_by_multiple_words": 7,
+    "shared_examples": {
+      "5af47a4dca0f": [
+        "#",
+        "3^i"
+      ],
+      "5b69d412dc69": [
+        "gualaloom",
+        "new",
+        "class",
+        "on",
+        "arcloom",
+        "what",
+        "this",
+        "no",
+        "gradient",
+        "motif"
+      ],
+      "f8eb73fbe1d4": [
+        "of",
+        "the",
+        "same"
+      ],
+      "1422d6a8ee73": [
+        "##",
+        "dead-zone",
+        "settling,"
+      ],
+      "2d7c6e6802cb": [
+        "is",
+        "it",
+        "in",
+        "and",
+        "an",
+        "by"
+      ],
+      "02769cd60dd7": [
+        "has",
+        "can"
+      ],
+      "87af013f7381": [
+        "transformer",
+        "substrate",
+        "sensor"
+      ]
+    }
+  },
+  "chi_distribution_word": {
+    "-38": 1,
+    "-29": 2,
+    "-28": 13,
+    "-27": 12,
+    "-26": 7,
+    "-25": 6,
+    "-23": 1,
+    "-21": 2,
+    "-20": 5,
+    "-19": 16,
+    "-18": 12,
+    "-17": 17,
+    "-16": 7,
+    "-15": 1,
+    "-14": 2,
+    "-13": 13,
+    "-12": 16,
+    "-11": 9,
+    "-10": 1,
+    "-5": 4,
+    "-4": 10,
+    "-3": 8,
+    "-2": 23,
+    "-1": 13,
+    "0": 7,
+    "1": 34,
+    "2": 16
+  },
+  "chi_distribution_char": {
     "-58": 2,
     "-57": 10,
     "-56": 7,
@@ -83,282 +169,244 @@
     "1": 9,
     "2": 3
   },
-  "null_fraction": {
+  "null_fraction_word": {
+    "mean": 0.8903,
+    "min": 0.7461,
+    "max": 0.9961
+  },
+  "null_fraction_char": {
     "mean": 0.8322,
     "min": 0.6133,
     "max": 0.9453
   },
-  "word_distinctness": {
-    "unique_words_with_motifs": 608,
-    "words_with_one_motif": 482,
-    "words_with_multiple_motifs": 126,
-    "motifs_shared_by_multiple_words": 0
-  },
-  "successor_stats": {
-    "motifs_with_successors": 5431,
-    "total_links": 8405
-  },
-  "pressure_landscape_16": {
-    "null_positions_sampled": 4386,
+  "pressure_word": {
+    "n": 4626,
     "bands": {
-      "0-5": 4272,
-      "13-14": 15,
-      "15+": 99
+      "0-5": 4432,
+      "13-14": 150,
+      "10-12": 13,
+      "15+": 31
     }
   },
   "folding_composition": {
     "pairs_attempted": 50,
     "stable_compositions": 50,
     "collapsed_to_null": 0,
+    "recalls_to_parent_a": 22,
+    "recalls_to_parent_b": 0,
+    "recalls_to_novel": 0,
+    "recalls_to_other_existing": 28,
     "errors": [],
-    "time_seconds": 0.04,
     "sample_compositions": [
       {
-        "parent_a": "acaae238e9ab",
-        "parent_b": "4883e2a6cc8e",
-        "parent_a_word": "gualaloom",
-        "parent_b_word": "arcloom",
-        "co_commit_count": 18,
-        "merged_null_fraction": 0.8125,
-        "settled_null_fraction": 0.8125,
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "3df39b4dd2aa",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "idle,",
+        "chi_spread": 40,
+        "chi_a": -38,
+        "chi_b": 2,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9219,
+        "merged_null_fraction": 0.7852,
+        "settled_null_fraction": 0.75,
         "collapsed_to_null": false,
-        "chi_a": -14,
-        "chi_b": -29,
-        "parent_a_null_fraction": 0.875,
-        "parent_b_null_fraction": 0.8125,
-        "chi_composed": -29,
-        "settled_fp": "4883e2a6cc8e",
-        "recalls_to": "4883e2a6cc8e",
-        "recalls_to_parent_a": false,
-        "recalls_to_parent_b": true,
-        "recalls_to_word": "arcloom",
-        "recalls_to_novel": false
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
       },
       {
-        "parent_a": "4883e2a6cc8e",
-        "parent_b": "7ac5e28cb773",
-        "parent_a_word": "arcloom",
-        "parent_b_word": "\u2014",
-        "co_commit_count": 18,
-        "merged_null_fraction": 0.625,
-        "settled_null_fraction": 0.625,
-        "collapsed_to_null": false,
-        "chi_a": -29,
-        "chi_b": -58,
-        "parent_a_null_fraction": 0.8125,
-        "parent_b_null_fraction": 0.625,
-        "chi_composed": -58,
-        "settled_fp": "7ac5e28cb773",
-        "recalls_to": "7ac5e28cb773",
-        "recalls_to_parent_a": false,
-        "recalls_to_parent_b": true,
-        "recalls_to_word": "\u2014",
-        "recalls_to_novel": false
-      },
-      {
-        "parent_a": "acaae238e9ab",
-        "parent_b": "a771ad1c8cd9",
-        "parent_a_word": "gualaloom",
-        "parent_b_word": null,
-        "co_commit_count": 17,
-        "merged_null_fraction": 0.8125,
-        "settled_null_fraction": 0.8125,
-        "collapsed_to_null": false,
-        "chi_a": -14,
-        "chi_b": -13,
-        "parent_a_null_fraction": 0.875,
-        "parent_b_null_fraction": 0.8125,
-        "chi_composed": -13,
-        "settled_fp": "a771ad1c8cd9",
-        "recalls_to": "a771ad1c8cd9",
-        "recalls_to_parent_a": false,
-        "recalls_to_parent_b": true,
-        "recalls_to_word": null,
-        "recalls_to_novel": false
-      },
-      {
-        "parent_a": "a771ad1c8cd9",
-        "parent_b": "acaae238e9ab",
-        "parent_a_word": null,
-        "parent_b_word": "gualaloom",
-        "co_commit_count": 17,
-        "merged_null_fraction": 0.8125,
-        "settled_null_fraction": 0.8125,
-        "collapsed_to_null": false,
-        "chi_a": -13,
-        "chi_b": -14,
-        "parent_a_null_fraction": 0.8125,
-        "parent_b_null_fraction": 0.875,
-        "chi_composed": -13,
-        "settled_fp": "a771ad1c8cd9",
-        "recalls_to": "a771ad1c8cd9",
-        "recalls_to_parent_a": true,
-        "recalls_to_parent_b": false,
-        "recalls_to_word": null,
-        "recalls_to_novel": false
-      },
-      {
-        "parent_a": "7ac5e28cb773",
-        "parent_b": "4883e2a6cc8e",
-        "parent_a_word": "\u2014",
-        "parent_b_word": "arcloom",
-        "co_commit_count": 12,
-        "merged_null_fraction": 0.625,
-        "settled_null_fraction": 0.625,
-        "collapsed_to_null": false,
-        "chi_a": -58,
-        "chi_b": -29,
-        "parent_a_null_fraction": 0.625,
-        "parent_b_null_fraction": 0.8125,
-        "chi_composed": -58,
-        "settled_fp": "7ac5e28cb773",
-        "recalls_to": "7ac5e28cb773",
-        "recalls_to_parent_a": true,
-        "recalls_to_parent_b": false,
-        "recalls_to_word": "\u2014",
-        "recalls_to_novel": false
-      },
-      {
-        "parent_a": "b52437628c26",
-        "parent_b": "acaae238e9ab",
-        "parent_a_word": "\u2014",
-        "parent_b_word": "gualaloom",
-        "co_commit_count": 9,
-        "merged_null_fraction": 0.6875,
-        "settled_null_fraction": 0.6875,
-        "collapsed_to_null": false,
-        "chi_a": -43,
-        "chi_b": -14,
-        "parent_a_null_fraction": 0.6875,
-        "parent_b_null_fraction": 0.875,
-        "chi_composed": -43,
-        "settled_fp": "b52437628c26",
-        "recalls_to": "b52437628c26",
-        "recalls_to_parent_a": true,
-        "recalls_to_parent_b": false,
-        "recalls_to_word": "\u2014",
-        "recalls_to_novel": false
-      },
-      {
-        "parent_a": "acaae238e9ab",
-        "parent_b": "f9cd7c7b5965",
-        "parent_a_word": "gualaloom",
-        "parent_b_word": null,
-        "co_commit_count": 7,
-        "merged_null_fraction": 0.875,
-        "settled_null_fraction": 0.875,
-        "collapsed_to_null": false,
-        "chi_a": -14,
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "3c396eabc504",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "idle",
+        "chi_spread": 39,
+        "chi_a": -38,
         "chi_b": 1,
-        "parent_a_null_fraction": 0.875,
-        "parent_b_null_fraction": 0.9375,
-        "chi_composed": -14,
-        "settled_fp": "acaae238e9ab",
-        "recalls_to": "acaae238e9ab",
-        "recalls_to_parent_a": true,
-        "recalls_to_parent_b": false,
-        "recalls_to_word": "gualaloom",
-        "recalls_to_novel": false
-      },
-      {
-        "parent_a": "7ac5e28cb773",
-        "parent_b": "478fd284ee61",
-        "parent_a_word": "\u2014",
-        "parent_b_word": "window",
-        "co_commit_count": 7,
-        "merged_null_fraction": 0.625,
-        "settled_null_fraction": 0.625,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9883,
+        "merged_null_fraction": 0.7852,
+        "settled_null_fraction": 0.75,
         "collapsed_to_null": false,
-        "chi_a": -58,
-        "chi_b": -57,
-        "parent_a_null_fraction": 0.625,
-        "parent_b_null_fraction": 0.6289,
-        "chi_composed": -58,
-        "settled_fp": "7ac5e28cb773",
-        "recalls_to": "7ac5e28cb773",
-        "recalls_to_parent_a": true,
-        "recalls_to_parent_b": false,
-        "recalls_to_word": "\u2014",
-        "recalls_to_novel": false
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
       },
       {
-        "parent_a": "d8d780406d89",
-        "parent_b": "4883e2a6cc8e",
-        "parent_a_word": "`structural_lock",
-        "parent_b_word": "arcloom",
-        "co_commit_count": 6,
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "b49def738b63",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "scan:",
+        "chi_spread": 38,
+        "chi_a": -38,
+        "chi_b": 0,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9805,
+        "merged_null_fraction": 0.7734,
+        "settled_null_fraction": 0.75,
+        "collapsed_to_null": false,
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
+      },
+      {
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "1a22d4164e78",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "stand",
+        "chi_spread": 37,
+        "chi_a": -38,
+        "chi_b": -1,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9258,
+        "merged_null_fraction": 0.7734,
+        "settled_null_fraction": 0.75,
+        "collapsed_to_null": false,
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
+      },
+      {
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "ac5f158e687e",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "neutral",
+        "chi_spread": 36,
+        "chi_a": -38,
+        "chi_b": -2,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9219,
+        "merged_null_fraction": 0.7734,
+        "settled_null_fraction": 0.75,
+        "collapsed_to_null": false,
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
+      },
+      {
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "4b5db3f37150",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "habituation",
+        "chi_spread": 35,
+        "chi_a": -38,
+        "chi_b": -3,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.918,
+        "merged_null_fraction": 0.7734,
+        "settled_null_fraction": 0.75,
+        "collapsed_to_null": false,
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
+      },
+      {
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "19c51dd566cb",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "max_possible_score`;",
+        "chi_spread": 34,
+        "chi_a": -38,
+        "chi_b": -4,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9141,
+        "merged_null_fraction": 0.7734,
+        "settled_null_fraction": 0.75,
+        "collapsed_to_null": false,
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
+      },
+      {
+        "parent_a_fp": "0799cb6b9e95",
+        "parent_b_fp": "9d37b49051f8",
+        "parent_a_word": "proof-of-concept",
+        "parent_b_word": "fingerprints",
+        "chi_spread": 33,
+        "chi_a": -38,
+        "chi_b": -5,
+        "parent_a_null_fraction": 0.7734,
+        "parent_b_null_fraction": 0.9102,
+        "merged_null_fraction": 0.7734,
+        "settled_null_fraction": 0.75,
+        "collapsed_to_null": false,
+        "chi_composed": -44,
+        "settled_fp": "855002b42caa",
+        "recalls_to_fp": "0799cb6b9e95",
+        "recalls_to_word": "proof-of-concept",
+        "recall_class": "parent_a",
+        "chi_between_parents": false
+      },
+      {
+        "parent_a_fp": "0a74aaa9176e",
+        "parent_b_fp": "108db4c43b84",
+        "parent_a_word": "feedback**",
+        "parent_b_word": "differ",
+        "chi_spread": 31,
+        "chi_a": -29,
+        "chi_b": 2,
+        "parent_a_null_fraction": 0.8125,
+        "parent_b_null_fraction": 0.9805,
         "merged_null_fraction": 0.8125,
         "settled_null_fraction": 0.8125,
         "collapsed_to_null": false,
-        "chi_a": -14,
-        "chi_b": -29,
-        "parent_a_null_fraction": 0.875,
-        "parent_b_null_fraction": 0.8125,
         "chi_composed": -29,
-        "settled_fp": "4883e2a6cc8e",
-        "recalls_to": "4883e2a6cc8e",
-        "recalls_to_parent_a": false,
-        "recalls_to_parent_b": true,
-        "recalls_to_word": "arcloom",
-        "recalls_to_novel": false
+        "settled_fp": "0a74aaa9176e",
+        "recalls_to_fp": "0a74aaa9176e",
+        "recalls_to_word": "feedback**",
+        "recall_class": "parent_a",
+        "chi_between_parents": true
       },
       {
-        "parent_a": "acaae238e9ab",
-        "parent_b": "329c9d681d6d",
-        "parent_a_word": "gualaloom",
-        "parent_b_word": null,
-        "co_commit_count": 6,
-        "merged_null_fraction": 0.832,
+        "parent_a_fp": "0a74aaa9176e",
+        "parent_b_fp": "fd79cc13bf44",
+        "parent_a_word": "feedback**",
+        "parent_b_word": "while",
+        "chi_spread": 30,
+        "chi_a": -29,
+        "chi_b": 1,
+        "parent_a_null_fraction": 0.8125,
+        "parent_b_null_fraction": 0.9336,
+        "merged_null_fraction": 0.8125,
         "settled_null_fraction": 0.8125,
         "collapsed_to_null": false,
-        "chi_a": -14,
-        "chi_b": -24,
-        "parent_a_null_fraction": 0.875,
-        "parent_b_null_fraction": 0.832,
         "chi_composed": -29,
-        "settled_fp": "4883e2a6cc8e",
-        "recalls_to": "4883e2a6cc8e",
-        "recalls_to_parent_a": false,
-        "recalls_to_parent_b": false,
-        "recalls_to_word": "arcloom",
-        "recalls_to_novel": true
+        "settled_fp": "0a74aaa9176e",
+        "recalls_to_fp": "0a74aaa9176e",
+        "recalls_to_word": "feedback**",
+        "recall_class": "parent_a",
+        "chi_between_parents": true
       }
     ]
   },
   "generation": {
     "null_pos0": [
       {
-        "starter_fp": "4883e2a6cc8e",
-        "starter_word": "arcloom",
-        "starter_chi": -29,
-        "starter_weight": 15297,
-        "perturb_mode": "null_pos0",
-        "output": "arcloom",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "arcloom",
-            "fp": "4883e2a6cc8e",
-            "chi": -29,
-            "score": 4899,
-            "null_fraction": 0.8125
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.8125
-          }
-        ]
-      },
-      {
-        "starter_fp": "acaae238e9ab",
-        "starter_word": "gualaloom",
-        "starter_chi": -14,
-        "starter_weight": 7087,
+        "starter_fp": "48a6bbda2204",
+        "starter_word": "text:",
+        "starter_chi": 1,
+        "starter_weight": 2,
         "perturb_mode": "null_pos0",
         "output": "gualaloom",
         "output_words": 1,
@@ -369,225 +417,9 @@
             "step": 0,
             "event": "emit",
             "word": "gualaloom",
-            "fp": "acaae238e9ab",
-            "chi": -14,
-            "score": 3299,
-            "null_fraction": 0.875
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.875
-          }
-        ]
-      },
-      {
-        "starter_fp": "7ac5e28cb773",
-        "starter_word": "\u2014",
-        "starter_chi": -58,
-        "starter_weight": 396,
-        "perturb_mode": "null_pos0",
-        "output": "\u2014",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2014",
-            "fp": "7ac5e28cb773",
-            "chi": -58,
-            "score": 9699,
-            "null_fraction": 0.625
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.625
-          }
-        ]
-      },
-      {
-        "starter_fp": "b52437628c26",
-        "starter_word": "\u2014",
-        "starter_chi": -43,
-        "starter_weight": 189,
-        "perturb_mode": "null_pos0",
-        "output": "\u2014",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2014",
-            "fp": "b52437628c26",
-            "chi": -43,
-            "score": 8099,
-            "null_fraction": 0.6875
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.6875
-          }
-        ]
-      },
-      {
-        "starter_fp": "31980621e4de",
-        "starter_word": "architecture.md",
-        "starter_chi": -14,
-        "starter_weight": 109,
-        "perturb_mode": "null_pos0",
-        "output": "architecture.md",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "architecture.md",
-            "fp": "31980621e4de",
-            "chi": -14,
-            "score": 3299,
-            "null_fraction": 0.875
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.875
-          }
-        ]
-      },
-      {
-        "starter_fp": "6620547dae1f",
-        "starter_word": "\u2192",
-        "starter_chi": -58,
-        "starter_weight": 49,
-        "perturb_mode": "null_pos0",
-        "output": "\u2192",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2192",
-            "fp": "6620547dae1f",
-            "chi": -58,
-            "score": 9649,
-            "null_fraction": 0.625
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.625
-          }
-        ]
-      },
-      {
-        "starter_fp": "0895c7653aab",
-        "starter_word": "line",
-        "starter_chi": -29,
-        "starter_weight": 47,
-        "perturb_mode": "null_pos0",
-        "output": "line",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "line",
-            "fp": "0895c7653aab",
-            "chi": -29,
-            "score": 4847,
-            "null_fraction": 0.8125
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.8125
-          }
-        ]
-      },
-      {
-        "starter_fp": "d8d780406d89",
-        "starter_word": "`structural_lock",
-        "starter_chi": -14,
-        "starter_weight": 27,
-        "perturb_mode": "null_pos0",
-        "output": "`structural_lock",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "`structural_lock",
-            "fp": "d8d780406d89",
-            "chi": -14,
-            "score": 3227,
-            "null_fraction": 0.875
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.875
-          }
-        ]
-      },
-      {
-        "starter_fp": "a771ad1c8cd9",
-        "starter_word": null,
-        "starter_chi": -13,
-        "starter_weight": 19,
-        "perturb_mode": "null_pos0",
-        "output": "?",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "?",
-            "fp": "a771ad1c8cd9",
-            "chi": -13,
-            "score": 4819,
-            "null_fraction": 0.8125
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.8125
-          }
-        ]
-      },
-      {
-        "starter_fp": "f9cd7c7b5965",
-        "starter_word": null,
-        "starter_chi": 1,
-        "starter_weight": 17,
-        "perturb_mode": "null_pos0",
-        "output": "?",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "?",
-            "fp": "f9cd7c7b5965",
+            "fp": "5b69d412dc69",
             "chi": 1,
-            "score": 1617,
+            "score": 1699,
             "null_fraction": 0.9375
           },
           {
@@ -596,358 +428,531 @@
             "null_fraction": 0.9375
           }
         ]
-      }
-    ],
-    "null_pos03": [
+      },
       {
-        "starter_fp": "4883e2a6cc8e",
-        "starter_word": "arcloom",
-        "starter_chi": -29,
-        "starter_weight": 15297,
-        "perturb_mode": "null_pos03",
-        "output": "arcloom the",
-        "output_words": 2,
-        "steps": 3,
+        "starter_fp": "810699b76bb6",
+        "starter_word": "overlap",
+        "starter_chi": -2,
+        "starter_weight": 10,
+        "perturb_mode": "null_pos0",
+        "output": "transformer",
+        "output_words": 1,
+        "steps": 2,
         "termination": "fixed_point",
         "trace": [
           {
             "step": 0,
             "event": "emit",
-            "word": "arcloom",
-            "fp": "4883e2a6cc8e",
+            "word": "transformer",
+            "fp": "87af013f7381",
+            "chi": -14,
+            "score": 3299,
+            "null_fraction": 0.875
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.875
+          }
+        ]
+      },
+      {
+        "starter_fp": "16338899febc",
+        "starter_word": "streams.",
+        "starter_chi": -17,
+        "starter_weight": 5,
+        "perturb_mode": "null_pos0",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
             "chi": -29,
             "score": 4899,
             "null_fraction": 0.8125
           },
           {
             "step": 1,
-            "event": "emit",
-            "word": "the",
-            "fp": "3ccf036e46eb",
-            "chi": 1,
-            "score": 1605,
-            "null_fraction": 0.9375
-          },
-          {
-            "step": 2,
             "event": "fixed_point",
-            "null_fraction": 0.9375
+            "null_fraction": 0.8125
           }
         ]
       },
       {
-        "starter_fp": "acaae238e9ab",
-        "starter_word": "gualaloom",
-        "starter_chi": -14,
-        "starter_weight": 7087,
-        "perturb_mode": "null_pos03",
-        "output": "gualaloom the",
-        "output_words": 2,
-        "steps": 3,
+        "starter_fp": "ec9e5a3717f8",
+        "starter_word": "which",
+        "starter_chi": 2,
+        "starter_weight": 5,
+        "perturb_mode": "null_pos0",
+        "output": "which",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "which",
+            "fp": "ec9e5a3717f8",
+            "chi": 2,
+            "score": 405,
+            "null_fraction": 0.9844
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.9844
+          }
+        ]
+      },
+      {
+        "starter_fp": "0f63da4e3fbd",
+        "starter_word": "**familiarity",
+        "starter_chi": -19,
+        "starter_weight": 2,
+        "perturb_mode": "null_pos0",
+        "output": "feedback**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "feedback**",
+            "fp": "0a74aaa9176e",
+            "chi": -29,
+            "score": 4816,
+            "null_fraction": 0.8125
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8125
+          }
+        ]
+      },
+      {
+        "starter_fp": "42e5954ce6e4",
+        "starter_word": "running",
+        "starter_chi": -12,
+        "starter_weight": 4,
+        "perturb_mode": "null_pos0",
+        "output": "transformer",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "transformer",
+            "fp": "87af013f7381",
+            "chi": -14,
+            "score": 3299,
+            "null_fraction": 0.875
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.875
+          }
+        ]
+      },
+      {
+        "starter_fp": "a399131ab593",
+        "starter_word": "stays",
+        "starter_chi": -1,
+        "starter_weight": 3,
+        "perturb_mode": "null_pos0",
+        "output": "stays",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "stays",
+            "fp": "a399131ab593",
+            "chi": -1,
+            "score": 1903,
+            "null_fraction": 0.9258
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.9258
+          }
+        ]
+      },
+      {
+        "starter_fp": "5bdff9934c24",
+        "starter_word": "|-------|--------|----------|",
+        "starter_chi": -13,
+        "starter_weight": 2,
+        "perturb_mode": "null_pos0",
+        "output": "|-------|--------|----------|",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "|-------|--------|----------|",
+            "fp": "5bdff9934c24",
+            "chi": -13,
+            "score": 4602,
+            "null_fraction": 0.8203
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8203
+          }
+        ]
+      },
+      {
+        "starter_fp": "53bb82988699",
+        "starter_word": "85-89:",
+        "starter_chi": -28,
+        "starter_weight": 2,
+        "perturb_mode": "null_pos0",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
+            "chi": -29,
+            "score": 3299,
+            "null_fraction": 0.8125
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8125
+          }
+        ]
+      },
+      {
+        "starter_fp": "152f59cab0d3",
+        "starter_word": "balanced-ternary",
+        "starter_chi": -18,
+        "starter_weight": 2,
+        "perturb_mode": "null_pos0",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
+            "chi": -29,
+            "score": 4899,
+            "null_fraction": 0.8125
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8125
+          }
+        ]
+      }
+    ],
+    "null_high": [
+      {
+        "starter_fp": "48a6bbda2204",
+        "starter_word": "text:",
+        "starter_chi": 1,
+        "starter_weight": 2,
+        "perturb_mode": "null_high",
+        "output": "gualaloom",
+        "output_words": 1,
+        "steps": 2,
         "termination": "fixed_point",
         "trace": [
           {
             "step": 0,
             "event": "emit",
             "word": "gualaloom",
-            "fp": "acaae238e9ab",
+            "fp": "5b69d412dc69",
+            "chi": 1,
+            "score": 1699,
+            "null_fraction": 0.9375
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.9375
+          }
+        ]
+      },
+      {
+        "starter_fp": "810699b76bb6",
+        "starter_word": "overlap",
+        "starter_chi": -2,
+        "starter_weight": 10,
+        "perturb_mode": "null_high",
+        "output": "transformer",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "transformer",
+            "fp": "87af013f7381",
             "chi": -14,
             "score": 3299,
             "null_fraction": 0.875
           },
           {
             "step": 1,
-            "event": "emit",
-            "word": "the",
-            "fp": "3ccf036e46eb",
-            "chi": 1,
-            "score": 1605,
-            "null_fraction": 0.9375
-          },
-          {
-            "step": 2,
             "event": "fixed_point",
-            "null_fraction": 0.9375
-          }
-        ]
-      },
-      {
-        "starter_fp": "7ac5e28cb773",
-        "starter_word": "\u2014",
-        "starter_chi": -58,
-        "starter_weight": 396,
-        "perturb_mode": "null_pos03",
-        "output": "\u2014 ?",
-        "output_words": 2,
-        "steps": 3,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2014",
-            "fp": "7ac5e28cb773",
-            "chi": -58,
-            "score": 9699,
-            "null_fraction": 0.625
-          },
-          {
-            "step": 1,
-            "event": "emit",
-            "word": "?",
-            "fp": "881e7dff9adb",
-            "chi": -28,
-            "score": 6405,
-            "null_fraction": 0.75
-          },
-          {
-            "step": 2,
-            "event": "fixed_point",
-            "null_fraction": 0.75
-          }
-        ]
-      },
-      {
-        "starter_fp": "b52437628c26",
-        "starter_word": "\u2014",
-        "starter_chi": -43,
-        "starter_weight": 189,
-        "perturb_mode": "null_pos03",
-        "output": "\u2014 ?",
-        "output_words": 2,
-        "steps": 3,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2014",
-            "fp": "b52437628c26",
-            "chi": -43,
-            "score": 8099,
-            "null_fraction": 0.6875
-          },
-          {
-            "step": 1,
-            "event": "emit",
-            "word": "?",
-            "fp": "881e7dff9adb",
-            "chi": -28,
-            "score": 6405,
-            "null_fraction": 0.75
-          },
-          {
-            "step": 2,
-            "event": "fixed_point",
-            "null_fraction": 0.75
-          }
-        ]
-      },
-      {
-        "starter_fp": "31980621e4de",
-        "starter_word": "architecture.md",
-        "starter_chi": -14,
-        "starter_weight": 109,
-        "perturb_mode": "null_pos03",
-        "output": "architecture.md the",
-        "output_words": 2,
-        "steps": 3,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "architecture.md",
-            "fp": "31980621e4de",
-            "chi": -14,
-            "score": 3299,
             "null_fraction": 0.875
-          },
-          {
-            "step": 1,
-            "event": "emit",
-            "word": "the",
-            "fp": "3ccf036e46eb",
-            "chi": 1,
-            "score": 1605,
-            "null_fraction": 0.9375
-          },
-          {
-            "step": 2,
-            "event": "fixed_point",
-            "null_fraction": 0.9375
           }
         ]
       },
       {
-        "starter_fp": "6620547dae1f",
-        "starter_word": "\u2192",
-        "starter_chi": -58,
-        "starter_weight": 49,
-        "perturb_mode": "null_pos03",
-        "output": "\u2192 ?",
-        "output_words": 2,
-        "steps": 3,
+        "starter_fp": "16338899febc",
+        "starter_word": "streams.",
+        "starter_chi": -17,
+        "starter_weight": 5,
+        "perturb_mode": "null_high",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
         "termination": "fixed_point",
         "trace": [
           {
             "step": 0,
             "event": "emit",
-            "word": "\u2192",
-            "fp": "6620547dae1f",
-            "chi": -58,
-            "score": 9649,
-            "null_fraction": 0.625
-          },
-          {
-            "step": 1,
-            "event": "emit",
-            "word": "?",
-            "fp": "881e7dff9adb",
-            "chi": -28,
-            "score": 4805,
-            "null_fraction": 0.75
-          },
-          {
-            "step": 2,
-            "event": "fixed_point",
-            "null_fraction": 0.75
-          }
-        ]
-      },
-      {
-        "starter_fp": "0895c7653aab",
-        "starter_word": "line",
-        "starter_chi": -29,
-        "starter_weight": 47,
-        "perturb_mode": "null_pos03",
-        "output": "line the",
-        "output_words": 2,
-        "steps": 3,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "line",
-            "fp": "0895c7653aab",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
             "chi": -29,
-            "score": 4847,
+            "score": 4899,
             "null_fraction": 0.8125
           },
           {
             "step": 1,
-            "event": "emit",
-            "word": "the",
-            "fp": "3ccf036e46eb",
-            "chi": 1,
-            "score": 1605,
-            "null_fraction": 0.9375
-          },
-          {
-            "step": 2,
             "event": "fixed_point",
-            "null_fraction": 0.9375
+            "null_fraction": 0.8125
           }
         ]
       },
       {
-        "starter_fp": "d8d780406d89",
-        "starter_word": "`structural_lock",
-        "starter_chi": -14,
-        "starter_weight": 27,
-        "perturb_mode": "null_pos03",
-        "output": "`structural_lock",
+        "starter_fp": "ec9e5a3717f8",
+        "starter_word": "which",
+        "starter_chi": 2,
+        "starter_weight": 5,
+        "perturb_mode": "null_high",
+        "output": "which",
         "output_words": 1,
         "steps": 2,
-        "termination": "perturbation_collapsed",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "`structural_lock",
-            "fp": "d8d780406d89",
-            "chi": -14,
-            "score": 3227,
-            "null_fraction": 0.875
-          },
-          {
-            "step": 1,
-            "event": "perturbation_collapsed"
-          }
-        ]
-      },
-      {
-        "starter_fp": "a771ad1c8cd9",
-        "starter_word": null,
-        "starter_chi": -13,
-        "starter_weight": 19,
-        "perturb_mode": "null_pos03",
-        "output": "? the",
-        "output_words": 2,
-        "steps": 3,
         "termination": "fixed_point",
         "trace": [
           {
             "step": 0,
             "event": "emit",
-            "word": "?",
-            "fp": "a771ad1c8cd9",
-            "chi": -13,
-            "score": 4819,
-            "null_fraction": 0.8125
+            "word": "which",
+            "fp": "ec9e5a3717f8",
+            "chi": 2,
+            "score": 405,
+            "null_fraction": 0.9844
           },
           {
             "step": 1,
-            "event": "emit",
-            "word": "the",
-            "fp": "3ccf036e46eb",
-            "chi": 1,
-            "score": 1605,
-            "null_fraction": 0.9375
-          },
-          {
-            "step": 2,
             "event": "fixed_point",
-            "null_fraction": 0.9375
+            "null_fraction": 0.9844
           }
         ]
       },
       {
-        "starter_fp": "f9cd7c7b5965",
-        "starter_word": null,
-        "starter_chi": 1,
-        "starter_weight": 17,
-        "perturb_mode": "null_pos03",
-        "output": "?",
+        "starter_fp": "0f63da4e3fbd",
+        "starter_word": "**familiarity",
+        "starter_chi": -19,
+        "starter_weight": 2,
+        "perturb_mode": "null_high",
+        "output": "feedback**",
         "output_words": 1,
         "steps": 2,
-        "termination": "perturbation_collapsed",
+        "termination": "fixed_point",
         "trace": [
           {
             "step": 0,
             "event": "emit",
-            "word": "?",
-            "fp": "f9cd7c7b5965",
-            "chi": 1,
-            "score": 1617,
-            "null_fraction": 0.9375
+            "word": "feedback**",
+            "fp": "0a74aaa9176e",
+            "chi": -29,
+            "score": 4816,
+            "null_fraction": 0.8125
           },
           {
             "step": 1,
-            "event": "perturbation_collapsed"
+            "event": "fixed_point",
+            "null_fraction": 0.8125
+          }
+        ]
+      },
+      {
+        "starter_fp": "42e5954ce6e4",
+        "starter_word": "running",
+        "starter_chi": -12,
+        "starter_weight": 4,
+        "perturb_mode": "null_high",
+        "output": "transformer",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "transformer",
+            "fp": "87af013f7381",
+            "chi": -14,
+            "score": 3299,
+            "null_fraction": 0.875
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.875
+          }
+        ]
+      },
+      {
+        "starter_fp": "a399131ab593",
+        "starter_word": "stays",
+        "starter_chi": -1,
+        "starter_weight": 3,
+        "perturb_mode": "null_high",
+        "output": "stays",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "stays",
+            "fp": "a399131ab593",
+            "chi": -1,
+            "score": 1903,
+            "null_fraction": 0.9258
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.9258
+          }
+        ]
+      },
+      {
+        "starter_fp": "5bdff9934c24",
+        "starter_word": "|-------|--------|----------|",
+        "starter_chi": -13,
+        "starter_weight": 2,
+        "perturb_mode": "null_high",
+        "output": "|-------|--------|----------|",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "|-------|--------|----------|",
+            "fp": "5bdff9934c24",
+            "chi": -13,
+            "score": 4602,
+            "null_fraction": 0.8203
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8203
+          }
+        ]
+      },
+      {
+        "starter_fp": "53bb82988699",
+        "starter_word": "85-89:",
+        "starter_chi": -28,
+        "starter_weight": 2,
+        "perturb_mode": "null_high",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
+            "chi": -29,
+            "score": 3299,
+            "null_fraction": 0.8125
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8125
+          }
+        ]
+      },
+      {
+        "starter_fp": "152f59cab0d3",
+        "starter_word": "balanced-ternary",
+        "starter_chi": -18,
+        "starter_weight": 2,
+        "perturb_mode": "null_high",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
+            "chi": -29,
+            "score": 4899,
+            "null_fraction": 0.8125
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8125
           }
         ]
       }
     ],
     "feed_char": [
       {
-        "starter_fp": "4883e2a6cc8e",
-        "starter_word": "arcloom",
-        "starter_chi": -29,
-        "starter_weight": 15297,
+        "starter_fp": "48a6bbda2204",
+        "starter_word": "text:",
+        "starter_chi": 1,
+        "starter_weight": 2,
         "perturb_mode": "feed_char",
-        "output": "arcloom",
+        "output": "gualaloom",
         "output_words": 1,
         "steps": 2,
         "termination": "fixed_point",
@@ -955,8 +960,62 @@
           {
             "step": 0,
             "event": "emit",
-            "word": "arcloom",
-            "fp": "4883e2a6cc8e",
+            "word": "gualaloom",
+            "fp": "5b69d412dc69",
+            "chi": 1,
+            "score": 1699,
+            "null_fraction": 0.9375
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.9375
+          }
+        ]
+      },
+      {
+        "starter_fp": "810699b76bb6",
+        "starter_word": "overlap",
+        "starter_chi": -2,
+        "starter_weight": 10,
+        "perturb_mode": "feed_char",
+        "output": "transformer",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "transformer",
+            "fp": "87af013f7381",
+            "chi": -14,
+            "score": 3299,
+            "null_fraction": 0.875
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.875
+          }
+        ]
+      },
+      {
+        "starter_fp": "16338899febc",
+        "starter_word": "streams.",
+        "starter_chi": -17,
+        "starter_weight": 5,
+        "perturb_mode": "feed_char",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
             "chi": -29,
             "score": 4899,
             "null_fraction": 0.8125
@@ -969,39 +1028,475 @@
         ]
       },
       {
-        "starter_fp": "acaae238e9ab",
-        "starter_word": "gualaloom",
-        "starter_chi": -14,
-        "starter_weight": 7087,
+        "starter_fp": "ec9e5a3717f8",
+        "starter_word": "which",
+        "starter_chi": 2,
+        "starter_weight": 5,
         "perturb_mode": "feed_char",
-        "output": "gualaloom",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
+        "output": "which files krimelack `krimelack` krimelack krimelack feedback feedback feedback feedback feedback likely file, feedback feedback feedback while feedback feedback feedback feedback feedback feedback feedback feedback feedback feedback likely file, feedback feedback feedback while feedback feedback feedback feedback feedback feedback feedback feedback feedback feedback likely file, feedback feedback feedback while feedback",
+        "output_words": 50,
+        "steps": 50,
+        "termination": "emit",
         "trace": [
           {
             "step": 0,
             "event": "emit",
-            "word": "gualaloom",
-            "fp": "acaae238e9ab",
-            "chi": -14,
-            "score": 3299,
-            "null_fraction": 0.875
+            "word": "which",
+            "fp": "ec9e5a3717f8",
+            "chi": 2,
+            "score": 405,
+            "null_fraction": 0.9844
           },
           {
             "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.875
+            "event": "emit",
+            "word": "files",
+            "fp": "9433a1d62350",
+            "chi": 2,
+            "score": 306,
+            "null_fraction": 0.9844
+          },
+          {
+            "step": 2,
+            "event": "emit",
+            "word": "krimelack",
+            "fp": "7601d63d1a25",
+            "chi": 2,
+            "score": 316,
+            "null_fraction": 0.9844
+          },
+          {
+            "step": 3,
+            "event": "emit",
+            "word": "`krimelack`",
+            "fp": "9634f8ce2fb9",
+            "chi": 2,
+            "score": 303,
+            "null_fraction": 0.9844
+          },
+          {
+            "step": 4,
+            "event": "emit",
+            "word": "krimelack",
+            "fp": "7601d63d1a25",
+            "chi": 2,
+            "score": 316,
+            "null_fraction": 0.9844
+          },
+          {
+            "step": 5,
+            "event": "emit",
+            "word": "krimelack",
+            "fp": "7601d63d1a25",
+            "chi": 2,
+            "score": 316,
+            "null_fraction": 0.9844
+          },
+          {
+            "step": 6,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 7,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 8,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 9,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 10,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 11,
+            "event": "emit",
+            "word": "likely",
+            "fp": "8b335a7dc6b8",
+            "chi": 1,
+            "score": 1703,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 12,
+            "event": "emit",
+            "word": "file,",
+            "fp": "57cfaea1ac26",
+            "chi": 1,
+            "score": 1702,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 13,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 14,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 15,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 16,
+            "event": "emit",
+            "word": "while",
+            "fp": "fd79cc13bf44",
+            "chi": 1,
+            "score": 1704,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 17,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 18,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 19,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 20,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 21,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 22,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 23,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 24,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 25,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 26,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 27,
+            "event": "emit",
+            "word": "likely",
+            "fp": "8b335a7dc6b8",
+            "chi": 1,
+            "score": 1703,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 28,
+            "event": "emit",
+            "word": "file,",
+            "fp": "57cfaea1ac26",
+            "chi": 1,
+            "score": 1702,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 29,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 30,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 31,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 32,
+            "event": "emit",
+            "word": "while",
+            "fp": "fd79cc13bf44",
+            "chi": 1,
+            "score": 1704,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 33,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 34,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 35,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 36,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 37,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 38,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 39,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 40,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 41,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 42,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 43,
+            "event": "emit",
+            "word": "likely",
+            "fp": "8b335a7dc6b8",
+            "chi": 1,
+            "score": 1703,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 44,
+            "event": "emit",
+            "word": "file,",
+            "fp": "57cfaea1ac26",
+            "chi": 1,
+            "score": 1702,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 45,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 46,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 47,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 48,
+            "event": "emit",
+            "word": "while",
+            "fp": "fd79cc13bf44",
+            "chi": 1,
+            "score": 1704,
+            "null_fraction": 0.9336
+          },
+          {
+            "step": 49,
+            "event": "emit",
+            "word": "feedback",
+            "fp": "6d1162d9b6ce",
+            "chi": 1,
+            "score": 1618,
+            "null_fraction": 0.9336
           }
         ]
       },
       {
-        "starter_fp": "7ac5e28cb773",
-        "starter_word": "\u2014",
-        "starter_chi": -58,
-        "starter_weight": 396,
+        "starter_fp": "0f63da4e3fbd",
+        "starter_word": "**familiarity",
+        "starter_chi": -19,
+        "starter_weight": 2,
         "perturb_mode": "feed_char",
-        "output": "\u2014",
+        "output": "feedback**",
         "output_words": 1,
         "steps": 2,
         "termination": "fixed_point",
@@ -1009,118 +1504,10 @@
           {
             "step": 0,
             "event": "emit",
-            "word": "\u2014",
-            "fp": "7ac5e28cb773",
-            "chi": -58,
-            "score": 9699,
-            "null_fraction": 0.625
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.625
-          }
-        ]
-      },
-      {
-        "starter_fp": "b52437628c26",
-        "starter_word": "\u2014",
-        "starter_chi": -43,
-        "starter_weight": 189,
-        "perturb_mode": "feed_char",
-        "output": "\u2014",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2014",
-            "fp": "b52437628c26",
-            "chi": -43,
-            "score": 8099,
-            "null_fraction": 0.6875
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.6875
-          }
-        ]
-      },
-      {
-        "starter_fp": "31980621e4de",
-        "starter_word": "architecture.md",
-        "starter_chi": -14,
-        "starter_weight": 109,
-        "perturb_mode": "feed_char",
-        "output": "architecture.md",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "architecture.md",
-            "fp": "31980621e4de",
-            "chi": -14,
-            "score": 3299,
-            "null_fraction": 0.875
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.875
-          }
-        ]
-      },
-      {
-        "starter_fp": "6620547dae1f",
-        "starter_word": "\u2192",
-        "starter_chi": -58,
-        "starter_weight": 49,
-        "perturb_mode": "feed_char",
-        "output": "\u2192",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "\u2192",
-            "fp": "6620547dae1f",
-            "chi": -58,
-            "score": 9649,
-            "null_fraction": 0.625
-          },
-          {
-            "step": 1,
-            "event": "fixed_point",
-            "null_fraction": 0.625
-          }
-        ]
-      },
-      {
-        "starter_fp": "0895c7653aab",
-        "starter_word": "line",
-        "starter_chi": -29,
-        "starter_weight": 47,
-        "perturb_mode": "feed_char",
-        "output": "line",
-        "output_words": 1,
-        "steps": 2,
-        "termination": "fixed_point",
-        "trace": [
-          {
-            "step": 0,
-            "event": "emit",
-            "word": "line",
-            "fp": "0895c7653aab",
+            "word": "feedback**",
+            "fp": "0a74aaa9176e",
             "chi": -29,
-            "score": 4847,
+            "score": 4816,
             "null_fraction": 0.8125
           },
           {
@@ -1131,12 +1518,12 @@
         ]
       },
       {
-        "starter_fp": "d8d780406d89",
-        "starter_word": "`structural_lock",
-        "starter_chi": -14,
-        "starter_weight": 27,
+        "starter_fp": "42e5954ce6e4",
+        "starter_word": "running",
+        "starter_chi": -12,
+        "starter_weight": 4,
         "perturb_mode": "feed_char",
-        "output": "`structural_lock",
+        "output": "transformer",
         "output_words": 1,
         "steps": 2,
         "termination": "fixed_point",
@@ -1144,10 +1531,10 @@
           {
             "step": 0,
             "event": "emit",
-            "word": "`structural_lock",
-            "fp": "d8d780406d89",
+            "word": "transformer",
+            "fp": "87af013f7381",
             "chi": -14,
-            "score": 3227,
+            "score": 3299,
             "null_fraction": 0.875
           },
           {
@@ -1158,12 +1545,66 @@
         ]
       },
       {
-        "starter_fp": "a771ad1c8cd9",
-        "starter_word": null,
-        "starter_chi": -13,
-        "starter_weight": 19,
+        "starter_fp": "a399131ab593",
+        "starter_word": "stays",
+        "starter_chi": -1,
+        "starter_weight": 3,
         "perturb_mode": "feed_char",
-        "output": "? ? ?",
+        "output": "stays part not transformer",
+        "output_words": 4,
+        "steps": 5,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "stays",
+            "fp": "a399131ab593",
+            "chi": -1,
+            "score": 1903,
+            "null_fraction": 0.9258
+          },
+          {
+            "step": 1,
+            "event": "emit",
+            "word": "part",
+            "fp": "83c75dc876d3",
+            "chi": -1,
+            "score": 1805,
+            "null_fraction": 0.9258
+          },
+          {
+            "step": 2,
+            "event": "emit",
+            "word": "not",
+            "fp": "f9bb572bbe05",
+            "chi": -1,
+            "score": 1752,
+            "null_fraction": 0.9258
+          },
+          {
+            "step": 3,
+            "event": "emit",
+            "word": "transformer",
+            "fp": "87af013f7381",
+            "chi": -14,
+            "score": 3299,
+            "null_fraction": 0.875
+          },
+          {
+            "step": 4,
+            "event": "fixed_point",
+            "null_fraction": 0.875
+          }
+        ]
+      },
+      {
+        "starter_fp": "5bdff9934c24",
+        "starter_word": "|-------|--------|----------|",
+        "starter_chi": -13,
+        "starter_weight": 2,
+        "perturb_mode": "feed_char",
+        "output": "|-------|--------|----------| |-------|--------|----------| **a",
         "output_words": 3,
         "steps": 4,
         "termination": "fixed_point",
@@ -1171,44 +1612,44 @@
           {
             "step": 0,
             "event": "emit",
-            "word": "?",
-            "fp": "a771ad1c8cd9",
+            "word": "|-------|--------|----------|",
+            "fp": "5bdff9934c24",
             "chi": -13,
-            "score": 4819,
-            "null_fraction": 0.8125
+            "score": 4602,
+            "null_fraction": 0.8203
           },
           {
             "step": 1,
             "event": "emit",
-            "word": "?",
-            "fp": "a771ad1c8cd9",
+            "word": "|-------|--------|----------|",
+            "fp": "5bdff9934c24",
             "chi": -13,
-            "score": 4719,
-            "null_fraction": 0.8164
+            "score": 4402,
+            "null_fraction": 0.8203
           },
           {
             "step": 2,
             "event": "emit",
-            "word": "?",
-            "fp": "a771ad1c8cd9",
-            "chi": -13,
-            "score": 4819,
-            "null_fraction": 0.8125
+            "word": "**a",
+            "fp": "1422d6a8ee73",
+            "chi": -14,
+            "score": 3299,
+            "null_fraction": 0.875
           },
           {
             "step": 3,
             "event": "fixed_point",
-            "null_fraction": 0.8125
+            "null_fraction": 0.875
           }
         ]
       },
       {
-        "starter_fp": "f9cd7c7b5965",
-        "starter_word": null,
-        "starter_chi": 1,
-        "starter_weight": 17,
+        "starter_fp": "53bb82988699",
+        "starter_word": "85-89:",
+        "starter_chi": -28,
+        "starter_weight": 2,
         "perturb_mode": "feed_char",
-        "output": "?",
+        "output": "substrate.**",
         "output_words": 1,
         "steps": 2,
         "termination": "fixed_point",
@@ -1216,16 +1657,43 @@
           {
             "step": 0,
             "event": "emit",
-            "word": "?",
-            "fp": "f9cd7c7b5965",
-            "chi": 1,
-            "score": 1617,
-            "null_fraction": 0.9375
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
+            "chi": -29,
+            "score": 3299,
+            "null_fraction": 0.8125
           },
           {
             "step": 1,
             "event": "fixed_point",
-            "null_fraction": 0.9375
+            "null_fraction": 0.8125
+          }
+        ]
+      },
+      {
+        "starter_fp": "152f59cab0d3",
+        "starter_word": "balanced-ternary",
+        "starter_chi": -18,
+        "starter_weight": 2,
+        "perturb_mode": "feed_char",
+        "output": "substrate.**",
+        "output_words": 1,
+        "steps": 2,
+        "termination": "fixed_point",
+        "trace": [
+          {
+            "step": 0,
+            "event": "emit",
+            "word": "substrate.**",
+            "fp": "8193fee374fc",
+            "chi": -29,
+            "score": 4899,
+            "null_fraction": 0.8125
+          },
+          {
+            "step": 1,
+            "event": "fixed_point",
+            "null_fraction": 0.8125
           }
         ]
       }

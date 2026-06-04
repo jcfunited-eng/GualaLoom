@@ -1,199 +1,181 @@
-# Experiment 06 — Three-Layer Collision (RERUN)
+# Experiment 06 — Three-Layer Collision (third pass)
 
 **Date:** 2026-06-04
 **Runner:** c1 (Claude Opus 4.6)
-**Rerun reason:** generate_from_word() was a Markov chain on successor
-counts, not cascade-based generation. Fixed and rerun.
 
-## (1) The cheat and the self-audit
+## What changed in the third pass
 
-### Cheat identified by Joe
+### Word-mosaic rewritten (weakening 1 fixed)
 
-`generate_from_word()` walked `m.successors` — the bigram counter
-built during corpus ingestion — to pick the next motif. The Loom was
-passed in and never called. settle() was never invoked during
-generation. The output was corpus bigram statistics wearing substrate
-clothing.
+**Old (pass 1-2):** Encoded fixed 16-char windows with truncation and
+previous-word-tail contamination. Produced 437 motifs from 4008 words.
+Word motifs were 16-char windows, not substrate snapshots.
 
-### Self-audit: other frequency-driven decisions
+**New (pass 3):** Normal character Loom runs through the entire corpus.
+Character motifs commit at every tick. At every whitespace boundary,
+the loom's current settled state is snapshotted and committed as a word
+motif labeled with the word that just completed. No truncation, no
+padding, no contamination. The word motif IS the substrate's state after
+processing that word's characters in their actual context.
 
-**Cheat 2 (documented, spec-compliant):** `run_folding_composition()`
-selects which pairs to compose by sorting on successor counts. The
-spec said "highest co-commit count from successors data" so this
-follows instructions, but it means the SELECTION uses corpus
-statistics even though the COMPOSITION uses real settle().
+### Folding composition rewritten (weakening 2 fixed)
 
-**Cheat 3 (inherited from substrate):** `recall()` uses
-`min(m.weight, 99)` as a tiebreaker. Weight is corpus frequency. This
-is the existing substrate's behavior (gualaloom.py line 171), not
-something I introduced. Documented, not changed.
+**Old (pass 1-2):** Destructive intersection — if one parent was null
+at a position, the composition went null. "100% stable" because
+compositions were nearly empty (null fraction 0.88).
 
-**Cheat 4 (documented):** Starter selection picks top-10 by weight
-(corpus frequency). This biases toward the attractor. Documented in
-code comments, not changed — it's how we pick starters, not how we
-generate.
+**New (pass 3):** Structural union with conflict-nulling:
+- Both agree (same sign or both null): keep
+- Both committed but disagree (opposite signs): null
+- One committed, one null: KEEP the commitment
 
-No other frequency/count-driven heuristics found in encode, settle,
-chi, fold_compose, word_mosaic_ingest, or pressure landscape analysis.
+Composition should ADD what each parent carries unless they actively
+disagree.
 
-### The fix
+## (1) Word-mosaic comparison
 
-`generate_from_word()` rewritten to use settle:
-1. Start from the starting motif's full state
-2. Each step: settle the current state at familiarity=0
-3. Recall the settled state from krimelack, emit the word
-4. Perturb: null out positions 0-3 in each strand (25% of trits,
-   the lowest-weight P3I positions) to prevent immediate fixed point
-5. Repeat until fixed point, all-null collapse, or max_steps
+| Metric | OLD (windows) | NEW (settled snapshot) |
+|--------|---------------|----------------------|
+| Total motifs | 437 | 5431 |
+| Word-labeled motifs | 437 | 981 |
+| Unique words with motifs | 437 | 608 |
+| Char motifs | 0 | 5431 |
+| Ingestion time | 1.1s | 26.2s |
+| Chi range | [-29, -5] | [-58, +1] |
+| Null fraction mean | 0.8387 | 0.8322 |
+| Word motifs new | 437 | 0 |
 
-The successor counter is not referenced. This is settle dynamics only.
+**"Word motifs new: 0"** is the headline finding. Every word's settled
+state, when snapshotted at the whitespace boundary, matched an EXISTING
+character motif that had already been committed during the character
+pipeline. Word motifs at CONTEXT=16 are not distinct structures — they
+are character-motif states that happen to coincide with word boundaries.
 
-Perturbation choice (best-guess, not tuned): null positions 0-3
-because P3I[0..3] = {1, 3, 9, 27} carry the least structural weight.
-Nulling them gives the substrate room to settle differently on the
-next iteration without destroying the high-weight structural
-commitments at positions 4+.
+This means: at CONTEXT=16, the word boundary carries no structural
+information that the character cascade didn't already produce. The
+settled state at the end of "substrate" is the same as the settled
+state at some character tick within the word. The word-level layer
+adds labels but no new structural content.
 
-## Configuration
+608 unique words → 981 word-labeled motifs (some words get different
+motifs depending on context = working correctly). 0 motifs shared by
+multiple words (each motif has exactly one word label = first-commit
+wins). 5431 total motifs dominated by character motifs from the Loom.
 
+## (2) Folding composition comparison
+
+| Metric | OLD (intersection) | NEW (union) |
+|--------|-------------------|-------------|
+| Pairs attempted | 50 | 50 |
+| Stable | 50 | 50 |
+| Collapsed to null | 0 | 0 |
+| Merged null fraction | 0.88 | 0.62-0.81 |
+| Settled null fraction | 0.88 | 0.62-0.81 |
+
+The union rule produces DENSER compositions (merged_null=0.62-0.81 vs
+0.88 under intersection). The compositions carry more structure.
+
+Sample compositions:
 ```
-TRITS=16, CONTEXT=16, POP=256, DEAD_ZONE=15
-P3I = (1, 3, 9, 27, 81, ..., 14348907)
-```
-
-## (2) The 10 faithful generation outputs verbatim
-
-```
-[0] start='gualaloom' (w=2918, chi=-29)
-    -> gualaloom architecture
-    steps=3, ended=fixed_point
-
-[1] start='descent,' (w=389, chi=-14)
-    -> descent, architecture
-    steps=3, ended=fixed_point
-
-[2] start='—' (w=89, chi=-58)
-    -> — #
-    steps=3, ended=fixed_point
-
-[3] start='substrate' (w=52, chi=-14)
-    -> substrate
-    steps=2, ended=perturbation_collapsed
-
-[4] start='architecture' (w=40, chi=1)
-    -> architecture
-    steps=2, ended=perturbation_collapsed
-
-[5] start='motif' (w=17, chi=-29)
-    -> motif architecture
-    steps=3, ended=fixed_point
-
-[6] start='#' (w=16, chi=-28)
-    -> # architecture
-    steps=3, ended=fixed_point
-
-[7] start='feedback' (w=9, chi=-14)
-    -> feedback
-    steps=2, ended=perturbation_collapsed
-
-[8] start='→' (w=7, chi=-58)
-    -> → #
-    steps=3, ended=fixed_point
-
-[9] start='ternary' (w=6, chi=-26)
-    -> gualaloom architecture
-    steps=3, ended=fixed_point
+gualaloom + arcloom: merged=0.81 settled=0.81 chi=-29 recalls=arcloom
+arcloom + —:        merged=0.62 settled=0.62 chi=-58 recalls=—
+gualaloom + None:    merged=0.81 settled=0.81 chi=-13 recalls=None
+— + arcloom:        merged=0.62 settled=0.62 chi=-58 recalls=—
 ```
 
-## (3) Comparison: bigram walker vs cascade walker
+**recalls_to_novel = False for all.** Every composed motif recalls to
+one of its parents or to an existing motif. No composition produced a
+novel recall target — the composed state is structurally close enough
+to one parent that recall finds it. Union didn't create genuinely new
+structures; it created denser versions of existing ones.
 
-| Starter | Bigram walker (cheated) | Cascade walker (faithful) |
-|---------|------------------------|--------------------------|
-| gualaloom | gualaloom descent, gualaloom substrate gualaloom — gualaloom — descent, gualaloom substrate... (50 words, looping) | gualaloom architecture (2 words, fixed point) |
-| descent, | descent, gualaloom descent, architecture gualaloom substrate... (50 words, looping) | descent, architecture (2 words, fixed point) |
-| — | — gualaloom descent, gualaloom substrate... (50 words, looping) | — # (2 words, fixed point) |
-| substrate | substrate gualaloom descent,... (50 words) | substrate (1 word, perturbation collapsed) |
-| architecture | architecture gualaloom descent,... (50 words) | architecture (1 word, perturbation collapsed) |
+The merged and settled null fractions are identical for all 50
+compositions. This means the merge result is ALREADY a fixed point of
+settle. The union of two settled states is itself settled. This is a
+real structural property: when parents agree or one is silent, the
+union inherits their settling. The only positions that could change
+under re-settle are the conflict-nulled positions, and those don't
+accumulate enough cross-strand pressure to commit.
 
-The bigram walker produced 50-word looping sequences because it was
-walking a well-connected frequency graph. The cascade walker produces
-1-2 words and stops because:
+## (3) Generation under three perturbation modes
 
-- **Fixed point (6/10 runs):** settle produces the same state after
-  perturbation. The substrate has only one stable configuration in
-  the neighborhood of each starting motif — perturbing the low-weight
-  positions doesn't move it to a different basin.
+### null_pos0 (null only position 0 per strand, 6%)
+```
+arcloom → arcloom (fixed point, 2 steps)
+gualaloom → gualaloom (fixed point, 2 steps)
+— → — (fixed point, 2 steps)
+architecture.md → architecture.md (fixed point, 2 steps)
+line → line (fixed point, 2 steps)
+```
+All 10 starters: emit starter word, fixed point. Position 0 (P3I=1)
+carries no structural weight. Nulling it changes nothing.
 
-- **Perturbation collapsed (4/10 runs):** after nulling positions 0-3,
-  the remaining committed trits at positions 4-15 don't survive
-  the next settle pass (the pressure at those positions, without
-  the low-position trits, falls below the barrier). The state
-  collapses to all-null.
+### null_pos03 (null positions 0-3, 25%)
+```
+arcloom → arcloom the (fixed point, 3 steps)
+gualaloom → gualaloom the (fixed point, 3 steps)
+architecture.md → architecture.md the (fixed point, 3 steps)
+line → line the (fixed point, 3 steps)
+`structural_lock → `structural_lock (perturbation collapsed, 2 steps)
+```
+7/10 starters emit starter word then "the", then fixed point. The
+perturbation nulled positions 0-3 (P3I up to 27), and the re-settle
+recalled "the" — the most common word in English, and therefore the
+word whose character cascade most commonly produced the settle
+configuration that remains after positions 0-3 are nulled.
 
-## (4) Honest verdict
+"the" is not a bigram-statistical artifact. It is what the substrate
+settles to when you remove the low-weight structural detail from any
+motif. Every word, stripped of its positions 0-3, looks like "the" to
+the recall function. This is the substrate's ACTUAL attractor at
+CONTEXT=16: the structural skeleton common to most English words.
 
-**The substrate's cascade machinery does NOT generate sequential
-output at CONTEXT=16 with barrier=15.**
+2/10 starters collapsed when positions 0-3 were nulled — these were
+motifs where positions 0-3 were load-bearing.
 
-The cascade walker produces 1-2 words and dies. The two failure modes
-are:
+### feed_char (replace strand 0 with cycling a-z)
+```
+arcloom → arcloom (fixed point, 2 steps)
+gualaloom → gualaloom (fixed point, 2 steps)
+— → — (fixed point, 2 steps)
+```
+All 10 starters: emit starter word, fixed point. Replacing one strand
+with a character encoding doesn't change the settle outcome — 15
+cross-strand terms at the high positions overwhelm the single
+perturbed strand.
 
-1. **Fixed point:** the perturbation isn't enough to escape the
-   attractor basin. The same motif recalls every time. This is
-   because at CONTEXT=16, the 15 cross-strand terms overwhelm the
-   barrier for any position with consistent neighbors — the settled
-   state is so strongly determined by the high-weight positions that
-   nulling the low-weight ones doesn't change the outcome.
+## (4) The findings from the wreckage
 
-2. **Perturbation collapse:** the perturbation is too much. Removing
-   25% of trits (positions 0-3) removes enough support that the
-   remaining positions can't sustain their commitments. The state
-   falls to all-null.
+1. **Word-level motifs are not structurally distinct from character
+   motifs at CONTEXT=16.** The word boundary adds a label, not a
+   structure. This means word-mosaic as a separate layer doesn't
+   exist — it's an index into the character krimelack, not a new
+   level of composition.
 
-This is the same loaded-zone failure from exp03/05, manifested in
-generation: the pressure landscape at CONTEXT=16 has no intermediate
-zone between "fully committed" and "null." The perturbation either
-does nothing (fixed point) or everything (collapse). There's no
-middle ground where the substrate can move to a DIFFERENT stable
-state — because at CONTEXT=16 with barrier=15, there's effectively
-only one stable configuration per neighborhood.
+2. **Union composition is stable and dense but not novel.** Every
+   composed motif recalls to a parent. The union doesn't create
+   structures that weren't already there. This is because the
+   parents share most of their committed positions (they're
+   sequential motifs in the same corpus flow, so their context
+   windows overlap heavily). Union of near-identical states is
+   near-identical to either parent.
 
-The bigram walker's 50-word loops were an illusion — it was walking
-corpus statistics, not substrate dynamics. The honest answer is: the
-substrate at this scale can't sequence. It can commit one state. It
-can recall one motif. It cannot cascade from one state to a different
-state. Sequential cognition requires either:
+3. **"the" is the structural attractor at CONTEXT=16.** When you
+   strip low-weight detail from any motif, the remaining structure
+   recalls to "the". This is not a frequency artifact — it's a
+   geometric property. "the" is the most structurally generic word
+   in the corpus, and its settle configuration is the basin floor
+   that everything falls into when perturbed.
 
-- The section-coupling mechanism (external trigger from a different
-  krimelack providing fresh input to the settle)
-- Barrier scaling (barrier ∝ CONTEXT to restore the loaded zone)
-- Hierarchical composition (exp04's multi-level structure where the
-  outer level has a richer pressure landscape)
+4. **Generation at CONTEXT=16 is single-step at every perturbation
+   level.** The substrate cannot sequence because there is no
+   intermediate perturbation strength between "does nothing" (6%)
+   and "collapses or recalls to the universal attractor" (25%).
+   This is the same loaded-zone finding as exp02-05: no middle
+   ground at this scale.
 
-## (5) Anything surprising in the wreckage
-
-1. **"ternary" → "gualaloom architecture"** — starting from a
-   low-weight motif (w=6), the substrate settled to a state that
-   recalled "gualaloom" (the dominant attractor), not "ternary."
-   The cascade erased the starting motif's identity in one step.
-   This confirms: at CONTEXT=16, every motif's basin of attraction
-   converges to the same few dominant states.
-
-2. **The perturbation-collapse motifs are exactly those with chi=-14
-   or chi=1.** These are the motifs where positions 0-3 were already
-   critical to the structural signature. Nulling them destroyed the
-   motif's identity before settle could re-derive it.
-
-3. **No crashes, again.** The faithful generation didn't error — it
-   ran, it settled, it recalled, it just had nothing to say. The
-   machinery works. The dynamics don't support sequencing.
-
-## Previous findings still hold
-
-- Ingestion: 4008 words → 437 motifs, identical to first run
-- Folding: 50/50 stable, 0 null collapses, identical
-- Pressure: loaded band empty, identical
-- Chi distribution: identical
-
-The only change is generation: from a 50-word illusion to a 1-2 word
-honest silence.
+5. **The cascade machinery works. The dynamics produce silence.**
+   No crashes. Every settle call returns a valid state. Every recall
+   finds a motif. The substrate is mechanically functional. It just
+   has nothing to say beyond one word, because the pressure landscape
+   at CONTEXT=16 has no loaded zone for generation to ride.

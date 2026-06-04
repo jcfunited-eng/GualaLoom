@@ -355,41 +355,80 @@ def run_folding_composition(k):
 # Generation from word motifs
 # ======================================================================
 
-def generate_from_word(k, loom, start_fp, max_steps=50):
-    """Generate output starting from a word motif via successor walk."""
+def generate_from_word(k, start_fp, max_steps=50):
+    """Faithful cascade-based generation. No successor walking.
+
+    1. Start from the starting motif's full state.
+    2. Each step: settle the current state at familiarity=0.
+    3. Recall the settled state from krimelack. Emit the recalled motif's word.
+    4. Perturb: null out the lowest-weight intra-strand positions (positions
+       0-3 in each strand, since P3I[0..3] carry the least structural weight)
+       to give the substrate room to move. Best-guess: null positions 0-3
+       across all strands (64 of 256 trits = 25%).
+    5. Repeat until fixed point, all-null, or max_steps.
+
+    The successor counter is NOT referenced. This is settle dynamics only.
+    """
+    import random as _rng
     out = []
-    recent_fps = []
-    current_fp = start_fp
+    trace = []  # detailed trace per step
+
+    m = k.motifs.get(start_fp)
+    if m is None:
+        return "", []
+
+    state = m.state
+    prev_state = None
 
     for step in range(max_steps):
-        m = k.motifs.get(current_fp)
-        if m is None:
+        # Settle the current state
+        strands = [state[j * TRITS:(j + 1) * TRITS] for j in range(CONTEXT)]
+        settled = settle(strands, 0)
+
+        # Check for fixed point
+        if settled == prev_state:
+            trace.append({"step": step, "event": "fixed_point",
+                          "null_fraction": round(count_nulls(settled) / POP, 4)})
             break
 
-        loop_depth = recent_fps[-4:].count(current_fp)
-        recent_fps.append(current_fp)
+        # Check for all-null collapse
+        if all(t == 0 for t in settled):
+            trace.append({"step": step, "event": "all_null_collapse"})
+            break
 
-        # Emit the word associated with this motif
-        if m.word:
-            out.append(m.word)
-        elif m.char_counts:
-            chars = sorted(m.char_counts.items(), key=lambda kv: -kv[1])
-            out.append(chars[0][0])
-        else:
+        # Recall from krimelack
+        recalled, score = k.recall(settled)
+        if recalled is None:
+            trace.append({"step": step, "event": "recall_failed"})
             out.append("?")
-
-        # Walk to successor
-        if m.successors:
-            ranked = sorted(m.successors.items(), key=lambda kv: -kv[1])
-            idx = min(loop_depth, len(ranked) - 1)
-            current_fp = ranked[idx][0]
         else:
+            word = recalled.word if recalled.word else "?"
+            out.append(word)
+            trace.append({
+                "step": step, "event": "emit",
+                "word": word, "fp": recalled.fp,
+                "chi": recalled.chi,
+                "score": score,
+                "null_fraction": round(count_nulls(settled) / POP, 4),
+            })
+
+        prev_state = settled
+
+        # Perturb: null out positions 0-3 in each strand to give the
+        # substrate room to move to a different state next step.
+        # Best-guess: null the lowest-weight trit positions (0-3).
+        perturbed = list(settled)
+        for s in range(CONTEXT):
+            for i in range(4):  # positions 0-3 (P3I = 1, 3, 9, 27)
+                perturbed[s * TRITS + i] = 0
+        state = tuple(perturbed)
+
+        # Check if perturbation collapsed everything
+        if all(t == 0 for t in state):
+            trace.append({"step": step + 1, "event": "perturbation_collapsed"})
             break
 
-        if loop_depth >= 3:
-            break
-
-    return " ".join(out)
+    return " ".join(out), trace
 
 
 # ======================================================================
@@ -563,29 +602,34 @@ def main():
                                            "reason": "fewer than 2 motifs"}
         print("  Skipped (fewer than 2 motifs)")
 
-    # ── Generation ───────────────────────────────────────────────────
-    print("\n=== Generation from word motifs ===")
+    # ── Generation (faithful: settle-based, no successor walking) ────
+    print("\n=== Generation from word motifs (settle-based) ===")
     if k.size() > 0:
-        loom = Loom(k)
-        # Pick 10 starting motifs: top by weight
+        # Pick 10 starting motifs: top by weight (note: weight is corpus
+        # frequency — this biases toward attractor, documented not hidden)
         by_weight = sorted(k.motifs.values(), key=lambda m: -m.weight)
         starters = by_weight[:10]
 
         generation_results = []
         for i, m in enumerate(starters):
             try:
-                output = generate_from_word(k, loom, m.fp, max_steps=50)
+                output, trace = generate_from_word(k, m.fp, max_steps=50)
                 gen = {
                     "starter_fp": m.fp,
                     "starter_word": m.word,
                     "starter_chi": m.chi,
                     "starter_weight": m.weight,
                     "output": output,
-                    "output_length": len(output),
+                    "output_words": len(output.split()) if output else 0,
+                    "steps": len(trace),
+                    "termination": trace[-1]["event"] if trace else "no_steps",
+                    "trace": trace,
                 }
                 generation_results.append(gen)
                 print(f"  [{i}] start='{m.word}' (w={m.weight}, chi={m.chi})")
-                print(f"      -> {output[:120]}")
+                print(f"      -> {output[:120] if output else '(empty)'}")
+                print(f"      steps={len(trace)}, "
+                      f"ended={trace[-1]['event'] if trace else 'no_steps'}")
             except Exception as e:
                 tb = traceback.format_exc()
                 generation_results.append({

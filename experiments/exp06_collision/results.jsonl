@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-04T09:21:20",
+  "timestamp": "2026-06-04T09:43:31",
   "config": {
     "TRITS": 16,
     "CONTEXT": 16,
@@ -38,7 +38,7 @@
     "null_collapses": 0,
     "words_truncated": 70,
     "errors": [],
-    "time_seconds": 1.07
+    "time_seconds": 1.12
   },
   "chi_distribution": {
     "-58": 2,
@@ -101,7 +101,7 @@
     "collapsed_to_null": 0,
     "scattered": 0,
     "errors": [],
-    "time_seconds": 0.02,
+    "time_seconds": 0.03,
     "sample_compositions": [
       {
         "parent_a": "4883e2a6cc8e",
@@ -251,80 +251,320 @@
       "starter_word": "gualaloom",
       "starter_chi": -29,
       "starter_weight": 2918,
-      "output": "gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent,",
-      "output_length": 430
+      "output": "gualaloom architecture",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "gualaloom",
+          "fp": "4883e2a6cc8e",
+          "chi": -29,
+          "score": 4899,
+          "null_fraction": 0.8125
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "architecture",
+          "fp": "f9cd7c7b5965",
+          "chi": 1,
+          "score": 40,
+          "null_fraction": 0.9375
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.9375
+        }
+      ]
     },
     {
       "starter_fp": "acaae238e9ab",
       "starter_word": "descent,",
       "starter_chi": -14,
       "starter_weight": 389,
-      "output": "descent, gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback",
-      "output_length": 452
+      "output": "descent, architecture",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "descent,",
+          "fp": "acaae238e9ab",
+          "chi": -14,
+          "score": 3299,
+          "null_fraction": 0.875
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "architecture",
+          "fp": "f9cd7c7b5965",
+          "chi": 1,
+          "score": 40,
+          "null_fraction": 0.9375
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.9375
+        }
+      ]
     },
     {
       "starter_fp": "7ac5e28cb773",
       "starter_word": "\u2014",
       "starter_chi": -58,
       "starter_weight": 89,
-      "output": "\u2014 gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
-      "output_length": 423
+      "output": "\u2014 #",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "\u2014",
+          "fp": "7ac5e28cb773",
+          "chi": -58,
+          "score": 9689,
+          "null_fraction": 0.625
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "#",
+          "fp": "8cba664a2a6c",
+          "chi": -28,
+          "score": 1616,
+          "null_fraction": 0.75
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.75
+        }
+      ]
     },
     {
       "starter_fp": "d8d780406d89",
       "starter_word": "substrate",
       "starter_chi": -14,
       "starter_weight": 52,
-      "output": "substrate gualaloom descent, gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent,",
-      "output_length": 441
+      "output": "substrate",
+      "output_words": 1,
+      "steps": 2,
+      "termination": "perturbation_collapsed",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "substrate",
+          "fp": "d8d780406d89",
+          "chi": -14,
+          "score": 3252,
+          "null_fraction": 0.875
+        },
+        {
+          "step": 1,
+          "event": "perturbation_collapsed"
+        }
+      ]
     },
     {
       "starter_fp": "f9cd7c7b5965",
       "starter_word": "architecture",
       "starter_chi": 1,
       "starter_weight": 40,
-      "output": "architecture gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
-      "output_length": 434
+      "output": "architecture",
+      "output_words": 1,
+      "steps": 2,
+      "termination": "perturbation_collapsed",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "architecture",
+          "fp": "f9cd7c7b5965",
+          "chi": 1,
+          "score": 1640,
+          "null_fraction": 0.9375
+        },
+        {
+          "step": 1,
+          "event": "perturbation_collapsed"
+        }
+      ]
     },
     {
       "starter_fp": "0895c7653aab",
       "starter_word": "motif",
       "starter_chi": -29,
       "starter_weight": 17,
-      "output": "motif descent, gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent,",
-      "output_length": 449
+      "output": "motif architecture",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "motif",
+          "fp": "0895c7653aab",
+          "chi": -29,
+          "score": 4817,
+          "null_fraction": 0.8125
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "architecture",
+          "fp": "f9cd7c7b5965",
+          "chi": 1,
+          "score": 40,
+          "null_fraction": 0.9375
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.9375
+        }
+      ]
     },
     {
       "starter_fp": "8cba664a2a6c",
       "starter_word": "#",
       "starter_chi": -28,
       "starter_weight": 16,
-      "output": "# gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
-      "output_length": 423
+      "output": "# architecture",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "#",
+          "fp": "8cba664a2a6c",
+          "chi": -28,
+          "score": 6416,
+          "null_fraction": 0.75
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "architecture",
+          "fp": "f9cd7c7b5965",
+          "chi": 1,
+          "score": 40,
+          "null_fraction": 0.9375
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.9375
+        }
+      ]
     },
     {
       "starter_fp": "8464c4ef87b0",
       "starter_word": "feedback",
       "starter_chi": -14,
       "starter_weight": 9,
-      "output": "feedback | gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture",
-      "output_length": 422
+      "output": "feedback",
+      "output_words": 1,
+      "steps": 2,
+      "termination": "perturbation_collapsed",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "feedback",
+          "fp": "8464c4ef87b0",
+          "chi": -14,
+          "score": 3209,
+          "null_fraction": 0.875
+        },
+        {
+          "step": 1,
+          "event": "perturbation_collapsed"
+        }
+      ]
     },
     {
       "starter_fp": "6620547dae1f",
       "starter_word": "\u2192",
       "starter_chi": -58,
       "starter_weight": 7,
-      "output": "\u2192 gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
-      "output_length": 423
+      "output": "\u2192 #",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "\u2192",
+          "fp": "6620547dae1f",
+          "chi": -58,
+          "score": 9607,
+          "null_fraction": 0.625
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "#",
+          "fp": "8cba664a2a6c",
+          "chi": -28,
+          "score": 1616,
+          "null_fraction": 0.75
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.75
+        }
+      ]
     },
     {
       "starter_fp": "ed6a845f3651",
       "starter_word": "ternary",
       "starter_chi": -26,
       "starter_weight": 6,
-      "output": "ternary gualaloom descent, gualaloom substrate gualaloom \u2014 gualaloom \u2014 descent, gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom descent, architecture descent, architecture descent, feedback | gualaloom descent, architecture gualaloom substrate gualaloom substrate \u2014 gualaloom substrate \u2014 descent, gualaloom substrate \u2014 descent, architecture gualaloom",
-      "output_length": 429
+      "output": "gualaloom architecture",
+      "output_words": 2,
+      "steps": 3,
+      "termination": "fixed_point",
+      "trace": [
+        {
+          "step": 0,
+          "event": "emit",
+          "word": "gualaloom",
+          "fp": "4883e2a6cc8e",
+          "chi": -29,
+          "score": 4899,
+          "null_fraction": 0.8125
+        },
+        {
+          "step": 1,
+          "event": "emit",
+          "word": "architecture",
+          "fp": "f9cd7c7b5965",
+          "chi": 1,
+          "score": 40,
+          "null_fraction": 0.9375
+        },
+        {
+          "step": 2,
+          "event": "fixed_point",
+          "null_fraction": 0.9375
+        }
+      ]
     }
   ]
 }

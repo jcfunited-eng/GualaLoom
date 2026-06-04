@@ -1,165 +1,199 @@
-# Experiment 06 — Three-Layer Collision
+# Experiment 06 — Three-Layer Collision (RERUN)
 
 **Date:** 2026-06-04
 **Runner:** c1 (Claude Opus 4.6)
+**Rerun reason:** generate_from_word() was a Markov chain on successor
+counts, not cascade-based generation. Fixed and rerun.
 
-## What this is
+## (1) The cheat and the self-audit
 
-Deliberate stress test: stack CONTEXT=16, folding composition, and
-word-mosaic ingestion. Best-guess everything, no tuning. Capture what
-breaks.
+### Cheat identified by Joe
+
+`generate_from_word()` walked `m.successors` — the bigram counter
+built during corpus ingestion — to pick the next motif. The Loom was
+passed in and never called. settle() was never invoked during
+generation. The output was corpus bigram statistics wearing substrate
+clothing.
+
+### Self-audit: other frequency-driven decisions
+
+**Cheat 2 (documented, spec-compliant):** `run_folding_composition()`
+selects which pairs to compose by sorting on successor counts. The
+spec said "highest co-commit count from successors data" so this
+follows instructions, but it means the SELECTION uses corpus
+statistics even though the COMPOSITION uses real settle().
+
+**Cheat 3 (inherited from substrate):** `recall()` uses
+`min(m.weight, 99)` as a tiebreaker. Weight is corpus frequency. This
+is the existing substrate's behavior (gualaloom.py line 171), not
+something I introduced. Documented, not changed.
+
+**Cheat 4 (documented):** Starter selection picks top-10 by weight
+(corpus frequency). This biases toward the attractor. Documented in
+code comments, not changed — it's how we pick starters, not how we
+generate.
+
+No other frequency/count-driven heuristics found in encode, settle,
+chi, fold_compose, word_mosaic_ingest, or pressure landscape analysis.
+
+### The fix
+
+`generate_from_word()` rewritten to use settle:
+1. Start from the starting motif's full state
+2. Each step: settle the current state at familiarity=0
+3. Recall the settled state from krimelack, emit the word
+4. Perturb: null out positions 0-3 in each strand (25% of trits,
+   the lowest-weight P3I positions) to prevent immediate fixed point
+5. Repeat until fixed point, all-null collapse, or max_steps
+
+The successor counter is not referenced. This is settle dynamics only.
+
+Perturbation choice (best-guess, not tuned): null positions 0-3
+because P3I[0..3] = {1, 3, 9, 27} carry the least structural weight.
+Nulling them gives the substrate room to settle differently on the
+next iteration without destroying the high-weight structural
+commitments at positions 4+.
 
 ## Configuration
 
 ```
-TRITS=16, CONTEXT=16, POP=256
-DEAD_ZONE=15 (unchanged)
-P3I = (1, 3, 9, 27, 81, 243, 729, 2187, 6561, 19683, 59049, 177147,
-       531441, 1594323, 4782969, 14348907)
+TRITS=16, CONTEXT=16, POP=256, DEAD_ZONE=15
+P3I = (1, 3, 9, 27, 81, ..., 14348907)
 ```
 
-## (1) What completed and what didn't
-
-**Everything completed. Zero crashes.**
-
-- Word-mosaic ingestion: 4008 words → 437 unique motifs in 1.1s
-- Folding composition: 50/50 pairs produced stable motifs, 0 null collapses
-- Generation: all 10 starting words produced output
-
-This was surprising. The three-layer stack ran without mechanical
-failure.
-
-## (2) The 10 generation outputs verbatim
+## (2) The 10 faithful generation outputs verbatim
 
 ```
 [0] start='gualaloom' (w=2918, chi=-29)
-    gualaloom descent, gualaloom substrate gualaloom — gualaloom —
-    descent, gualaloom substrate gualaloom substrate — gualaloom
+    -> gualaloom architecture
+    steps=3, ended=fixed_point
 
 [1] start='descent,' (w=389, chi=-14)
-    descent, gualaloom descent, architecture gualaloom substrate
-    gualaloom substrate — gualaloom substrate — descent, gualaloom
+    -> descent, architecture
+    steps=3, ended=fixed_point
 
 [2] start='—' (w=89, chi=-58)
-    — gualaloom descent, gualaloom substrate gualaloom — gualaloom —
-    descent, gualaloom substrate gualaloom substrate — gualaloom
+    -> — #
+    steps=3, ended=fixed_point
 
 [3] start='substrate' (w=52, chi=-14)
-    substrate gualaloom descent, gualaloom substrate — gualaloom
-    substrate — descent, gualaloom substrate — descent, architecture
+    -> substrate
+    steps=2, ended=perturbation_collapsed
 
 [4] start='architecture' (w=40, chi=1)
-    architecture gualaloom descent, gualaloom substrate gualaloom —
-    gualaloom — descent, gualaloom substrate gualaloom substrate
+    -> architecture
+    steps=2, ended=perturbation_collapsed
 
 [5] start='motif' (w=17, chi=-29)
-    motif descent, gualaloom descent, architecture gualaloom substrate
-    gualaloom substrate — gualaloom substrate — descent,
+    -> motif architecture
+    steps=3, ended=fixed_point
 
 [6] start='#' (w=16, chi=-28)
-    # gualaloom descent, gualaloom substrate gualaloom — gualaloom —
-    descent, gualaloom substrate gualaloom substrate — gualaloom
+    -> # architecture
+    steps=3, ended=fixed_point
 
 [7] start='feedback' (w=9, chi=-14)
-    feedback | gualaloom descent, gualaloom substrate gualaloom —
-    gualaloom — descent, gualaloom substrate gualaloom substrate
+    -> feedback
+    steps=2, ended=perturbation_collapsed
 
 [8] start='→' (w=7, chi=-58)
-    → gualaloom descent, gualaloom substrate gualaloom — gualaloom —
-    descent, gualaloom substrate gualaloom substrate — gualaloom
+    -> → #
+    steps=3, ended=fixed_point
 
 [9] start='ternary' (w=6, chi=-26)
-    ternary gualaloom descent, gualaloom substrate gualaloom —
-    gualaloom — descent, gualaloom substrate gualaloom substrate
+    -> gualaloom architecture
+    steps=3, ended=fixed_point
 ```
 
-## (3) The first thing that broke
+## (3) Comparison: bigram walker vs cascade walker
 
-**Nothing mechanically broke.** The first FAILURE is the attractor
-collapse in generation. "gualaloom" (weight=2918) dominates every
-output within 1-2 steps. Every generation run converges to the same
-~5 word orbit: {gualaloom, descent, substrate, —, architecture}.
-This is the exp01 attractor problem at word scale.
+| Starter | Bigram walker (cheated) | Cascade walker (faithful) |
+|---------|------------------------|--------------------------|
+| gualaloom | gualaloom descent, gualaloom substrate gualaloom — gualaloom — descent, gualaloom substrate... (50 words, looping) | gualaloom architecture (2 words, fixed point) |
+| descent, | descent, gualaloom descent, architecture gualaloom substrate... (50 words, looping) | descent, architecture (2 words, fixed point) |
+| — | — gualaloom descent, gualaloom substrate... (50 words, looping) | — # (2 words, fixed point) |
+| substrate | substrate gualaloom descent,... (50 words) | substrate (1 word, perturbation collapsed) |
+| architecture | architecture gualaloom descent,... (50 words) | architecture (1 word, perturbation collapsed) |
 
-## (4) The most interesting failure mode
+The bigram walker produced 50-word looping sequences because it was
+walking a well-connected frequency graph. The cascade walker produces
+1-2 words and stops because:
 
-**The pressure landscape at CONTEXT=16 is WORSE than CONTEXT=8.**
+- **Fixed point (6/10 runs):** settle produces the same state after
+  perturbation. The substrate has only one stable configuration in
+  the neighborhood of each starting motif — perturbing the low-weight
+  positions doesn't move it to a different basin.
 
-```
-CONTEXT=8 pressure bands:       CONTEXT=16 pressure bands:
-  0-5:   91.1%                    0-5:   97.7%
-  6-9:    0.0%                    6-9:    0.0%
-10-12:    0.0%                   10-12:   0.0%
-13-14:    1.5%                   13-14:   0.0%   ← GONE
-  15+:    7.4%                    15+:    2.3%
-```
+- **Perturbation collapsed (4/10 runs):** after nulling positions 0-3,
+  the remaining committed trits at positions 4-15 don't survive
+  the next settle pass (the pressure at those positions, without
+  the low-position trits, falls below the barrier). The state
+  collapses to all-null.
 
-At CONTEXT=16, the loaded band (13-14) is **completely empty**. The
-one cognitive position (intra-strand 3, |h|=13 from 7 cross-strand
-neighbors each contributing P3I[3]//2=13) now has 15 cross-strand
-neighbors each contributing 13, giving |h|=195 for any position
-where neighbors agree. The pressure jumps from the inert zone
-straight to the already-committed zone, skipping the loaded band
-entirely.
+## (4) Honest verdict
 
-**Wider context DESTROYED the loaded-null mechanism.** More
-cross-strand terms don't smooth the pressure landscape — they amplify
-it. The barrier of 15 is overwhelmed by 15 cross-strand votes at
-P3I[3]//2=13 each. Every position that has any cross-strand resonance
-blows past the barrier immediately. The loaded zone between "inert"
-and "committed" doesn't exist at this scale.
+**The substrate's cascade machinery does NOT generate sequential
+output at CONTEXT=16 with barrier=15.**
 
-This means: the cognitive surface area finding from exp02-04 is
-BARRIER-DEPENDENT and CONTEXT-DEPENDENT in a non-obvious way.
-Doubling context doesn't double the cognitive surface — it can
-collapse it to zero.
+The cascade walker produces 1-2 words and dies. The two failure modes
+are:
 
-## (5) What surprised me in the wreckage
+1. **Fixed point:** the perturbation isn't enough to escape the
+   attractor basin. The same motif recalls every time. This is
+   because at CONTEXT=16, the 15 cross-strand terms overwhelm the
+   barrier for any position with consistent neighbors — the settled
+   state is so strongly determined by the high-weight positions that
+   nulling the low-weight ones doesn't change the outcome.
 
-1. **Zero mechanical failures.** The entire stack ran in 1.1s.
-   The substrate's computational properties (integer ternary, no
-   floating point, deterministic) mean it doesn't crash on scale
-   change. The MATH is wrong at scale, but the CODE is fine.
+2. **Perturbation collapse:** the perturbation is too much. Removing
+   25% of trits (positions 0-3) removes enough support that the
+   remaining positions can't sustain their commitments. The state
+   falls to all-null.
 
-2. **Folding composition succeeded at 100%.** All 50 merges produced
-   stable motifs, zero null collapses. "agree-keep, disagree-null"
-   is a robust merge rule. The composed motifs recall to their parents
-   (every composition recalled to one of its source motifs). This
-   suggests folding composition at CONTEXT=16 is mechanically sound
-   even if the pressure landscape is broken.
+This is the same loaded-zone failure from exp03/05, manifested in
+generation: the pressure landscape at CONTEXT=16 has no intermediate
+zone between "fully committed" and "null." The perturbation either
+does nothing (fixed point) or everything (collapse). There's no
+middle ground where the substrate can move to a DIFFERENT stable
+state — because at CONTEXT=16 with barrier=15, there's effectively
+only one stable configuration per neighborhood.
 
-3. **437 motifs from 4008 words (1676 unique) = 26% motif-to-word
-   ratio.** Many distinct words collapse to the same motif. This is
-   expected — the context window means similar character sequences
-   settle to the same state — but the ratio tells us something:
-   word-mosaic at CONTEXT=16 provides about 4x compression of the
-   vocabulary into structural equivalence classes.
+The bigram walker's 50-word loops were an illusion — it was walking
+corpus statistics, not substrate dynamics. The honest answer is: the
+substrate at this scale can't sequence. It can commit one state. It
+can recall one motif. It cannot cascade from one state to a different
+state. Sequential cognition requires either:
 
-4. **Chi distribution shifted dramatically.** CONTEXT=8 chi range:
-   [-19, +2]. CONTEXT=16 chi range: [-58, +1]. The wider state
-   allows much more negative chi (more edges in the coupling graph
-   relative to vertices). The chi landscape is richer at CONTEXT=16,
-   even though the pressure landscape is poorer.
+- The section-coupling mechanism (external trigger from a different
+  krimelack providing fresh input to the settle)
+- Barrier scaling (barrier ∝ CONTEXT to restore the loaded zone)
+- Hierarchical composition (exp04's multi-level structure where the
+  outer level has a richer pressure landscape)
 
-5. **The attractor is even worse at word scale.** At character scale,
-   the loop-breaker managed 11 distinct outputs for 16 inputs. At
-   word scale, "gualaloom" (w=2918) has 7x the weight of "descent,"
-   (w=389) and 50x the weight of everything else. The successor graph
-   is a star topology centered on "gualaloom". The loop-breaker can't
-   escape because there are no alternative paths — every word leads
-   back to "gualaloom" within 1-2 hops.
+## (5) Anything surprising in the wreckage
 
-## The key finding
+1. **"ternary" → "gualaloom architecture"** — starting from a
+   low-weight motif (w=6), the substrate settled to a state that
+   recalled "gualaloom" (the dominant attractor), not "ternary."
+   The cascade erased the starting motif's identity in one step.
+   This confirms: at CONTEXT=16, every motif's basin of attraction
+   converges to the same few dominant states.
 
-**The barrier must scale with context.** At CONTEXT=8, barrier=15
-creates a loaded zone at position 3 because 7 cross-strand terms at
-P3I[3]//2=13 can't all push past 15 unless they agree. At CONTEXT=16,
-15 cross-strand terms at P3I[3]//2=13 sum to 195, which overwhelms
-barrier=15 completely. The barrier needs to be proportional to
-(CONTEXT - 1) × P3I[loaded_position] // 2, or approximately
-barrier ≈ 0.5 × CONTEXT × 13 ≈ 104 at CONTEXT=16 for position 3 to
-remain in the loaded zone.
+2. **The perturbation-collapse motifs are exactly those with chi=-14
+   or chi=1.** These are the motifs where positions 0-3 were already
+   critical to the structural signature. Nulling them destroyed the
+   motif's identity before settle could re-derive it.
 
-This is not a tuning recommendation — it's a structural observation
-about what broke and why. The barrier-to-context relationship is the
-first thing to investigate if wider context is the path forward.
+3. **No crashes, again.** The faithful generation didn't error — it
+   ran, it settled, it recalled, it just had nothing to say. The
+   machinery works. The dynamics don't support sequencing.
+
+## Previous findings still hold
+
+- Ingestion: 4008 words → 437 motifs, identical to first run
+- Folding: 50/50 stable, 0 null collapses, identical
+- Pressure: loaded band empty, identical
+- Chi distribution: identical
+
+The only change is generation: from a 50-word illusion to a 1-2 word
+honest silence.

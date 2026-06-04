@@ -1,0 +1,2642 @@
+{
+  "timestamp": "2026-06-04T17:47:50",
+  "precommit_hash": "0fbb36f",
+  "config": {
+    "TRITS": 16,
+    "CONTEXT": 16,
+    "POP": 256,
+    "BARRIER": 104,
+    "SEED": 70707,
+    "P3I_3": 27,
+    "P3I_3_half": 13,
+    "D4_POSITIONS": [
+      8,
+      9,
+      10
+    ],
+    "D5_POSITIONS": [
+      12,
+      13,
+      14
+    ]
+  },
+  "crashes": [],
+  "corpus": {
+    "files": 6,
+    "total_chars": 26794,
+    "total_words": 4008
+  },
+  "D4_preload": {
+    "singletons": 20,
+    "pairs": 190,
+    "triples": 1140,
+    "quads": 4845,
+    "total_committed": 6195,
+    "total_new": 1753,
+    "null_collapses": 0,
+    "time_seconds": 1.54
+  },
+  "D5_preload": {
+    "singletons": 20,
+    "pairs": 190,
+    "triples": 1140,
+    "quads": 4845,
+    "total_committed": 6195,
+    "total_new": 1753,
+    "null_collapses": 0,
+    "time_seconds": 1.47
+  },
+  "ingestion_hash": "003400fd0448",
+  "D1_ingestion": {
+    "motifs": 6189,
+    "time_seconds": 112.4
+  },
+  "D2_ingestion": {
+    "unique_morphemes": 1098,
+    "committed": 47,
+    "new": 33,
+    "null_collapses": 1051,
+    "time_seconds": 0.24
+  },
+  "D3_ingestion": {
+    "unique_words": 1165,
+    "committed": 73,
+    "new": 22,
+    "null_collapses": 1092,
+    "time_seconds": 0.24
+  },
+  "chi_snapshot_post_ingestion": {
+    "D1": {
+      "count": 6189,
+      "chi_range": [
+        -43,
+        2
+      ],
+      "chi_classes": 26,
+      "distribution": {
+        "-43": 2,
+        "-42": 29,
+        "-41": 10,
+        "-40": 3,
+        "-37": 10,
+        "-36": 15,
+        "-35": 24,
+        "-34": 20,
+        "-33": 7,
+        "-30": 103,
+        "-29": 11,
+        "-28": 86,
+        "-15": 1,
+        "-14": 1,
+        "-13": 18,
+        "-12": 50,
+        "-11": 8,
+        "-9": 23,
+        "-8": 166,
+        "-7": 819,
+        "-6": 1720,
+        "-5": 1095,
+        "-1": 2,
+        "0": 1457,
+        "1": 495,
+        "2": 14
+      }
+    },
+    "D2": {
+      "count": 33,
+      "chi_range": [
+        1,
+        1
+      ],
+      "chi_classes": 1,
+      "distribution": {
+        "1": 33
+      }
+    },
+    "D3": {
+      "count": 22,
+      "chi_range": [
+        1,
+        1
+      ],
+      "chi_classes": 1,
+      "distribution": {
+        "1": 22
+      }
+    },
+    "D4": {
+      "count": 1753,
+      "chi_range": [
+        -29,
+        2
+      ],
+      "chi_classes": 19,
+      "distribution": {
+        "-29": 8,
+        "-28": 48,
+        "-27": 117,
+        "-26": 110,
+        "-25": 38,
+        "-17": 24,
+        "-16": 35,
+        "-15": 122,
+        "-14": 190,
+        "-13": 107,
+        "-12": 56,
+        "-5": 39,
+        "-4": 56,
+        "-3": 89,
+        "-2": 43,
+        "-1": 230,
+        "0": 263,
+        "1": 111,
+        "2": 67
+      }
+    },
+    "D5": {
+      "count": 1753,
+      "chi_range": [
+        -29,
+        2
+      ],
+      "chi_classes": 19,
+      "distribution": {
+        "-29": 8,
+        "-28": 48,
+        "-27": 117,
+        "-26": 110,
+        "-25": 38,
+        "-17": 24,
+        "-16": 35,
+        "-15": 122,
+        "-14": 190,
+        "-13": 107,
+        "-12": 56,
+        "-5": 39,
+        "-4": 56,
+        "-3": 89,
+        "-2": 43,
+        "-1": 230,
+        "0": 263,
+        "1": 111,
+        "2": 67
+      }
+    }
+  },
+  "composition_trials": {
+    "D1_D2": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 0,
+      "recall_to_parent_b": 0,
+      "recall_to_other": 500,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 488,
+      "cross_domain_consistent_count": 0,
+      "cognitively_engaged_count": 10,
+      "empty_real_estate_count": 0,
+      "sample_trials": [
+        {
+          "parent_a": null,
+          "parent_b": "contentaddress",
+          "chi_a": -6,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "tritstrand",
+          "chi_a": -28,
+          "chi_b": 1,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "srcgualaloomsubstratepy",
+          "chi_a": -42,
+          "chi_b": 1,
+          "chi_composed": -43,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "transcripts",
+          "chi_a": -6,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "generatenextcharloom",
+          "chi_a": -7,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-43": 27,
+        "-35": 2,
+        "-34": 8,
+        "-28": 5,
+        "-14": 458
+      }
+    },
+    "D1_D3": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 2,
+      "recall_to_parent_b": 0,
+      "recall_to_other": 498,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 483,
+      "cross_domain_consistent_count": 1,
+      "cognitively_engaged_count": 13,
+      "empty_real_estate_count": 0,
+      "sample_trials": [
+        {
+          "parent_a": null,
+          "parent_b": "transformer",
+          "chi_a": -7,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "recallbyresonance",
+          "chi_a": -6,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "recallbyresonance",
+          "chi_a": -5,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "uncertainty",
+          "chi_a": -5,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "freeevolution",
+          "chi_a": -5,
+          "chi_b": 1,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-43": 34,
+        "-35": 4,
+        "-34": 8,
+        "-28": 4,
+        "-14": 449,
+        "1": 1
+      }
+    },
+    "D1_D4": {
+      "trials": 500,
+      "compositional_novel": 14,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 32,
+      "recall_to_parent_b": 28,
+      "recall_to_other": 440,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 284,
+      "cross_domain_consistent_count": 311,
+      "cognitively_engaged_count": 355,
+      "empty_real_estate_count": 51,
+      "sample_trials": [
+        {
+          "parent_a": null,
+          "parent_b": "deixis_distal+modifier+mood+performative",
+          "chi_a": -5,
+          "chi_b": -17,
+          "chi_composed": -22,
+          "recall_class": "parent_b",
+          "recall_label": "deixis_distal+modifier+mood+performative",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "deixis_distal+deixis_proximal+question+verb",
+          "chi_a": -5,
+          "chi_b": -26,
+          "chi_composed": -34,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "focus+performative+verb",
+          "chi_a": -6,
+          "chi_b": 0,
+          "chi_composed": -7,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": true,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "focus+mood+performative",
+          "chi_a": -35,
+          "chi_b": 0,
+          "chi_composed": -45,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "focus+question",
+          "chi_a": -6,
+          "chi_b": -15,
+          "chi_composed": -21,
+          "recall_class": "parent_b",
+          "recall_label": "focus+question",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": true,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.028,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-73": 4,
+        "-65": 5,
+        "-64": 2,
+        "-61": 1,
+        "-59": 1,
+        "-58": 1,
+        "-51": 1,
+        "-49": 2,
+        "-45": 3,
+        "-43": 18,
+        "-41": 1,
+        "-37": 4,
+        "-36": 2,
+        "-35": 30,
+        "-34": 20,
+        "-31": 14,
+        "-30": 3,
+        "-29": 55,
+        "-28": 13,
+        "-27": 1,
+        "-23": 9,
+        "-22": 13,
+        "-21": 34,
+        "-20": 27,
+        "-19": 2,
+        "-17": 25,
+        "-16": 6,
+        "-15": 44,
+        "-14": 15,
+        "-13": 2,
+        "-12": 1,
+        "-9": 6,
+        "-8": 3,
+        "-7": 39,
+        "-6": 54,
+        "-5": 23,
+        "-4": 12,
+        "-3": 2,
+        "-2": 2
+      }
+    },
+    "D1_D5": {
+      "trials": 500,
+      "compositional_novel": 12,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 24,
+      "recall_to_parent_b": 23,
+      "recall_to_other": 453,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 295,
+      "cross_domain_consistent_count": 290,
+      "cognitively_engaged_count": 354,
+      "empty_real_estate_count": 43,
+      "sample_trials": [
+        {
+          "parent_a": null,
+          "parent_b": "deixis_distal+focus+mood+performative",
+          "chi_a": 1,
+          "chi_b": -15,
+          "chi_composed": -16,
+          "recall_class": "other",
+          "recall_label": "deixis_distal+negation+performative+verb",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": true,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "agent+vocative",
+          "chi_a": -5,
+          "chi_b": -15,
+          "chi_composed": -20,
+          "recall_class": "parent_b",
+          "recall_label": "agent+vocative",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "mood+negation+sentence_bound+statement",
+          "chi_a": -6,
+          "chi_b": -1,
+          "chi_composed": -7,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": true,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "deixis_proximal+hedge+negation+sentence_bound",
+          "chi_a": -6,
+          "chi_b": -2,
+          "chi_composed": -9,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": null,
+          "parent_b": "deixis_distal+mood+sentence_bound+statement",
+          "chi_a": -5,
+          "chi_b": -1,
+          "chi_composed": -6,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": true,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.024,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-72": 2,
+        "-64": 2,
+        "-60": 1,
+        "-58": 4,
+        "-52": 1,
+        "-50": 1,
+        "-48": 1,
+        "-44": 6,
+        "-43": 35,
+        "-40": 1,
+        "-35": 40,
+        "-34": 25,
+        "-33": 1,
+        "-31": 8,
+        "-29": 42,
+        "-28": 10,
+        "-23": 15,
+        "-22": 11,
+        "-21": 31,
+        "-20": 18,
+        "-19": 4,
+        "-17": 11,
+        "-16": 7,
+        "-15": 62,
+        "-14": 22,
+        "-13": 2,
+        "-12": 2,
+        "-9": 10,
+        "-8": 1,
+        "-7": 51,
+        "-6": 39,
+        "-5": 20,
+        "-4": 12,
+        "-3": 1,
+        "-2": 1
+      }
+    },
+    "D2_D3": {
+      "skipped": true,
+      "reason": "no chi-dissimilar pairs"
+    },
+    "D2_D4": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 0,
+      "recall_to_parent_b": 59,
+      "recall_to_other": 441,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 18,
+      "cross_domain_consistent_count": 0,
+      "cognitively_engaged_count": 500,
+      "empty_real_estate_count": 0,
+      "sample_trials": [
+        {
+          "parent_a": "highestresonance",
+          "parent_b": "deixis_proximal+mood+statement+verb",
+          "chi_a": 1,
+          "chi_b": -27,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "dep_dir+object+subject+verb",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "loomlastsettl",
+          "parent_b": "mood+negation+verb",
+          "chi_a": 1,
+          "chi_b": -27,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "dep_dir+modality+performative+subject",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "lingualoomstep",
+          "parent_b": "mood+object+statement",
+          "chi_a": 1,
+          "chi_b": -14,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "dep_dir+hedge+negation",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "constraint",
+          "parent_b": "deixis_distal+dep_dir+verb",
+          "chi_a": 1,
+          "chi_b": -28,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "dep_dir+object+subject+verb",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "lingualoomstep",
+          "parent_b": "imperative+performative+question+vocative",
+          "chi_a": 1,
+          "chi_b": -5,
+          "chi_composed": -4,
+          "recall_class": "other",
+          "recall_label": "imperative+object+sentence_bound+vocative",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-28": 167,
+        "-16": 83,
+        "-14": 151,
+        "-13": 7,
+        "-4": 71,
+        "-2": 21
+      }
+    },
+    "D2_D5": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 0,
+      "recall_to_parent_b": 59,
+      "recall_to_other": 441,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 23,
+      "cross_domain_consistent_count": 0,
+      "cognitively_engaged_count": 500,
+      "empty_real_estate_count": 0,
+      "sample_trials": [
+        {
+          "parent_a": "positions",
+          "parent_b": "dep_dir+hedge+modality+question",
+          "chi_a": 1,
+          "chi_b": -12,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "agent+hedge+modality+question",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "tensorflow",
+          "parent_b": "dep_dir+hedge+question+statement",
+          "chi_a": 1,
+          "chi_b": -26,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "focus+question+scope",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "transcripts",
+          "parent_b": "agent+deixis_distal+object+sentence_bound",
+          "chi_a": 1,
+          "chi_b": -12,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "agent+deixis_proximal+mood+statement",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "highestresonance",
+          "parent_b": "agent+sentence_bound+statement",
+          "chi_a": 1,
+          "chi_b": -28,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "agent+mood+scope+verb",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "inforcementbyrecurrence",
+          "parent_b": "agent+deixis_proximal+focus+hedge",
+          "chi_a": 1,
+          "chi_b": -14,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "imperative+modality+question",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-28": 148,
+        "-16": 90,
+        "-14": 165,
+        "-13": 8,
+        "-4": 66,
+        "-2": 23
+      }
+    },
+    "D3_D4": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 0,
+      "recall_to_parent_b": 53,
+      "recall_to_other": 447,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 26,
+      "cross_domain_consistent_count": 0,
+      "cognitively_engaged_count": 500,
+      "empty_real_estate_count": 0,
+      "sample_trials": [
+        {
+          "parent_a": "conversion",
+          "parent_b": "hedge+imperative+modifier+performative",
+          "chi_a": 1,
+          "chi_b": -26,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "agent+hedge+imperative+sentence_bound",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "recallbyresonance",
+          "parent_b": "object+question+sentence_bound",
+          "chi_a": 1,
+          "chi_b": -14,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "hedge+question+sentence_bound",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "subsequent",
+          "parent_b": "deixis_proximal+hedge+imperative+statement",
+          "chi_a": 1,
+          "chi_b": -13,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "deixis_proximal+hedge+imperative+modifier",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "conversation",
+          "parent_b": "object+scope+verb+vocative",
+          "chi_a": 1,
+          "chi_b": -14,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "deixis_proximal+object+verb+vocative",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "subsequent",
+          "parent_b": "focus+modifier+mood+verb",
+          "chi_a": 1,
+          "chi_b": -17,
+          "chi_composed": -16,
+          "recall_class": "other",
+          "recall_label": "deixis_distal+focus+imperative+sentence_bound",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-28": 146,
+        "-16": 98,
+        "-14": 167,
+        "-13": 16,
+        "-4": 51,
+        "-2": 22
+      }
+    },
+    "D3_D5": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 0,
+      "recall_to_parent_b": 51,
+      "recall_to_other": 449,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 19,
+      "cross_domain_consistent_count": 0,
+      "cognitively_engaged_count": 500,
+      "empty_real_estate_count": 0,
+      "sample_trials": [
+        {
+          "parent_a": "subsequent",
+          "parent_b": "deixis_proximal+modifier+negation+sentence_bound",
+          "chi_a": 1,
+          "chi_b": -27,
+          "chi_composed": -28,
+          "recall_class": "other",
+          "recall_label": "deixis_distal+negation+performative+vocative",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "corruption",
+          "parent_b": "imperative+mood+sentence_bound+vocative",
+          "chi_a": 1,
+          "chi_b": -15,
+          "chi_composed": -16,
+          "recall_class": "other",
+          "recall_label": "imperative+modality+question+sentence_bound",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "conversion",
+          "parent_b": "deixis_distal+negation+question",
+          "chi_a": 1,
+          "chi_b": -13,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "agent+modifier+vocative",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 91
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "continuous",
+          "parent_b": "deixis_proximal+focus+hedge+mood",
+          "chi_a": 1,
+          "chi_b": -14,
+          "chi_composed": -14,
+          "recall_class": "other",
+          "recall_label": "deixis_proximal+focus+hedge+sentence_bound",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "subconscious",
+          "parent_b": "focus+negation+performative+scope",
+          "chi_a": 1,
+          "chi_b": -4,
+          "chi_composed": -4,
+          "recall_class": "parent_b",
+          "recall_label": "focus+negation+performative+scope",
+          "novelty": {
+            "not_parental": false,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": true,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 104
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-28": 164,
+        "-16": 81,
+        "-14": 163,
+        "-13": 17,
+        "-4": 55,
+        "-2": 20
+      }
+    },
+    "D4_D5": {
+      "trials": 500,
+      "compositional_novel": 0,
+      "geometric_novel": 0,
+      "recall_to_parent_a": 15,
+      "recall_to_parent_b": 19,
+      "recall_to_other": 466,
+      "recall_changed_post_dream": 0,
+      "null_collapses": 0,
+      "not_parental_count": 333,
+      "cross_domain_consistent_count": 312,
+      "cognitively_engaged_count": 0,
+      "empty_real_estate_count": 28,
+      "sample_trials": [
+        {
+          "parent_a": "agent+hedge+imperative+negation",
+          "parent_b": "modality+negation+verb+vocative",
+          "chi_a": -27,
+          "chi_b": -16,
+          "chi_composed": -46,
+          "recall_class": "other",
+          "recall_label": "imperative",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": true,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "agent+focus+negation+question",
+          "parent_b": "agent+modifier+negation+question",
+          "chi_a": -26,
+          "chi_b": 0,
+          "chi_composed": -30,
+          "recall_class": "other",
+          "recall_label": null,
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": true,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "focus+modifier+sentence_bound+verb",
+          "parent_b": "deixis_distal+imperative+modifier+performative",
+          "chi_a": -5,
+          "chi_b": -15,
+          "chi_composed": -22,
+          "recall_class": "other",
+          "recall_label": "deixis_distal+dep_dir+focus+performative",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "deixis_distal+focus+hedge+mood",
+          "parent_b": "deixis_distal+deixis_proximal+imperative+statement",
+          "chi_a": -26,
+          "chi_b": -13,
+          "chi_composed": -44,
+          "recall_class": "other",
+          "recall_label": "focus",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        },
+        {
+          "parent_a": "hedge+performative+question",
+          "parent_b": "dep_dir+focus+negation+sentence_bound",
+          "chi_a": -12,
+          "chi_b": -4,
+          "chi_composed": -20,
+          "recall_class": "other",
+          "recall_label": "hedge+imperative+modifier",
+          "novelty": {
+            "not_parental": true,
+            "cross_domain_consistent": false,
+            "cognitively_engaged": false,
+            "empty_real_estate": false,
+            "novel": false,
+            "geometric_novel": false,
+            "h_at_pos3": 0
+          },
+          "recall_changed": false
+        }
+      ],
+      "compositional_novelty_rate": 0.0,
+      "geometric_novelty_rate": 0.0,
+      "recall_change_rate": 0.0,
+      "chi_composed_distribution": {
+        "-46": 28,
+        "-44": 51,
+        "-43": 2,
+        "-34": 29,
+        "-32": 20,
+        "-31": 1,
+        "-30": 60,
+        "-29": 24,
+        "-28": 6,
+        "-27": 9,
+        "-22": 15,
+        "-20": 43,
+        "-18": 37,
+        "-17": 15,
+        "-16": 70,
+        "-15": 39,
+        "-14": 3,
+        "-13": 13,
+        "-6": 12,
+        "-5": 11,
+        "-4": 2,
+        "-3": 6,
+        "-2": 2,
+        "-1": 2
+      }
+    }
+  },
+  "composition_time_seconds": 81.31,
+  "vitals_log": [
+    {
+      "trial": 0,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 100,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 200,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 300,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 400,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 500,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 600,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 700,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 800,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 900,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1000,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1100,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1200,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1300,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1400,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1500,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1600,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1700,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1800,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 1900,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2000,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2100,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2200,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2300,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2400,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2500,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2600,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2700,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2800,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 2900,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3000,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3100,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3200,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3300,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3400,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3500,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3600,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3700,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3800,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 3900,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 4000,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 4100,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 4200,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 4300,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 4400,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    },
+    {
+      "trial": 4500,
+      "total_motifs": 9750,
+      "domain_sizes": {
+        "D1": 6189,
+        "D2": 33,
+        "D3": 22,
+        "D4": 1753,
+        "D5": 1753,
+        "dream": 0
+      },
+      "chi_classes": 34,
+      "pressure_pos3_mean": 0.0,
+      "pressure_pos3_loaded": 0,
+      "pressure_pos3_total_nulls": 1600
+    }
+  ],
+  "loaded_null_test": {
+    "trials": 200,
+    "preserved": 2,
+    "destroyed": 197,
+    "relocated": 1,
+    "null_collapses": 0,
+    "h_all_positions": {
+      "4": {
+        "count": 14,
+        "mean": 82.0
+      },
+      "3": {
+        "count": 17,
+        "mean": 97.12
+      }
+    },
+    "sample_trials": [
+      {
+        "n_composed": 3,
+        "parents": [
+          null,
+          null,
+          null
+        ],
+        "h_pos3": 0,
+        "preserved": false,
+        "relocated": false
+      },
+      {
+        "n_composed": 4,
+        "parents": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "h_pos3": 0,
+        "preserved": false,
+        "relocated": false
+      },
+      {
+        "n_composed": 3,
+        "parents": [
+          null,
+          null,
+          null
+        ],
+        "h_pos3": 0,
+        "preserved": false,
+        "relocated": false
+      },
+      {
+        "n_composed": 4,
+        "parents": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "h_pos3": 0,
+        "preserved": false,
+        "relocated": false
+      },
+      {
+        "n_composed": 3,
+        "parents": [
+          null,
+          null,
+          null
+        ],
+        "h_pos3": 0,
+        "preserved": false,
+        "relocated": false
+      }
+    ],
+    "preservation_rate": 0.01,
+    "destruction_rate": 0.985,
+    "relocation_rate": 0.005,
+    "time_seconds": 0.3
+  },
+  "feed_char_sweep": {
+    "R1": [
+      {
+        "starter": "consolidation",
+        "starter_chi": 1,
+        "steps": 7,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 7
+      },
+      {
+        "starter": "continuous",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "contributing",
+        "starter_chi": 1,
+        "steps": 7,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 7
+      },
+      {
+        "starter": "conversation",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "conversion",
+        "starter_chi": 1,
+        "steps": 6,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 6
+      },
+      {
+        "starter": "coresonant",
+        "starter_chi": 1,
+        "steps": 5,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 5
+      },
+      {
+        "starter": "corruption",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "demonstrates",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "freeevolution",
+        "starter_chi": 1,
+        "steps": 4,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 4
+      },
+      {
+        "starter": "inputpipeline",
+        "starter_chi": 1,
+        "steps": 8,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 8
+      }
+    ],
+    "R2": [
+      {
+        "starter": "consolidation",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "continuous",
+        "starter_chi": 1,
+        "steps": 4,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 4
+      },
+      {
+        "starter": "contributing",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "conversation",
+        "starter_chi": 1,
+        "steps": 7,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 7
+      },
+      {
+        "starter": "conversion",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "coresonant",
+        "starter_chi": 1,
+        "steps": 7,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 7
+      },
+      {
+        "starter": "corruption",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "demonstrates",
+        "starter_chi": 1,
+        "steps": 4,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 4
+      },
+      {
+        "starter": "freeevolution",
+        "starter_chi": 1,
+        "steps": 4,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 4
+      },
+      {
+        "starter": "inputpipeline",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      }
+    ],
+    "R3": [
+      {
+        "starter": "consolidation",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "continuous",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "contributing",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "conversation",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "conversion",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "coresonant",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "corruption",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "demonstrates",
+        "starter_chi": 1,
+        "steps": 4,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 4
+      },
+      {
+        "starter": "freeevolution",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "inputpipeline",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      }
+    ],
+    "R4": [
+      {
+        "starter": "consolidation",
+        "starter_chi": 1,
+        "steps": 7,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 7
+      },
+      {
+        "starter": "continuous",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "contributing",
+        "starter_chi": 1,
+        "steps": 7,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 7
+      },
+      {
+        "starter": "conversation",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "conversion",
+        "starter_chi": 1,
+        "steps": 6,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 6
+      },
+      {
+        "starter": "coresonant",
+        "starter_chi": 1,
+        "steps": 5,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 5
+      },
+      {
+        "starter": "corruption",
+        "starter_chi": 1,
+        "steps": 2,
+        "distinct_words": 1,
+        "output_preview": "? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 2
+      },
+      {
+        "starter": "demonstrates",
+        "starter_chi": 1,
+        "steps": 3,
+        "distinct_words": 1,
+        "output_preview": "? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 3
+      },
+      {
+        "starter": "freeevolution",
+        "starter_chi": 1,
+        "steps": 4,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 4
+      },
+      {
+        "starter": "inputpipeline",
+        "starter_chi": 1,
+        "steps": 8,
+        "distinct_words": 1,
+        "output_preview": "? ? ? ? ? ? ? ?",
+        "fixed_point": true,
+        "orbit_depth": 1,
+        "max_repeat": 8
+      }
+    ]
+  },
+  "feed_char_sweep_time": 1.06,
+  "chi_snapshot_post_trial": {
+    "D1": {
+      "count": 6189,
+      "chi_classes": 26
+    },
+    "D2": {
+      "count": 33,
+      "chi_classes": 1
+    },
+    "D3": {
+      "count": 22,
+      "chi_classes": 1
+    },
+    "D4": {
+      "count": 1753,
+      "chi_classes": 19
+    },
+    "D5": {
+      "count": 1753,
+      "chi_classes": 19
+    },
+    "dream": {
+      "count": 0,
+      "chi_classes": 0
+    }
+  },
+  "vitals_final": {
+    "trial": -1,
+    "total_motifs": 9750,
+    "domain_sizes": {
+      "D1": 6189,
+      "D2": 33,
+      "D3": 22,
+      "D4": 1753,
+      "D5": 1753,
+      "dream": 0
+    },
+    "chi_classes": 34,
+    "pressure_pos3_mean": 0.0,
+    "pressure_pos3_loaded": 0,
+    "pressure_pos3_total_nulls": 1600
+  },
+  "total_time_seconds": 198.59
+}

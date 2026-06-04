@@ -1,0 +1,662 @@
+{
+  "42": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 61,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.5279440449751568,
+        "verb": 0.44472708758423046,
+        "object": 0.6145177572406426
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 169,
+      "b_utterances": 207,
+      "vector_response_overlap": 0.06922850437146087,
+      "random_baseline": 0.06119470740312011,
+      "ratio": 1.131282545652488,
+      "early_response": 0.08984558590822195,
+      "late_response": 0.0532412364016278,
+      "grounded_A": 135,
+      "grounded_B": 130,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.7797619047619048,
+      "chance_level": 0.16666666666666666,
+      "n_chi_classes": 6,
+      "intro_commits": 36,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.3729166666666667,
+      "mean_without": 0.36666666666666664,
+      "peak_with": 0.55,
+      "peak_without": 0.6166666666666667,
+      "gamma_with_self_evo": {
+        "symmetry": 0.3513359759375428,
+        "consistency": 0.3513359759375428,
+        "compactness": 0.4704833968377547
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 127,
+      "conflict_deliberations": 33,
+      "actions_logged": 160,
+      "actions_with_effect": 67,
+      "resolution_effect_ratio": 0.41875,
+      "pass": true
+    }
+  },
+  "7": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 56,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.43942482854113923,
+        "verb": 0.5356612670195591,
+        "object": 0.5584610677115421
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 164,
+      "b_utterances": 158,
+      "vector_response_overlap": 0.060668058383902095,
+      "random_baseline": 0.06534422739820638,
+      "ratio": 0.9284379171581936,
+      "early_response": 0.06815130457914946,
+      "late_response": 0.046915347078850374,
+      "grounded_A": 196,
+      "grounded_B": 100,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.7142857142857143,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 12,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.39166666666666666,
+      "mean_without": 0.36458333333333337,
+      "peak_with": 0.5,
+      "peak_without": 0.4666666666666667,
+      "gamma_with_self_evo": {
+        "symmetry": 0.3673395136432753,
+        "consistency": 0.3673395136432753,
+        "compactness": 0.7335222440676572
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 127,
+      "conflict_deliberations": 41,
+      "actions_logged": 167,
+      "actions_with_effect": 69,
+      "resolution_effect_ratio": 0.350253807106599,
+      "pass": true
+    }
+  },
+  "99": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 62,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.6704183561017196,
+        "verb": 0.5569071600004031,
+        "object": 0.45357515636395185
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 174,
+      "b_utterances": 227,
+      "vector_response_overlap": 0.06745877556422522,
+      "random_baseline": 0.05842543857270222,
+      "ratio": 1.1546130797166765,
+      "early_response": 0.08174562293506249,
+      "late_response": 0.06315553573874345,
+      "grounded_A": 97,
+      "grounded_B": 64,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.8357314148681055,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 1966,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.525,
+      "mean_without": 0.5854166666666667,
+      "peak_with": 0.85,
+      "peak_without": 0.85,
+      "gamma_with_self_evo": {
+        "symmetry": 0.5,
+        "consistency": 0.5,
+        "compactness": 0.3412711060736885
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 1,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 126,
+      "conflict_deliberations": 40,
+      "actions_logged": 166,
+      "actions_with_effect": 71,
+      "resolution_effect_ratio": 0.4251497005988024,
+      "pass": true
+    }
+  },
+  "23": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 40,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.47478757438189484,
+        "verb": 0.46829403777085665,
+        "object": 0.6762759170653907
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 212,
+      "b_utterances": 181,
+      "vector_response_overlap": 0.06746454884205527,
+      "random_baseline": 0.06297693665073043,
+      "ratio": 1.0712580260328175,
+      "early_response": 0.07082758192319016,
+      "late_response": 0.06253256323411766,
+      "grounded_A": 109,
+      "grounded_B": 62,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 1.0,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 14,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.30416666666666664,
+      "mean_without": 0.40208333333333335,
+      "peak_with": 0.4166666666666667,
+      "peak_without": 0.5,
+      "gamma_with_self_evo": {
+        "symmetry": 0.23452812468823883,
+        "consistency": 0.23452812468823883,
+        "compactness": 0.8536219594098009
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 100,
+      "conflict_deliberations": 32,
+      "actions_logged": 132,
+      "actions_with_effect": 44,
+      "resolution_effect_ratio": 0.26666666666666666,
+      "pass": true
+    }
+  },
+  "156": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 53,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.5436989379084968,
+        "verb": 0.47171873928479113,
+        "object": 0.5833649513317033
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 209,
+      "b_utterances": 177,
+      "vector_response_overlap": 0.0602460710579988,
+      "random_baseline": 0.05940458452686147,
+      "ratio": 1.0141653466283707,
+      "early_response": 0.07805266627819457,
+      "late_response": 0.06613911398033216,
+      "grounded_A": 124,
+      "grounded_B": 71,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.7285714285714285,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 22,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.3666666666666667,
+      "mean_without": 0.3875,
+      "peak_with": 0.5,
+      "peak_without": 0.5,
+      "gamma_with_self_evo": {
+        "symmetry": 0.32125324583132675,
+        "consistency": 0.32125324583132675,
+        "compactness": 0.8997046705682248
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 116,
+      "conflict_deliberations": 33,
+      "actions_logged": 149,
+      "actions_with_effect": 65,
+      "resolution_effect_ratio": 0.436241610738255,
+      "pass": true
+    }
+  },
+  "311": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 51,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.48632044597275526,
+        "verb": 0.6292124542124542,
+        "object": 0.608327460653042
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 230,
+      "b_utterances": 220,
+      "vector_response_overlap": 0.05659335962837721,
+      "random_baseline": 0.06270884595586224,
+      "ratio": 0.9024780916588797,
+      "early_response": 0.057606550535100796,
+      "late_response": 0.054649480832049416,
+      "grounded_A": 121,
+      "grounded_B": 142,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.5202561421850497,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 1955,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.36458333333333337,
+      "mean_without": 0.3145833333333333,
+      "peak_with": 0.45,
+      "peak_without": 0.4666666666666667,
+      "gamma_with_self_evo": {
+        "symmetry": 0.38679484639062894,
+        "consistency": 0.38679484639062894,
+        "compactness": 0.6368306864562516
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 125,
+      "conflict_deliberations": 40,
+      "actions_logged": 165,
+      "actions_with_effect": 57,
+      "resolution_effect_ratio": 0.3392857142857143,
+      "pass": true
+    }
+  },
+  "8888": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 43,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.39345085584142914,
+        "verb": 0.4419035049917403,
+        "object": 0.5878394836195348
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 165,
+      "b_utterances": 212,
+      "vector_response_overlap": 0.06187605096644357,
+      "random_baseline": 0.061042875697554094,
+      "ratio": 1.0136490173401653,
+      "early_response": 0.0591764349176546,
+      "late_response": 0.06944545545215944,
+      "grounded_A": 93,
+      "grounded_B": 73,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.5851318944844124,
+      "chance_level": 0.16666666666666666,
+      "n_chi_classes": 6,
+      "intro_commits": 1994,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.4229166666666666,
+      "mean_without": 0.4041666666666667,
+      "peak_with": 0.5333333333333333,
+      "peak_without": 0.5833333333333334,
+      "gamma_with_self_evo": {
+        "symmetry": 0.4585084552854765,
+        "consistency": 0.4585084552854765,
+        "compactness": 0.4520521063652789
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 104,
+      "conflict_deliberations": 26,
+      "actions_logged": 130,
+      "actions_with_effect": 61,
+      "resolution_effect_ratio": 0.3696969696969697,
+      "pass": true
+    }
+  },
+  "1": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 57,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.48044545786664256,
+        "verb": 0.4557561588657647,
+        "object": 0.549308736259756
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 151,
+      "b_utterances": 271,
+      "vector_response_overlap": 0.06599769513366016,
+      "random_baseline": 0.06233723667862149,
+      "ratio": 1.0587202553412833,
+      "early_response": 0.07201990251720787,
+      "late_response": 0.05559103738462876,
+      "grounded_A": 101,
+      "grounded_B": 133,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.4962852897473997,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 685,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.375,
+      "mean_without": 0.3666666666666667,
+      "peak_with": 0.48333333333333334,
+      "peak_without": 0.4666666666666667,
+      "gamma_with_self_evo": {
+        "symmetry": 0.34846978550867214,
+        "consistency": 0.34846978550867214,
+        "compactness": 1.0069525294717807
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 128,
+      "conflict_deliberations": 40,
+      "actions_logged": 168,
+      "actions_with_effect": 84,
+      "resolution_effect_ratio": 0.5,
+      "pass": true
+    }
+  },
+  "2024": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 44,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.4701293520086622,
+        "verb": 0.5120140937001403,
+        "object": 0.5703059486373165
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 220,
+      "b_utterances": 158,
+      "vector_response_overlap": 0.06541353948643171,
+      "random_baseline": 0.059647130771190576,
+      "ratio": 1.0966753746690912,
+      "early_response": 0.06834453552578622,
+      "late_response": 0.07181916202574543,
+      "grounded_A": 147,
+      "grounded_B": 93,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.7777777777777778,
+      "chance_level": 0.2,
+      "n_chi_classes": 5,
+      "intro_commits": 17,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.3104166666666667,
+      "mean_without": 0.3333333333333333,
+      "peak_with": 0.7333333333333333,
+      "peak_without": 0.6333333333333333,
+      "gamma_with_self_evo": {
+        "symmetry": 0.3763866860406927,
+        "consistency": 0.3763866860406927,
+        "compactness": 0.6375369979446007
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 128,
+      "conflict_deliberations": 33,
+      "actions_logged": 161,
+      "actions_with_effect": 72,
+      "resolution_effect_ratio": 0.3956043956043956,
+      "pass": true
+    }
+  },
+  "17": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 50,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.4971609368840314,
+        "verb": 0.4689581716457984,
+        "object": 0.5254038989333106
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 183,
+      "b_utterances": 184,
+      "vector_response_overlap": 0.06517841788282047,
+      "random_baseline": 0.06129974099449576,
+      "ratio": 1.0632739523103856,
+      "early_response": 0.05040887843114407,
+      "late_response": 0.08632457043556654,
+      "grounded_A": 71,
+      "grounded_B": 119,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.85,
+      "chance_level": 0.16666666666666666,
+      "n_chi_classes": 6,
+      "intro_commits": 22,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.3125,
+      "mean_without": 0.3020833333333333,
+      "peak_with": 0.43333333333333335,
+      "peak_without": 0.43333333333333335,
+      "gamma_with_self_evo": {
+        "symmetry": 0.22383583469831636,
+        "consistency": 0.22383583469831636,
+        "compactness": 0.8111033165677375
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 137,
+      "conflict_deliberations": 42,
+      "actions_logged": 179,
+      "actions_with_effect": 55,
+      "resolution_effect_ratio": 0.30726256983240224,
+      "pass": true
+    }
+  },
+  "555": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 57,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.5267405841539605,
+        "verb": 0.6135911147675854,
+        "object": 0.5097591601780562
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 169,
+      "b_utterances": 211,
+      "vector_response_overlap": 0.06957119170204974,
+      "random_baseline": 0.06411319708359857,
+      "ratio": 1.085130595052597,
+      "early_response": 0.051871238041461334,
+      "late_response": 0.07260861727395088,
+      "grounded_A": 170,
+      "grounded_B": 180,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.7431565563348509,
+      "chance_level": 0.16666666666666666,
+      "n_chi_classes": 6,
+      "intro_commits": 1405,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.30833333333333335,
+      "mean_without": 0.33958333333333335,
+      "peak_with": 0.4666666666666667,
+      "peak_without": 0.48333333333333334,
+      "gamma_with_self_evo": {
+        "symmetry": 0.4435719671774149,
+        "consistency": 0.4435719671774149,
+        "compactness": 0.7477265528345968
+      },
+      "gamma_pinned": 0,
+      "gamma_moved_from_defaults": 3,
+      "pass": true
+    },
+    "awareness": {
+      "routine_deliberations": 121,
+      "conflict_deliberations": 40,
+      "actions_logged": 161,
+      "actions_with_effect": 58,
+      "resolution_effect_ratio": 0.36024844720496896,
+      "pass": true
+    }
+  },
+  "1234": {
+    "syntax": {
+      "order_accuracy": 1.0,
+      "measurable_sentences": 48,
+      "total_sentences": 100,
+      "mode_purity": {
+        "subject": 0.42330980677169167,
+        "verb": 0.5968115933393711,
+        "object": 0.5027157498234625
+      },
+      "pass": true
+    },
+    "conversation": {
+      "a_utterances": 190,
+      "b_utterances": 213,
+      "vector_response_overlap": 0.06445637345194606,
+      "random_baseline": 0.05569987759640599,
+      "ratio": 1.1572085295947774,
+      "early_response": 0.09993340946631639,
+      "late_response": 0.048659256978569904,
+      "grounded_A": 161,
+      "grounded_B": 150,
+      "pass": true
+    },
+    "introspection": {
+      "avg_intro_purity": 0.5574067532739381,
+      "chance_level": 0.16666666666666666,
+      "n_chi_classes": 6,
+      "intro_commits": 1391,
+      "atlas_leakage": 0,
+      "pass": true
+    },
+    "self_improvement": {
+      "mean_with": 0.3104166666666667,
+      "mean_without": 0.33958333333333335,
+      "peak_with": 0.5,
+      "peak_without": 0.5,
+      "gamma_with_self_evo": {
+        "symmetry": 0.05,
+        "consistency": 0.05,
+        "compactness": 1.035530316251057
+      },
+      "gamma_pinned": 2,
+      "gamma_moved_from_defaults": 3,
+      "pass": false
+    },
+    "awareness": {
+      "routine_deliberations": 131,
+      "conflict_deliberations": 40,
+      "actions_logged": 171,
+      "actions_with_effect": 68,
+      "resolution_effect_ratio": 0.3417085427135678,
+      "pass": true
+    }
+  }
+}

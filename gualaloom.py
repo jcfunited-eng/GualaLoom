@@ -19,6 +19,10 @@ Run:  python3 gualaloom.py
 import os, sys, json, time, hashlib, glob
 from collections import OrderedDict, defaultdict
 
+# Daemon import — anchored to this file's location so nohup/systemd work
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+from gualaloom.daemon import LifeDaemon
+
 # ----------------------------------------------------------------------
 # The substrate. Six pieces. Frozen constants.
 # ----------------------------------------------------------------------
@@ -379,60 +383,87 @@ def repl():
         if n:
             print(f"  fed {n} chars, krimelack now {k.size()} motifs")
         save(k, loom)
+
+    # Start the life daemon — she lives between your visits
+    daemon = LifeDaemon(
+        loom, k,
+        save_fn=lambda: save(k, loom),
+        sleep_fn=lambda kk: sleep_cycle(kk, 50),
+        dream_fn=lambda kk: dream_cycle(kk, 30),
+        world_paths=["corpus"],
+    )
+    daemon.start()
+
     print(BANNER)
-    print(f"krimelack: {k.size()} motifs loaded\n")
+    print(f"krimelack: {k.size()} motifs loaded")
+    print(f"daemon: running ({len(daemon._threads)} loops)\n")
 
     last_input = time.time()
     while True:
         try:
             line = input("> ")
         except (EOFError, KeyboardInterrupt):
-            print("\nsaving ..."); save(k, loom); break
+            print("\nstopping daemon ..."); daemon.stop(); break
 
         now = time.time()
         # auto-sleep on idle (5 min) — substrate consolidates while away
         if now - last_input > 300 and k.size() > 0:
-            culled = sleep_cycle(k, 50)[1]
-            d = dream_cycle(k, 30)
+            with daemon.lock:
+                culled = sleep_cycle(k, 50)[1]
+                d = dream_cycle(k, 30)
             print(f"  (you were away; slept, culled {culled}, dreamed {len(d)})")
         last_input = now
 
         cmd = line.strip().lower()
         if cmd == "/quit":
-            print("saving ..."); save(k, loom); break
+            print("stopping daemon ..."); daemon.stop(); break
         elif cmd == "/sleep":
-            _, culled = sleep_cycle(k, 200)
+            with daemon.lock:
+                _, culled = sleep_cycle(k, 200)
             print(f"  slept 200 cycles, culled {culled} motifs, {k.size()} remain")
-            save(k, loom); continue
+            with daemon.lock:
+                save(k, loom)
+            continue
         elif cmd == "/dream":
-            d = dream_cycle(k, 50)
+            with daemon.lock:
+                d = dream_cycle(k, 50)
             print(f"  dreamed: {len(d)} new motifs from free-settling")
-            save(k, loom); continue
+            with daemon.lock:
+                save(k, loom)
+            continue
         elif cmd == "/status":
-            chis = defaultdict(int)
-            for m in k.motifs.values():
-                chis[m.chi] += 1
-            top = sorted(chis.items(), key=lambda kv: -kv[1])[:5]
-            print(f"  motifs: {k.size()} | familiarity: {loom.fam} | "
+            with daemon.lock:
+                chis = defaultdict(int)
+                for m in k.motifs.values():
+                    chis[m.chi] += 1
+                top = sorted(chis.items(), key=lambda kv: -kv[1])[:5]
+                motif_count = k.size()
+                fam = loom.fam
+            print(f"  motifs: {motif_count} | familiarity: {fam} | "
                   f"top chi classes: {top}")
+            print(f"  daemon: {'running' if daemon.is_running() else 'stopped'}")
             continue
         elif cmd == "/dreams":
-            dreamt = [m for m in k.motifs.values() if m.weight == 1 and m.age == 0]
+            with daemon.lock:
+                dreamt = [m for m in k.motifs.values() if m.weight == 1 and m.age == 0]
             print(f"  recent free-settled motifs: {len(dreamt)}")
             for m in dreamt[:8]:
                 ch = max(m.char_counts.items(), key=lambda kv: kv[1])[0] if m.char_counts else "?"
                 print(f"    [{m.fp}] chi={m.chi}")
             continue
         elif cmd == "/save":
-            save(k, loom); print("  saved."); continue
+            with daemon.lock:
+                save(k, loom)
+            print("  saved."); continue
         elif not line.strip():
             continue
 
         # eat the input, then speak
-        loom.feed(line + " ")
-        reply = generate(loom, k, max_chars=120)
+        with daemon.lock:
+            loom.feed(line + " ")
+            reply = generate(loom, k, max_chars=120)
+            save(k, loom)
         print(reply if reply else "  ...")
-        save(k, loom)
 
 
 if __name__ == "__main__":

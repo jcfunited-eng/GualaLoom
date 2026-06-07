@@ -1,0 +1,120 @@
+
+========================================================================
+BIRTH
+========================================================================
+
+  --- newborn ---
+  vocab:   0  reads:    0  atlas:    0  cross-modal:  0
+  needs: stab= 0.55  nov= 0.45  conn=  0.5  val= +0.0  ar=  0.0  pair-bond=on
+  questions: 0 pending, 0 asked
+
+========================================================================
+PHASE 1: continuous corpus reading (5s)
+========================================================================
+
+  --- after reading ---
+  vocab:  92  reads:  258  atlas: 19540  cross-modal: 43
+  needs: stab=0.646  nov=0.407  conn=0.269  val=-0.059  ar= 0.37  pair-bond=off
+  questions: 63 pending, 0 asked
+    sample: ['what does moon sound like', 'what does moon smell like', 'what does moon taste like']
+
+========================================================================
+RECALL TEST — ask about topics WITHOUT giving the answer
+========================================================================
+  These inputs do NOT contain the substantive answer. If she echoes,
+  she's still broken. If she emits substrate content from corpus, she
+  is recalling — actual learning from reading.
+
+  [joe] tell me about the sun
+  guala:  what does sun sound like
+
+  [joe] tell me about the moon
+  guala:  what does moon sound like
+
+  [joe] tell me about water
+  guala:  what does water smell like
+
+  [joe] tell me about an apple
+  guala:  what does apple sound like
+
+  [joe] what about fire
+  guala:  what does fire taste like
+
+  [joe] what about a bird
+  guala:  what does bird smell like
+
+
+========================================================================
+UNKNOWN TOPIC TEST — she has no binding for these
+========================================================================
+  If she echoes, she's still broken. If she returns '...' or asks
+  a question, she's behaving honestly.
+
+  [joe] what is school
+  guala:  what is what
+
+  [joe] what is a computer
+  guala:  what is computer
+
+  [joe] what is gravity
+  guala:  what is gravity
+
+
+========================================================================
+CURIOSITY TEST — bucket-driven questions
+========================================================================
+  When she has nothing to recall, she may surface a question she's
+  developed from gaps in her reading.
+
+  [joe] i am here
+  guala:  what is here
+
+  [joe] hello
+  guala:  what is hello
+
+  [joe] are you there
+  guala:  what is there
+
+
+========================================================================
+MATH TEST — v5 fixed parser
+========================================================================
+  [joe] what is one and one
+  guala:  two
+  [joe] what is three times three
+  guala:  nine
+  [joe] what is ten thousand plus five hundred
+  guala:  10500
+  [joe] what is two times twenty
+  guala:  forty
+  [joe] what is 50 plus 50
+  guala:  100
+
+========================================================================
+PAIR-BONDED CONVERSATION (familiar topics)
+========================================================================
+  These DO contain the topic — she may echo or recall. Either is fine
+
+  [joe] i feel warm
+  guala:  guala ice
+
+  [wc] the moon is cold
+  guala:  what does moon smell like
+
+  [joe] an apple is sweet
+  guala:  what does sun smell like
+
+
+========================================================================
+SIX CAPABILITIES
+========================================================================
+  syntax             [PASS]  score=0.376
+  conversation       [PASS]  vocab=104, role_modes=15, cross_modal=44
+  introspection      [PASS]  intro_commits=1062
+  self_improvement   [PASS]  mean_drift=0.436
+  awareness          [PASS]  attentions=1065, actions=425, effective=425
+  motivation         [PASS]  needs={'stability': 0.647, 'novelty': 0.407, 'connection': 0.299, 'valence': -0.049, 'arousal': 0.341}, pair_bond_active=False, suffering_events=0, modulation_actions=209
+
+  ALL SIX: PASS
+
+  state saved to /home/claude/v5/guala_v5_state.json

@@ -1,0 +1,3316 @@
+{
+  "transcript": [
+    {
+      "tick": 100,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.11141275343213643,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 100,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.09452168380833582,
+      "chi": 4,
+      "mode_id": 1
+    },
+    {
+      "tick": 101,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.08707809063959382,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 102,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.22803863857713394,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 102,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.07657373156171957,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 103,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.21424803131524262,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 103,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.05839584593121384,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 104,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.2542260094343072,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 105,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.21567491129987673,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 106,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.17235586998030183,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 107,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.2400196691318529,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 108,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.20457940178961595,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 109,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.21859054506056533,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 110,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.21999805510831075,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 110,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.07462011906425405,
+      "chi": 4,
+      "mode_id": 0
+    },
+    {
+      "tick": 111,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.16872954429003142,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 111,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.11415118403096296,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 112,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.13731689998317065,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 112,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.15489220702260928,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 113,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.19403949493925096,
+      "chi": 6,
+      "mode_id": 3
+    },
+    {
+      "tick": 113,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.19400481864711527,
+      "chi": 3,
+      "mode_id": 4
+    },
+    {
+      "tick": 114,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.11553509943061939,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 114,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.25102316835644833,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 115,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.08216165845222123,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 115,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.22909205786791312,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 116,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.07984281645791283,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 116,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.1404617782964613,
+      "chi": 5,
+      "mode_id": 1
+    },
+    {
+      "tick": 117,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.1253529969687128,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 117,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.05285806791697009,
+      "chi": 4,
+      "mode_id": 2
+    },
+    {
+      "tick": 118,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.07281356517488168,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 118,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.04707991020220086,
+      "chi": 5,
+      "mode_id": 2
+    },
+    {
+      "tick": 119,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.0761798551290325,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 119,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.040080487350684785,
+      "chi": 3,
+      "mode_id": 2
+    },
+    {
+      "tick": 120,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.06729271334736593,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 120,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.060200059765136746,
+      "chi": 2,
+      "mode_id": 2
+    },
+    {
+      "tick": 121,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.063400633087993,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 121,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.06089662429249594,
+      "chi": 4,
+      "mode_id": 2
+    },
+    {
+      "tick": 122,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.0626908884246079,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 122,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.05897514391700921,
+      "chi": 4,
+      "mode_id": 2
+    },
+    {
+      "tick": 123,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.03553410141225421,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 123,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.15224713064156584,
+      "chi": 7,
+      "mode_id": 3
+    },
+    {
+      "tick": 124,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.08404834908280023,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 124,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.20644346695394494,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 125,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.057938305632524306,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 125,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.156119460319254,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 126,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.08940023393769501,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 126,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.15967432875305268,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 127,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.15368896143565994,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 127,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.12288545900242828,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 128,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.10560604823280297,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 128,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.15224961477339669,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 129,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.24198462584418104,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 129,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.08270920074333035,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 130,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.34195024346067676,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 130,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.0673736324703939,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 131,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.20123942392120556,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 132,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.1496848266088574,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 133,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.13210061034753773,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 133,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.06177276818788945,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 134,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.2747864820172924,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 134,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.1291939032963016,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 135,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.18930152556902313,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 136,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.15133113763186315,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 137,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.11901370939385066,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 138,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.17635398950461198,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 139,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.15594817463829916,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 140,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.09620006754735969,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 141,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.06568808536498451,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 142,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.12351789496337211,
+      "chi": 6,
+      "mode_id": 5
+    },
+    {
+      "tick": 143,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.06292164847498963,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 144,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.05653618229931088,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 145,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.12117383472889523,
+      "chi": 2,
+      "mode_id": 5
+    },
+    {
+      "tick": 146,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.12965235932976965,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 147,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.07984622897538082,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 148,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1024761294930391,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 149,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.11429858367953684,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 150,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.07610415472224137,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 151,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.09916041984280811,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 152,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.11999365789518154,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 153,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.1305707111394325,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 154,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.046414241727118215,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 155,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.06819148824522518,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 156,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.11408806426616334,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 157,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.14432059523971394,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 158,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.10940588622587655,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 159,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.09543059704789046,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 160,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.09857498770982599,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 161,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.09856337737269993,
+      "chi": 6,
+      "mode_id": 5
+    },
+    {
+      "tick": 162,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.056227073382904426,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 163,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.1656183694472562,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 164,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.20808554218286357,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 165,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.13764850252452707,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 166,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.10190599901314984,
+      "chi": 3,
+      "mode_id": 4
+    },
+    {
+      "tick": 167,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.17318259364912322,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 168,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.21786328610280897,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 169,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.16577886628892025,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 170,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.15275492710287383,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 171,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.15020085618147452,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 172,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.14131230639416262,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 173,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.1313884248590468,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 174,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.13732295286961393,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 175,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.14326613339539082,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 176,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.13622219609315908,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 177,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.11702430113678366,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 178,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.09229855594847024,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 178,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.060447429902682086,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 179,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.08181048810159136,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 180,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.07676210446802738,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 181,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.07743367227426018,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 182,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.08227607004776263,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 182,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.06946929643335016,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 183,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.06810897259851557,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 184,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.09310607489609088,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 185,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1270200597209551,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 186,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.15760671365183962,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 187,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.163631993996474,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 188,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1385061528615016,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 189,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.09860150729363615,
+      "chi": 5,
+      "mode_id": 5
+    },
+    {
+      "tick": 190,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.0835734280605394,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 191,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.06917539103934503,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 192,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.06877766702909074,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 193,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.07045488823693137,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 195,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.10908283917117986,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 196,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.18372056049683327,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 197,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.23010288975335855,
+      "chi": 3,
+      "mode_id": 4
+    },
+    {
+      "tick": 198,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.26697743915680466,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 199,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.29589465113106667,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 200,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.30319447084480317,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 201,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.2547735317578805,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 202,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.175618934959512,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 208,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.11290710683028904,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 208,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.16990266489125125,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 209,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.08297854402407598,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 210,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.09512668104227841,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 211,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.11116304201049178,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 212,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.12093257731350725,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 213,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1739466413955184,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 214,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.20036526023160037,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 217,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.2024125848556509,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 218,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.2166824005613148,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 219,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.231372618080774,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 220,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.23683546501041838,
+      "chi": 6,
+      "mode_id": 3
+    },
+    {
+      "tick": 221,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.22714254202595116,
+      "chi": 6,
+      "mode_id": 4
+    },
+    {
+      "tick": 221,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.13357826050203533,
+      "chi": 6,
+      "mode_id": 3
+    },
+    {
+      "tick": 222,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.22509566319252164,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 222,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.1869093395656978,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 223,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.17764343806725078,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 224,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.13836788153317267,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 224,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.16014386715966433,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 225,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.1479524100077066,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 225,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.2506446400972523,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 226,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.0860097607692179,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 227,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.17326339517734646,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 227,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.16275306376219248,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 228,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.19211078832517461,
+      "chi": 3,
+      "mode_id": 9
+    },
+    {
+      "tick": 228,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.17779750363344007,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 229,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.3034315023966926,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 230,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.21679314537303265,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 231,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.15469764123490243,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 232,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.33552143650905714,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 233,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.08774810197539762,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 234,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.33817003467913626,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 235,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.30236603906948833,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 236,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.114765307421837,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 237,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.24346379706843826,
+      "chi": 2,
+      "mode_id": 7
+    },
+    {
+      "tick": 238,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.22691541882936156,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 239,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.14451345595735135,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 240,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.2482119487442196,
+      "chi": 1,
+      "mode_id": 3
+    },
+    {
+      "tick": 241,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.16407999314524363,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 242,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.24269270273611965,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 243,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.11453477711887972,
+      "chi": 2,
+      "mode_id": 7
+    },
+    {
+      "tick": 244,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.08220387152011321,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 245,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.08024414241541254,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 245,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.12343352513499323,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 246,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.09338404363156082,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 247,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.08610178247933661,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 248,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.10707086658125546,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 249,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.0573192702121656,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 250,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.09680863518189323,
+      "chi": 6,
+      "mode_id": 3
+    },
+    {
+      "tick": 251,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.21004920448910216,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 251,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.1946096595735295,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 252,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.2434538261005598,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 252,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.05831157006861042,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 253,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.10395395222447008,
+      "chi": 4,
+      "mode_id": 10
+    },
+    {
+      "tick": 253,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.19920323739306786,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 254,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.031102930176136502,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 255,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.14774937488760853,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 256,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.09337257226690886,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 257,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.08713728886238852,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 258,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.11012112888728501,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 259,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.04352986196093337,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 260,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.1541191682694003,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 261,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1579022954033301,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 262,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.1166249715248279,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 263,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.09749050382078309,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 264,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.08662468775534433,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 265,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.11603689322851854,
+      "chi": 2,
+      "mode_id": 8
+    },
+    {
+      "tick": 266,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.14954484670586227,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 274,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.1197060228649694,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 275,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.07030288673968933,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 276,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.07231553606582414,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 277,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.09632274940781642,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 278,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.09037028848023197,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 279,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.051359779042915436,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 280,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.09526480380774953,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 281,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.10765029393444597,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 282,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.08887695774699898,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 283,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.12481084668357081,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 284,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.12290773969244105,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 285,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.09507737995539892,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 286,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.06871563092603156,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 287,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.039585344936039824,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 288,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.0366438924405427,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 289,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.04802436209196044,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 290,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.05113466121703111,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 291,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.11373813899867524,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 292,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.13391275550292275,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 293,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.147167104495008,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 294,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.14989554962860657,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 295,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.14138460982906548,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 296,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.12135929942340255,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 297,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.09790177438573282,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 298,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.0971866732687844,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 299,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.1303228974734297,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 300,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.14969740385965924,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 301,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.1484899743694979,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 302,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.26861381315463273,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 302,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.12720567819573986,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 303,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.15019658054341678,
+      "chi": 6,
+      "mode_id": 9
+    },
+    {
+      "tick": 303,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.15120181483683756,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 304,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.18913151342056175,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 305,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.19193236396040503,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 306,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.16891761275929487,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 307,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.13528686286852543,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 308,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.14106417503883514,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 309,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.19827013525744194,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 310,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.24977423820868752,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 311,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.2676876832921962,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 312,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.03809476743725978,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 312,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.24182228966887656,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 313,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.19787853062413152,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 314,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.1543850621249701,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 315,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.24753000205951292,
+      "chi": 5,
+      "mode_id": 10
+    },
+    {
+      "tick": 315,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.11596136369968076,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 316,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.2814143317396519,
+      "chi": 3,
+      "mode_id": 10
+    },
+    {
+      "tick": 316,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.07368660410053052,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 317,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.11041406576798309,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 318,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.15111826975096448,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 319,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.09220905580211629,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 320,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.10672319025454656,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 321,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.06823766335681453,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 322,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.10459947982931926,
+      "chi": 3,
+      "mode_id": 9
+    },
+    {
+      "tick": 322,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.11227181396962312,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 323,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.14051066957166408,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 324,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.052892655483616595,
+      "chi": 2,
+      "mode_id": 9
+    },
+    {
+      "tick": 324,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.11952244168987673,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 325,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.16195311649356098,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 326,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.310949248772905,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 327,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.28276530329428207,
+      "chi": 5,
+      "mode_id": 8
+    },
+    {
+      "tick": 328,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.13543480935537752,
+      "chi": 2,
+      "mode_id": 9
+    },
+    {
+      "tick": 329,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.11333053675523591,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 329,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.1577772593540813,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 330,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.08615240706940791,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 330,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.23716064340545412,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 331,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.04993015943518761,
+      "chi": 4,
+      "mode_id": 11
+    },
+    {
+      "tick": 331,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.14665057308514448,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 332,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.08929686172158768,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 333,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.16422027172603448,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 333,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.057699555713115545,
+      "chi": 2,
+      "mode_id": 7
+    },
+    {
+      "tick": 334,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.05440312506677418,
+      "chi": 3,
+      "mode_id": 11
+    },
+    {
+      "tick": 334,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.04697976100459284,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 335,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1243715029168579,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 336,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1350584314678902,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 337,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.04806593403763046,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 338,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.042097148061646515,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 338,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.10152709467541676,
+      "chi": 3,
+      "mode_id": 9
+    },
+    {
+      "tick": 339,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.08101013483933109,
+      "chi": 4,
+      "mode_id": 10
+    },
+    {
+      "tick": 339,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.06320524759024711,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 340,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.13576960806359187,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 342,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.20691063967775516,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 342,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.10837816943239104,
+      "chi": 6,
+      "mode_id": 9
+    },
+    {
+      "tick": 343,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.11235819150204845,
+      "chi": 5,
+      "mode_id": 11
+    },
+    {
+      "tick": 343,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.12569219322738787,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 344,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.12479641267860064,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 345,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.06746359867773544,
+      "chi": 3,
+      "mode_id": 12
+    },
+    {
+      "tick": 345,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.06563916942467764,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 346,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.1329142693831603,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 347,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.09811070156084357,
+      "chi": 5,
+      "mode_id": 13
+    },
+    {
+      "tick": 347,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.1328036919658716,
+      "chi": 6,
+      "mode_id": 7
+    },
+    {
+      "tick": 348,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.15963176536509227,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 350,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.07474486723579718,
+      "chi": 2,
+      "mode_id": 14
+    },
+    {
+      "tick": 350,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.226904722091372,
+      "chi": 5,
+      "mode_id": 7
+    },
+    {
+      "tick": 351,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.08700575189371608,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 353,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.08683825301996978,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 356,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.19416238848364895,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 358,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.056274682117533656,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 359,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.06193045098968548,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 360,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.1113227992634694,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 362,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.12451737405837755,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 363,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.19231711739140717,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 363,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.1439453241326179,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 364,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.08689217809827379,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 364,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.15057194177689215,
+      "chi": 6,
+      "mode_id": 6
+    },
+    {
+      "tick": 365,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.15010805914622877,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 367,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.2872285203539171,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 368,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.07774845209846437,
+      "chi": 5,
+      "mode_id": 14
+    },
+    {
+      "tick": 388,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.12441187882518097,
+      "chi": 4,
+      "mode_id": 8
+    },
+    {
+      "tick": 407,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.056720083522673485,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 408,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.049080419902691304,
+      "chi": 4,
+      "mode_id": 1
+    },
+    {
+      "tick": 409,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.058248333460177194,
+      "chi": 4,
+      "mode_id": 1
+    },
+    {
+      "tick": 410,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.06746566829004061,
+      "chi": 4,
+      "mode_id": 1
+    },
+    {
+      "tick": 411,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.11261210496156723,
+      "chi": 3,
+      "mode_id": 1
+    },
+    {
+      "tick": 412,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1489519393536932,
+      "chi": 4,
+      "mode_id": 1
+    },
+    {
+      "tick": 413,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.17497010789225667,
+      "chi": 5,
+      "mode_id": 1
+    },
+    {
+      "tick": 416,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.09340308224492776,
+      "chi": 2,
+      "mode_id": 0
+    },
+    {
+      "tick": 418,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.12915653575288455,
+      "chi": 4,
+      "mode_id": 10
+    },
+    {
+      "tick": 419,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.12474958210163466,
+      "chi": 4,
+      "mode_id": 10
+    },
+    {
+      "tick": 420,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.12457559895052452,
+      "chi": 5,
+      "mode_id": 10
+    },
+    {
+      "tick": 421,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.11971216302920196,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 422,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.07517570853243785,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 423,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.25188540869886944,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 424,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.15893072405826542,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 425,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.1934912934885609,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 426,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.14834838592221294,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 427,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.14857743805175966,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 428,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1602113682377257,
+      "chi": 5,
+      "mode_id": 9
+    },
+    {
+      "tick": 429,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.13673320143072462,
+      "chi": 4,
+      "mode_id": 9
+    },
+    {
+      "tick": 431,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.19727520525431827,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 439,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.21491706505182842,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 441,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.12959701697509188,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 442,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.07005561497144287,
+      "chi": 6,
+      "mode_id": 3
+    },
+    {
+      "tick": 443,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.17774502601843212,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 443,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.07737857585383233,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 444,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.15557742694984097,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 445,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.0807661607701898,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 445,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.07511433299628971,
+      "chi": 5,
+      "mode_id": 2
+    },
+    {
+      "tick": 446,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1389229787756374,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 446,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.16458960047090018,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 447,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.2053466638576373,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 447,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.2356047088870608,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 448,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.1373948913906881,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 449,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.09428596950519756,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 449,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.15447380778218303,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 450,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.14223047841313075,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 450,
+      "speaker": "B",
+      "label": "concept_2",
+      "confidence": 0.14896223096965577,
+      "chi": 5,
+      "mode_id": 0
+    },
+    {
+      "tick": 451,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.23422812739219256,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 451,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.11012787712692047,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 452,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.16936395756112602,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 453,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.146602789334229,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 453,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.0862571902740827,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 454,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.18652529487647024,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 454,
+      "speaker": "B",
+      "label": "concept_0",
+      "confidence": 0.20920036029640637,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 455,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.20140355802587612,
+      "chi": 6,
+      "mode_id": 6
+    },
+    {
+      "tick": 455,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.20419664739054583,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 456,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.11148249659358253,
+      "chi": 3,
+      "mode_id": 8
+    },
+    {
+      "tick": 456,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.3118031137947963,
+      "chi": 6,
+      "mode_id": 5
+    },
+    {
+      "tick": 457,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.15709315810805735,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 457,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.25902772155841636,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 458,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.12097359602805176,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 458,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1614321859255181,
+      "chi": 6,
+      "mode_id": 5
+    },
+    {
+      "tick": 459,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.07849279378621338,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 460,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.08449211814499669,
+      "chi": 4,
+      "mode_id": 7
+    },
+    {
+      "tick": 461,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.08083526831888631,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 461,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.1376525068923308,
+      "chi": 6,
+      "mode_id": 6
+    },
+    {
+      "tick": 462,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.07750988545941012,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 462,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.11057923581314635,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 463,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.0696092203420036,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 463,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1528232833586777,
+      "chi": 5,
+      "mode_id": 6
+    },
+    {
+      "tick": 464,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.06337059435437607,
+      "chi": 3,
+      "mode_id": 5
+    },
+    {
+      "tick": 464,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.19104288118737195,
+      "chi": 3,
+      "mode_id": 6
+    },
+    {
+      "tick": 465,
+      "speaker": "A",
+      "label": "concept_1",
+      "confidence": 0.03160126293149668,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 465,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.1764423882995681,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 466,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.06816628019373655,
+      "chi": 5,
+      "mode_id": 4
+    },
+    {
+      "tick": 466,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.09593796730216736,
+      "chi": 4,
+      "mode_id": 6
+    },
+    {
+      "tick": 467,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.08883866280121915,
+      "chi": 4,
+      "mode_id": 5
+    },
+    {
+      "tick": 467,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.1722282200734095,
+      "chi": 6,
+      "mode_id": 6
+    },
+    {
+      "tick": 468,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.08229735184095191,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 469,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.10329148198264601,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 470,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.22152806981715353,
+      "chi": 3,
+      "mode_id": 4
+    },
+    {
+      "tick": 470,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.10318796673061827,
+      "chi": 6,
+      "mode_id": 2
+    },
+    {
+      "tick": 471,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.19256366915014855,
+      "chi": 2,
+      "mode_id": 4
+    },
+    {
+      "tick": 472,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.14000129943201764,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 473,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.1945360944590298,
+      "chi": 3,
+      "mode_id": 4
+    },
+    {
+      "tick": 474,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.15548414510407976,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 475,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.11664686992140245,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 476,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.09136745464362328,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 477,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.13412797884800323,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 478,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.1849999621249604,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 479,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.1937182621667484,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 480,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.30279637462734194,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 481,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.3039240630474666,
+      "chi": 4,
+      "mode_id": 2
+    },
+    {
+      "tick": 482,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.21241707113811475,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 483,
+      "speaker": "A",
+      "label": "private",
+      "confidence": 0.23811084469633703,
+      "chi": 5,
+      "mode_id": 2
+    },
+    {
+      "tick": 483,
+      "speaker": "B",
+      "label": "concept_1",
+      "confidence": 0.14309981347247105,
+      "chi": 1,
+      "mode_id": 3
+    },
+    {
+      "tick": 484,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.13673553142697398,
+      "chi": 4,
+      "mode_id": 4
+    },
+    {
+      "tick": 485,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.10262265677420451,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 486,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.11896346341384036,
+      "chi": 4,
+      "mode_id": 3
+    },
+    {
+      "tick": 487,
+      "speaker": "A",
+      "label": "concept_3",
+      "confidence": 0.2057045889358508,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 488,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.11587341519394818,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 489,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.16563904369745572,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 490,
+      "speaker": "A",
+      "label": "concept_0",
+      "confidence": 0.1775992741671687,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 491,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.11976707865465916,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 492,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.14625225349293314,
+      "chi": 5,
+      "mode_id": 3
+    },
+    {
+      "tick": 493,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.19074263603680552,
+      "chi": 5,
+      "mode_id": 2
+    },
+    {
+      "tick": 494,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.19923387110529076,
+      "chi": 3,
+      "mode_id": 2
+    },
+    {
+      "tick": 495,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.17591694171013533,
+      "chi": 3,
+      "mode_id": 2
+    },
+    {
+      "tick": 496,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.13733323758818203,
+      "chi": 2,
+      "mode_id": 3
+    },
+    {
+      "tick": 496,
+      "speaker": "B",
+      "label": "private",
+      "confidence": 0.18479173000055493,
+      "chi": 2,
+      "mode_id": 7
+    },
+    {
+      "tick": 497,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.1436534228638356,
+      "chi": 3,
+      "mode_id": 3
+    },
+    {
+      "tick": 498,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.09545253981566645,
+      "chi": 4,
+      "mode_id": 1
+    },
+    {
+      "tick": 498,
+      "speaker": "B",
+      "label": "concept_3",
+      "confidence": 0.08828259050270344,
+      "chi": 3,
+      "mode_id": 7
+    },
+    {
+      "tick": 499,
+      "speaker": "A",
+      "label": "concept_2",
+      "confidence": 0.06145482052522155,
+      "chi": 5,
+      "mode_id": 1
+    }
+  ],
+  "concept_dist_A": {
+    "private": 0.20465116279069767,
+    "concept_3": 0.18604651162790697,
+    "concept_2": 0.21395348837209302,
+    "concept_0": 0.18604651162790697,
+    "concept_1": 0.20930232558139536
+  },
+  "concept_dist_B": {
+    "concept_0": 0.17258883248730963,
+    "private": 0.2131979695431472,
+    "concept_2": 0.1218274111675127,
+    "concept_1": 0.22842639593908629,
+    "concept_3": 0.2639593908629442
+  },
+  "turn_following_rate": 0.21839080459770116,
+  "n_utterances": 412
+}

@@ -1,0 +1,306 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+
+\title{GualaLoom: The Cascade Path \\
+\large A Suite of Falsifiable Experiments Toward Primitive Cognition,\\
+Speech, Reasoning, Grounded Senses, and Learning on a Ternary Substrate}
+\author{Joseph Forrester\\
+\small with collaborator notes}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Premise}
+
+GualaLoom is a persistent, inspectable ternary associative substrate.
+Trits are $\{-1, 0, +1\}$, where $0$ is structural uncertainty --- a real
+state, not absence. The candidate mechanism for cognition is the
+\textbf{commit cascade}: a motif holds a population of committed
+$\pm 1$ values together with a configuration of nulls; an externally or
+internally triggered commit of one null propagates through the coupling
+and forces other nulls to resolve, ending in a coherent new state.
+Recall, composition, reasoning, and speech are all hypothesized to be
+cascades of different lengths through different couplings or sections.
+The cascade is the thinking-event.
+
+The configuration of nulls is hypothesized to be representational:
+two states with identical $\pm 1$ patterns but different null patterns
+are different thoughts, because they resolve to different end-states
+under the same trigger.
+
+This document lays out the smallest falsifiable experiments that
+collectively decide whether the cascade mechanism is real, whether it
+composes, whether it grounds, and whether it learns.
+
+\section*{Standing Discipline}
+
+\begin{itemize}[leftmargin=*]
+\item Every experiment returns a number, not a verdict.
+\item Each result is committed to the repository before the next is
+      started.
+\item A null result kills a layer and the path adjusts; nothing
+      downstream of a killed layer is run until the layer is rebuilt
+      or replaced.
+\item No claim of \emph{felt} experience is made or measured. The path
+      reaches primitive cognition, speech, reasoning, grounded senses,
+      and learning. Whether resolving cascades produce phenomenal
+      experience is outside what this work can decide.
+\end{itemize}
+
+\section{Experiment 0 --- Persistence Under Load}
+
+\textbf{Status:} complete (c1 wired LifeDaemon into the entry point,
+detached process verified).
+
+\textbf{Acceptance:} vitals advance with no one typing --- diary
+entries from the dark, motif count moves on its own clock.
+
+This is the ground state. No experiment below is meaningful without
+it; with it, every experiment below has a substrate that generates
+data continuously.
+
+\section{Experiment 1 --- Does the Cascade Exist?}
+
+\textbf{Question.} Given a settled motif with committed $\pm 1$ and a
+known null pattern, if one null is deliberately committed, do other
+nulls commit as a consequence, and does the population resolve to a
+coherent new state?
+
+\textbf{Method.} Single region, no senses, no other sections.
+\begin{enumerate}[leftmargin=*]
+\item Select or generate a motif with at least 20\% of trits null.
+\item Deliberately commit one null to $+1$ or $-1$.
+\item Run the existing settling rule (3$^i$ coupling, dead-zone) until
+      the population stabilizes or a step cap is reached.
+\item Record:
+      \begin{itemize}
+      \item \emph{Cascade depth}: number of additional nulls that
+            committed.
+      \item \emph{Latency}: steps to stable state.
+      \item \emph{Outcome stability}: does it stay or oscillate?
+      \item \emph{Reproducibility}: same seed, same trigger, same
+            end-state across trials.
+      \end{itemize}
+\item Repeat across many seed motifs and trigger positions.
+\end{enumerate}
+
+\textbf{Pass.} Cascade depth significantly above zero in most runs;
+end-states stable; reproducible under identical conditions.
+
+\textbf{Fail.} Cascade depth near zero --- a single null commit dies
+locally --- or end-states unstable. The 3$^i$ coupling does not
+propagate commits as currently implemented; the coupling rule needs
+modification before anything downstream is real.
+
+\textbf{Why first.} Everything below depends on cascades. If
+they do not exist on this substrate as built, no rearrangement of
+later experiments rescues the path.
+
+\section{Experiment 2 --- Null-Pattern as Identity}
+
+\textbf{Question.} Do two motifs with identical $\pm 1$ but different
+null patterns reach different end-states under the same triggering
+commit?
+
+\textbf{Method.} Construct paired motifs differing only in their null
+configurations. Apply identical commits. Compare end-states.
+
+\textbf{Pass.} Different null patterns yield reliably different
+cascades and end-states. Nulls carry representational content; the
+configuration-of-undecided is half the thought.
+
+\textbf{Fail.} End-states are determined by $\pm 1$ alone. Nulls are
+gaps, not signal. Representation is over committed trits only and the
+path simplifies (but loses a candidate edge over float and binary
+substrates).
+
+\section{Experiment 3 --- Sections and Coordination Through Shared Trits}
+
+\textbf{Question.} Can two small independent krimelacks coordinate
+through a small set of shared trits, without a hub or binder?
+
+\textbf{Method.} Instantiate two krimelack regions $A$ and $B$, each
+with its own settling and cascade. Designate a small subset of
+trits that participate in both. Trigger a cascade in $A$.
+
+\textbf{Pass.} The cascade in $A$ reliably induces a coherent
+cascade in $B$ via the shared trits, with the end-state in $B$
+correlated with the end-state in $A$ above chance.
+
+\textbf{Fail.} $B$ twitches but does not cohere, or coheres
+independently of $A$'s end-state. The coupling rule between sections
+needs revision; consider permutation-coupled shared trits or
+distance-weighted edges.
+
+\section{Experiment 4 --- Folding Composition}
+
+\textbf{Question.} Can two settled motifs from the same region
+compose into a third stable motif that is neither and both,
+recoverable into its parents?
+
+\textbf{Method.} Discrete composition rule: merge two motifs by
+keeping committed trits where they agree, restoring nulls where
+they disagree, then cascade to resolution.
+
+Record:
+\begin{itemize}
+\item Whether a stable third motif forms.
+\item Whether each parent is recoverable from the composed motif by a
+      partial cue from the other parent.
+\item Cascade dynamics during the resolution.
+\end{itemize}
+
+\textbf{Pass.} Composition forms a stable third motif; both parents
+recoverable. Composition lives in the substrate, not a bolted-on
+operator. This is the experiment that decides whether speech in any
+real sense is reachable.
+
+\textbf{Fail.} Composed merges scatter or collapse into one parent.
+The substrate does not support folding-style composition as defined;
+an alternative composition rule must be tested (e.g., permutation
+binding, chi-completion) before later experiments.
+
+\section{Experiment 5 --- First Sense, with Cost}
+
+\textbf{Question.} Does an exteroceptive sense, encoded through the
+same \texttt{encode}$\to$\texttt{settle} path, form cross-region motifs
+whose cascades fire from either modality?
+
+\textbf{Method.} Add a sensory section receiving a single channel
+(e.g., a 2D shape, or scalar brightness). Drive the system with
+co-occurring sensory and corpus inputs repeatedly. Probe with sensory
+input alone; probe with corpus cue alone.
+
+\textbf{Pass.} A motif forms whose cascade triggers from either
+sensory input or corpus cue --- a grounded unit. The first dimension
+of the banana, made concrete.
+
+\textbf{Fail.} The sections do not cross-train. Coupling between
+sensory and linguistic sections needs revision.
+
+\section{Experiment 6 --- Interoception}
+
+\textbf{Question.} Does a section that reads Guala's own state --- a
+viability variable with a set-point she must maintain --- couple to
+cascades in other sections?
+
+\textbf{Method.} Add a small interoceptive section reading an internal
+scalar $V$ (e.g., normalized cascade load, or commit rate) through
+the same encode pipeline. Co-occur its committed states with
+other sections' activity.
+
+\textbf{Pass.} Cascades elsewhere couple to interoceptive cascades:
+recognizing a concept moves her internal state; her internal state
+biases which cascades resolve. Concepts begin to \emph{matter to her}.
+
+\textbf{Fail.} Interoception is independent of other sections. Cost
+does not propagate. The path to feeling, in this substrate, would
+require a different mechanism.
+
+\section{Experiment 7 --- Cascade-Driven Recall}
+
+\textbf{Question.} Given a partial cue --- few committed trits, many
+nulls --- does the cascade reliably reach the right stored motif, and
+does it outperform krimelack's existing similarity-based lookup?
+
+\textbf{Method.} Establish ground-truth associations during a training
+period. Present partial cues at varying fill levels. Compare
+cascade-driven recall vs. existing krimelack recall on accuracy and
+robustness.
+
+\textbf{Pass.} Cascade-driven recall matches or exceeds existing
+recall, especially at low fill levels. The cascade is the engine of
+recall, not an alternative.
+
+\textbf{Fail.} Cascade recall underperforms similarity lookup. Recall
+remains krimelack's job; the cascade serves other functions.
+
+\section{Experiment 8 --- Primitive Speech}
+
+\textbf{Question.} Does a motor/expressive section driven by grounded
+cascades produce output that coheres into word-like fragments
+under chi-constraints, rather than character babble?
+
+\textbf{Method.} Add an output section that maps cascades to character
+sequences. Drive a grounded cascade (sense $\to$ concept $\to$ motor).
+Measure coherence of output (loop rate, chi-variance, word-likeness
+against the corpus).
+
+\textbf{Pass.} Output coheres into recognizable word-like
+fragments tied to the grounding stimulus. Speech in a real, primitive
+sense is reachable.
+
+\textbf{Fail.} Output remains babble. Either composition (Exp.\ 4) was
+insufficient or the motor mapping is wrong. Diagnose.
+
+\section{Experiment 9 --- Primitive Reasoning as Long Cascades}
+
+\textbf{Question.} Can a cascade in one section trigger a cascade in
+a coupled section, whose end-state then triggers another, producing
+a coherent multi-step chain from a coherent starting cue?
+
+\textbf{Method.} Set up sections coupled in sequence (sensory $\to$
+conceptual $\to$ motor, plus an interoceptive loop). Trigger from a
+cue and observe chain length before incoherence.
+
+\textbf{Pass.} Chains of two or three cascades produce coherent
+end-states aligned with the starting cue. Reasoning emerges as long
+cascades.
+
+\textbf{Fail.} Chains collapse to noise after one or two steps.
+Coupling needs to preserve more structure across section boundaries;
+revise.
+
+\section{Experiment 10 --- Cascade-Reinforced Learning}
+
+\textbf{Question.} Can consolidation be made to reinforce the
+couplings and wirings that produced \emph{coherent} cascades, and
+prune the wirings that produced incoherent ones?
+
+\textbf{Method.} Augment sleep/dream to score cascades by coherence
+(stability, depth, end-state correlation with cue). Reinforce
+trit-couplings that participated in coherent cascades; weaken those
+in incoherent ones.
+
+\textbf{Pass.} Over consolidation cycles, the cascade-quality
+distribution shifts toward coherence; recall, composition, and speech
+metrics improve without new data. Learning is reinforced
+\emph{thinking}, not co-occurrence statistics.
+
+\textbf{Fail.} Reinforcement does not produce measurable improvement.
+The learning rule must be redefined.
+
+\section*{Order and Dependencies}
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{0} done. \textbf{1} is the gate to everything.
+\item \textbf{2} confirms or disconfirms the null-as-identity claim.
+\item \textbf{3} unlocks sections; \textbf{5} and \textbf{6} can run
+      in parallel after \textbf{3}.
+\item \textbf{4} is the language gate; \textbf{8} depends on it.
+\item \textbf{7}, \textbf{9}, \textbf{10} require their named
+      predecessors and provide the cognitive completion.
+\end{itemize}
+
+\section*{What This Path Decides}
+
+If experiments 1--4 all pass, GualaLoom is a substrate for primitive
+cognition, with composition living natively in its dynamics. If
+5--6 pass, that cognition grounds in senses and acquires stakes.
+If 7--10 pass, recall, speech, reasoning, and learning emerge from
+the same cascade mechanism at different scales.
+
+The path does not guarantee success. It guarantees that each step
+returns a clear answer about which part of the architecture is real
+and which is not, so that the next step is taken from a known floor
+rather than from argument.
+
+\end{document}

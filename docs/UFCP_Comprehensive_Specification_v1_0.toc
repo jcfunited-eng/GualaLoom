@@ -1,0 +1,91 @@
+\contentsline {part}{I\hspace {1em}Theoretical Foundation}{6}{part.1}%
+\contentsline {section}{\numberline {1}Introduction}{6}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Design Principles}{6}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Coherence Field and Action}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Equation of Motion}{7}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Conserved Currents}{7}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Interaction Kernel Symmetry}{7}{section.3}%
+\contentsline {section}{\numberline {4}Correspondence Proofs}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Schr\"odinger Equation}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Classical Limit (Newton/Ehrenfest)}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Relativistic Limit}{8}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Measurement: Born's Rule from Structural Extremum}{8}{section.5}%
+\contentsline {section}{\numberline {6}Soliton Particle Ontology}{9}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Soliton Formation}{9}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Compton Wavelength Correspondence}{9}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Stability (Numerically Verified)}{9}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Particle Ontology}{9}{subsection.6.4}%
+\contentsline {section}{\numberline {7}Gravitational Waves and Virtual Particles}{9}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Vacuum State}{10}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Gravitational Wave as Metric Perturbation}{10}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Inelastic Scattering and Particle Creation}{10}{section.8}%
+\contentsline {section}{\numberline {9}Non-Abelian Gauge Fields and Confinement}{10}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Flux Tube Confinement (Numerically Verified)}{10}{subsection.9.1}%
+\contentsline {section}{\numberline {10}Fermionic Statistics from Phase Antisymmetry}{11}{section.10}%
+\contentsline {subsection}{\numberline {10.1}The Exclusion Principle}{11}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Bound States (Numerically Verified)}{11}{subsection.10.2}%
+\contentsline {part}{II\hspace {1em}Derived Constants and Emergent Spacetime}{12}{part.2}%
+\contentsline {section}{\numberline {11}The Fine Structure Constant}{12}{section.11}%
+\contentsline {subsection}{\numberline {11.1}$\alpha $ from 3D Soliton Stability}{12}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Three Self-Consistency Conditions}{12}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}Why Exactly Three Dimensions}{12}{subsection.11.3}%
+\contentsline {section}{\numberline {12}Connected Constants}{13}{section.12}%
+\contentsline {subsection}{\numberline {12.1}The Speed of Light}{13}{subsection.12.1}%
+\contentsline {subsection}{\numberline {12.2}The Cosmological Constant}{13}{subsection.12.2}%
+\contentsline {section}{\numberline {13}Emergent Spacetime}{13}{section.13}%
+\contentsline {subsection}{\numberline {13.1}Cotton Candy Dissolution}{13}{subsection.13.1}%
+\contentsline {subsection}{\numberline {13.2}Emergent Gravity from Density Gradient}{14}{subsection.13.2}%
+\contentsline {subsection}{\numberline {13.3}The Coherence Metric}{14}{subsection.13.3}%
+\contentsline {subsection}{\numberline {13.4}GR Correspondence}{14}{subsection.13.4}%
+\contentsline {part}{III\hspace {1em}The Geometric Coupling Law}{15}{part.3}%
+\contentsline {section}{\numberline {14}The Unifying Equation}{15}{section.14}%
+\contentsline {section}{\numberline {15}Five Unified Systems}{15}{section.15}%
+\contentsline {subsection}{\numberline {15.1}System 1: Cooper Pair Mass (Tate 1989)}{15}{subsection.15.1}%
+\contentsline {subsection}{\numberline {15.2}System 2: Tajmar Anomalous Acceleration (2006)}{15}{subsection.15.2}%
+\contentsline {subsection}{\numberline {15.3}System 3: London Moment (24 Materials)}{15}{subsection.15.3}%
+\contentsline {subsection}{\numberline {15.4}System 4: Pulsar Glitch Geometry}{16}{subsection.15.4}%
+\contentsline {subsection}{\numberline {15.5}System 5: Muon g-2 Measurement Geometry}{16}{subsection.15.5}%
+\contentsline {subsection}{\numberline {15.6}Unification Summary}{16}{subsection.15.6}%
+\contentsline {part}{IV\hspace {1em}Nanoparticle Quantitative Theory}{17}{part.4}%
+\contentsline {section}{\numberline {16}The Icosahedral Frustration Angle}{17}{section.16}%
+\contentsline {section}{\numberline {17}Validation: 63 Predictions, 6.5\% Average Error}{17}{section.17}%
+\contentsline {subsection}{\numberline {17.1}Key Results}{17}{subsection.17.1}%
+\contentsline {subsection}{\numberline {17.2}Key Formulas}{17}{subsection.17.2}%
+\contentsline {part}{V\hspace {1em}Applied Physics}{18}{part.5}%
+\contentsline {section}{\numberline {18}Superconductor Design: Cu$_3$O$_2$ Kagome}{18}{section.18}%
+\contentsline {subsection}{\numberline {18.1}The Do-Si-Do Mechanism}{18}{subsection.18.1}%
+\contentsline {subsection}{\numberline {18.2}Frustration Cascade (UFCP Correction)}{18}{subsection.18.2}%
+\contentsline {subsection}{\numberline {18.3}Blind Predictions (Sealed April 29, 2026)}{18}{subsection.18.3}%
+\contentsline {section}{\numberline {19}Gravitational Phase Coupling (C-Field)}{19}{section.19}%
+\contentsline {subsection}{\numberline {19.1}The Cross-Term Mechanism}{19}{subsection.19.1}%
+\contentsline {subsection}{\numberline {19.2}Force Budget}{19}{subsection.19.2}%
+\contentsline {subsection}{\numberline {19.3}Experimental Validation}{19}{subsection.19.3}%
+\contentsline {subsection}{\numberline {19.4}Device Concept: Cargo Pallet}{19}{subsection.19.4}%
+\contentsline {section}{\numberline {20}Condensate-Mediated Fusion (CMF)}{19}{section.20}%
+\contentsline {subsection}{\numberline {20.1}The W-Kernel Range Extension}{19}{subsection.20.1}%
+\contentsline {subsection}{\numberline {20.2}Coherent Cage Enhancement}{20}{subsection.20.2}%
+\contentsline {subsection}{\numberline {20.3}Optimal Fuel: HD Molecules}{20}{subsection.20.3}%
+\contentsline {subsection}{\numberline {20.4}Dream Configuration}{20}{subsection.20.4}%
+\contentsline {part}{VI\hspace {1em}Experimental Validation}{21}{part.6}%
+\contentsline {section}{\numberline {21}Complete Test Record}{21}{section.21}%
+\contentsline {subsection}{\numberline {21.1}Category 1: Foundation (Tests 1--31)}{21}{subsection.21.1}%
+\contentsline {subsection}{\numberline {21.2}Category 2: Nuclear \& Particle (Tests 32--39)}{21}{subsection.21.2}%
+\contentsline {subsection}{\numberline {21.3}Category 3: Theoretical Structure (Tests 40--42)}{21}{subsection.21.3}%
+\contentsline {subsection}{\numberline {21.4}Category 4: Quantum \& Chaos (Tests 43--53)}{21}{subsection.21.4}%
+\contentsline {subsection}{\numberline {21.5}Category 5: Materials (Tests 54--78)}{22}{subsection.21.5}%
+\contentsline {subsection}{\numberline {21.6}Category 6: Astronomy (Test 79)}{22}{subsection.21.6}%
+\contentsline {subsection}{\numberline {21.7}Category 7: Unification (Tests 80--84)}{22}{subsection.21.7}%
+\contentsline {subsection}{\numberline {21.8}Category 8: Hardware (Tests 85--88)}{22}{subsection.21.8}%
+\contentsline {subsection}{\numberline {21.9}Category 9: Nanoparticle Theory (Tests 89--151)}{22}{subsection.21.9}%
+\contentsline {subsection}{\numberline {21.10}Retroactive Validation Against Published Data}{22}{subsection.21.10}%
+\contentsline {part}{VII\hspace {1em}Predictions and Failure Conditions}{23}{part.7}%
+\contentsline {section}{\numberline {22}New Predictions Beyond Standard Theory}{23}{section.22}%
+\contentsline {section}{\numberline {23}Failure Conditions}{23}{section.23}%
+\contentsline {part}{VIII\hspace {1em}Cosmological Implications}{25}{part.8}%
+\contentsline {section}{\numberline {24}Dark Energy}{25}{section.24}%
+\contentsline {section}{\numberline {25}Structure Formation and Brane Pressure}{25}{section.25}%
+\contentsline {section}{\numberline {26}Baryon Asymmetry}{25}{section.26}%
+\contentsline {part}{IX\hspace {1em}Document Index and Version History}{26}{part.9}%
+\contentsline {section}{\numberline {27}Source Document Index}{26}{section.27}%
+\contentsline {section}{\numberline {28}Validation Scripts Index}{26}{section.28}%
+\contentsline {section}{\numberline {29}Version History}{27}{section.29}%

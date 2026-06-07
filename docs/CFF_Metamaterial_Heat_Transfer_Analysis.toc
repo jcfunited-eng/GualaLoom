@@ -1,0 +1,19 @@
+\contentsline {section}{\numberline {1}Target Property}{2}{section.1}%
+\contentsline {section}{\numberline {2}CFF Structural Filters}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Filter 1: Surface Mode Support}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Filter 2: SPhP Strength Ranking}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Filter 3: Mode Confinement (Geometric Enhancement)}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Filter 4: Resonance Matching}{4}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Filter 5: Thermal Stability}{4}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Filter 6: Fabrication Feasibility}{4}{subsection.2.6}%
+\contentsline {section}{\numberline {3}Forcing Chain}{4}{section.3}%
+\contentsline {section}{\numberline {4}Ranked Candidates}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Rank 1: SiC Pillar Array on SiC Substrate}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Rank 2: hBN Nanostructures on SiC Substrate}{6}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Rank 3: SiC Phononic Crystal Slab}{6}{subsection.4.3}%
+\contentsline {section}{\numberline {5}What the Nature 2026 Paper Got Right and Wrong}{7}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Right}{7}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Suboptimal (CFF Prediction)}{7}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Rejected Approaches}{7}{section.6}%
+\contentsline {section}{\numberline {7}Experimental Validation Path}{8}{section.7}%
+\contentsline {section}{\numberline {8}What This Demonstrates About CFF}{8}{section.8}%

@@ -1,0 +1,882 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\geometry{margin=1in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    citecolor=blue!60!black,
+    urlcolor=blue!60!black
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue!70!black}\bfseries,
+    commentstyle=\color{green!50!black}\itshape,
+    stringstyle=\color{red!60!black},
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    xleftmargin=2em,
+    framexleftmargin=1.5em
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textsc{ArcLoom SPPU --- Technical Architecture}}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{\small\textit{Confidential --- Trade Secret}}
+
+\title{\textbf{The ArcLoom SPPU Explained}\\[0.5em]
+\large Ternary Coupling Fabric for Structural Perception\\[0.3em]
+\normalsize Architecture, Implementation, and Theoretical Foundations}
+\author{ArcLoom Project}
+\date{April 30, 2026}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\vspace{1em}
+\begin{abstract}
+This document provides a complete technical explanation of the ArcLoom Sensor Processing and Perception Unit (SPPU): how ternary trits are created in hardware, why the null state avoids the information-energy tax, how MathLoom implements balanced ternary arithmetic through constraint satisfaction, how Krimelack structural memory operates, and how the coupling-based computation model differs fundamentally from instruction-executing processors. All claims are grounded in the implemented Verilog HDL verified on Xilinx Zynq-7020 FPGA silicon (19,683 arithmetic operations, zero errors; full sensor-to-motor chain demonstrated April 2026).
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Ternary Trits: Creation and Physical Basis}
+%==============================================================================
+
+\subsection{The Three States}
+
+A trit has three stable values:
+\begin{itemize}
+    \item \textbf{+1} (positive commitment) --- encoded as \texttt{2'b01}
+    \item \textbf{--1} (negative commitment) --- encoded as \texttt{2'b10}
+    \item \textbf{0} (null / uncommitted) --- encoded as \texttt{2'b00}
+\end{itemize}
+
+The encoding \texttt{2'b11} is unused and invalid. Each trit occupies two physical wires on silicon.
+
+\subsection{BSIL Trit Creation (Sensor-to-Trit Conversion)}
+
+The Binary Sensor Ingestion Layer (\texttt{arcloom\_bsil}) converts a 12-bit ADC reading into ternary strands through \textbf{threshold comparison with a deliberate gap}.
+
+For each trit, two thresholds define three regions:
+\begin{equation}
+\text{trit}(x) = \begin{cases}
++1 & \text{if } x > \theta_{\text{high}} \\
+-1 & \text{if } x < \theta_{\text{low}} \\
+0  & \text{if } \theta_{\text{low}} \leq x \leq \theta_{\text{high}}
+\end{cases}
+\end{equation}
+
+The gap $[\theta_{\text{low}}, \theta_{\text{high}}]$ is not hysteresis or noise margin. It is the \textbf{structural encoding of genuine ambiguity}. When the sensor reading falls in this region, the physical signal is insufficient to determine state. The hardware outputs \texttt{2'b00} --- both wires LOW, zero switching activity.
+
+BSIL maintains a 2-sample history register to compute derivatives:
+\begin{align}
+\text{direction} &= \text{adc}(t) - \text{adc}(t-1) \\
+\text{acceleration} &= \text{adc}(t) - 2 \cdot \text{adc}(t-1) + \text{adc}(t-2)
+\end{align}
+
+Each derivative is thresholded identically (with its own gap) to produce direction and acceleration trits. From one 12-bit ADC sample, BSIL produces 5 strands of 3 trits each = 15 input trits on 30 wires.
+
+\subsection{SPPU Trit Creation (Coupling-Forced Commitment)}
+
+This is the non-BSIL mechanism and the architecturally unique one. Inside the SPPU, the settling strands (context, momentum, decision) are created by \texttt{arcloom\_local\_field} --- a purely combinational module that converts coupled influence into a ternary state.
+
+\subsubsection{The Accumulation}
+
+Each \texttt{arcloom\_local\_field} instance has $N$ input trits and $N$ signed 8-bit coupling weights $w_i$. It computes:
+
+\begin{equation}
+\text{sum} = \left(\sum_{i=0}^{N-1} w_i \cdot \text{trit}_i\right) + \text{bias}_{\text{ext}}
+\label{eq:field_sum}
+\end{equation}
+
+where the trit multiplication is:
+\begin{equation}
+w_i \cdot \text{trit}_i = \begin{cases}
++w_i & \text{if trit}_i = +1 \text{ (encoding \texttt{2'b01})} \\
+-w_i & \text{if trit}_i = -1 \text{ (encoding \texttt{2'b10})} \\
+0    & \text{if trit}_i = 0 \text{ (encoding \texttt{2'b00})}
+\end{cases}
+\end{equation}
+
+The external bias $\text{bias}_{\text{ext}}$ comes from the DSF feedback path (UF pipeline output feeding back into the SPPU).
+
+\subsubsection{The Dead-Zone Threshold}
+
+The accumulated sum drives a tri-state comparator:
+\begin{equation}
+\text{output trit} = \begin{cases}
++1 & \text{if sum} > +\Delta \\
+-1 & \text{if sum} < -\Delta \\
+0  & \text{if } -\Delta \leq \text{sum} \leq +\Delta
+\end{cases}
+\label{eq:deadzone}
+\end{equation}
+
+where $\Delta = 20$ in the current implementation (parameter \texttt{DEAD\_ZONE}).
+
+\subsubsection{Physical Interpretation}
+
+The output trit sits in a triple-well potential with barrier height $\Delta$. The coupling network computes a net force (the weighted sum). If the net force exceeds the barrier, the trit is forced into the $+1$ or $-1$ well. If not, it remains in the null well.
+
+\textbf{Null is not ``low confidence.''} Null is \textbf{insufficient driving force to overcome the potential barrier.} The distinction matters: confidence is an epistemological judgment; insufficient force is a physical state. The hardware doesn't ``decide'' it's uncertain --- the physics simply cannot move the trit out of the null well.
+
+\subsection{The Information-Energy Tax and How Null Avoids It}
+
+\subsubsection{The Problem in Binary}
+
+In a binary processor, every wire is always either HIGH or LOW. Every gate evaluates every input every cycle. A logic-0 input to an AND gate still causes the gate to evaluate --- transistors switch, current flows, power dissipates. Even when the result is trivially determined (one input is 0, so the AND output is 0 regardless of other inputs), the evaluation happens.
+
+The energy cost per bit per cycle is:
+\begin{equation}
+E_{\text{bit}} = C_{\text{wire}} \cdot V_{\text{dd}}^2 \cdot \alpha
+\end{equation}
+
+where $\alpha$ is the switching activity factor (probability of transition per cycle). In a clocked system, $\alpha > 0$ for every wire every cycle, even wires carrying ``no information.''
+
+\subsubsection{How Null Eliminates It}
+
+In the SPPU, a null trit (\texttt{2'b00}) enters the accumulation loop and hits the no-op case:
+\begin{lstlisting}[language=Verilog]
+case (trit_in[i*2 +: 2])
+    2'b01: accum = accum + weight[i];   // gate transitions occur
+    2'b10: accum = accum - weight[i];   // gate transitions occur
+    2'b00: accum = accum;               // NO-OP: no transitions
+endcase
+\end{lstlisting}
+
+The \texttt{accum = accum} path through the synthesized LUTs means the carry chain and adder logic for that trit position does not toggle. The output of the LUT remains unchanged. No wire transitions, no dynamic power.
+
+On the output side: if the sum falls within $[-\Delta, +\Delta]$, the output is \texttt{2'b00}. Both output wires remain LOW. Every downstream module that receives this null trit also hits its own no-op case.
+
+\textbf{The energy cost of the SPPU is proportional to the number of committed trits, not the total number of trits.} In a typical settling, 30--60\% of trits remain null (depending on input ambiguity). That's 30--60\% of the fabric drawing zero dynamic power.
+
+\subsubsection{No Clock Means No Wasted Evaluation}
+
+The SPPU has no clock. It is purely combinational (\texttt{always @(*)} and \texttt{assign} only). There is no periodic evaluation. The logic only fires when an input wire transitions. If the sensor reading doesn't change, nothing in the SPPU switches. Zero dynamic power at steady state.
+
+In a clocked binary processor, even when inputs are static, the clock tree toggles every cycle (often 30--40\% of total chip power), registers re-latch identical values, and combinational logic re-evaluates unchanged inputs. All waste.
+
+\subsection{True Ternary vs Binary Emulation}
+
+\subsubsection{What ``Ternary Processors'' in the Literature Do}
+
+Existing ternary processor papers (including the 5500FP balanced ternary RISC on Zenodo) implement ternary arithmetic on standard binary CMOS:
+
+\begin{enumerate}
+    \item Trits encoded as 2-bit binary codes in standard registers
+    \item A binary ALU with logic that implements ternary truth tables
+    \item A standard fetch-decode-execute pipeline with a program counter
+    \item A clock driving every stage every cycle
+\end{enumerate}
+
+Every trit, every cycle, gets read from a register file (both wires evaluated), routed through a multiplexer (all inputs evaluated), processed by binary logic (all gates toggle), and written back (both wires driven). A null trit (\texttt{00}) receives exactly the same processing as a committed trit. The gates don't know it's null. Full dynamic power regardless of information content.
+
+This is \textbf{a binary computer simulating ternary arithmetic.} The silicon is binary. The computation is binary. The instruction set is ternary. No physical tri-stability exists anywhere.
+
+\subsubsection{What ArcLoom Does on FPGA (Current State)}
+
+ArcLoom on the Zynq-7020 is still binary CMOS underneath. Still 2-bit encoding. But two architectural properties create a measurable difference:
+
+\begin{enumerate}
+    \item \textbf{Combinational fabric with null-path optimization.} When Vivado synthesizes the \texttt{arcloom\_local\_field}, the LUT configurations for the \texttt{2'b00} input case propagate the accumulator unchanged. The downstream logic sees no input transitions and does not toggle. This is not ``simulating ternary'' --- it's binary logic that genuinely does less work when trits are null.
+
+    \item \textbf{No clock.} The SPPU has no periodic evaluation. Energy is consumed only when input wires change state. Static inputs = zero dynamic power. This is architecturally impossible in a clocked processor.
+\end{enumerate}
+
+\subsubsection{What ArcLoom Will Be on ASIC (Target State)}
+
+The ASIC architecture specifies \textbf{Tri-Stable Attractor Cells (TSACs)} --- single physical elements with three stable states:
+
+\begin{itemize}
+    \item \textbf{Ferroic thin-film:} Three polarization states in a ferroelectric material. Coupling weights are voltage biases on adjacent cells. Below threshold: cell sits in center polarization (null). Above threshold: flips to $+1$ or $-1$ polarization.
+    \item \textbf{Multi-threshold CMOS:} Single transistor channel with two threshold voltages creating three operating regions.
+\end{itemize}
+
+On TSAC silicon:
+\begin{itemize}
+    \item One physical element per trit (not two wires)
+    \item Null is the physical rest state (zero switching energy)
+    \item Commitment costs energy (state transition through potential barrier)
+    \item The dead zone is a physical potential barrier, not a digital comparison
+    \item Energy scales exactly with committed information: $E \propto n_{\text{committed}}$
+\end{itemize}
+
+The FPGA implementation is an architecturally faithful prototype. The energy advantage is partially realized on binary silicon. On TSAC silicon, it becomes complete.
+
+%==============================================================================
+\section{MathLoom: Balanced Ternary Arithmetic}
+%==============================================================================
+
+\subsection{Representation}
+
+A balanced ternary number is a sequence of digits $d_i \in \{-1, 0, +1\}$ with value:
+\begin{equation}
+\text{Val}(A) = \sum_{i=0}^{N-1} a_i \cdot 3^i
+\end{equation}
+
+Examples: $5 = (+1)(-1)(-1)_{\text{BT}}$ because $9 - 3 - 1 = 5$. $-5 = (-1)(+1)(+1)_{\text{BT}}$.
+
+Negation: flip every digit ($+1 \leftrightarrow -1$, $0 \rightarrow 0$). No special encoding like two's complement.
+
+\subsection{The Truncation-as-Rounding Property}
+
+In binary, truncating the lowest bit of an integer always rounds toward zero (floor for positive, ceiling for negative). This introduces systematic bias in multi-step computation.
+
+In balanced ternary, truncating the lowest digit is equivalent to rounding to the nearest multiple of 3. The representation is symmetric around zero at every scale. Formally:
+\begin{equation}
+\left\lfloor \frac{\text{Val}(A)}{3} \right\rceil = \text{Val}(A[N-1:1])
+\end{equation}
+
+where $\lfloor \cdot \rceil$ denotes round-to-nearest. No correction pass, no bias accumulation.
+
+\subsection{Addition: Constraint Satisfaction}
+
+\subsubsection{The Constraint}
+
+At each digit position $i$, the full adder satisfies:
+\begin{equation}
+a_i + b_i + c_i = s_i + 3 \cdot c_{i+1}
+\label{eq:bt_constraint}
+\end{equation}
+
+where $a_i, b_i \in \{-1, 0, +1\}$ are operand digits, $c_i \in \{-1, 0, +1\}$ is the carry-in, $s_i \in \{-1, 0, +1\}$ is the sum digit, and $c_{i+1} \in \{-1, 0, +1\}$ is the carry-out.
+
+The total $a_i + b_i + c_i$ ranges from $-3$ to $+3$. Each total has exactly one valid $(s_i, c_{i+1})$ pair:
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Total} & \textbf{Sum $s_i$} & \textbf{Carry $c_{i+1}$} \\
+\midrule
+$-3$ & $0$ & $-1$ \\
+$-2$ & $+1$ & $-1$ \\
+$-1$ & $-1$ & $0$ \\
+$0$  & $0$ & $0$ \\
+$+1$ & $+1$ & $0$ \\
+$+2$ & $-1$ & $+1$ \\
+$+3$ & $0$ & $+1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Why This Is Constraint Satisfaction, Not Algorithm Execution}
+
+The full adder does not ``compute'' the sum. It looks up the unique solution to Equation~\ref{eq:bt_constraint}. The truth table IS the complete set of solutions to the constraint. The hardware is a stored constraint, not a procedure.
+
+The ripple-carry chain is constraint propagation: $c_{\text{out}}$ at position $i$ constrains $c_{\text{in}}$ at position $i+1$. The full answer is the unique assignment of all $(s_i, c_i)$ values that simultaneously satisfies the constraint at every position. This exists after one propagation delay through the LUT chain ($\sim$10--15\,ns for 9 digits on Zynq-7020). No clock. No iteration. No algorithm.
+
+\subsubsection{Implementation}
+
+\texttt{arcloom\_bt\_fulladder}: Combinational case statement on the signed total.
+
+\texttt{arcloom\_bt\_adder}: $N$ full adders chained --- $c_{\text{out}}[i]$ feeds $c_{\text{in}}[i+1]$, $c_{\text{in}}[0] = 0$.
+
+\texttt{arcloom\_bt\_sub}: Negate $B$ (flip all trits via \texttt{arcloom\_trit\_neg}), then add.
+
+\texttt{arcloom\_trit\_mul}: Single-trit multiply --- null $\rightarrow$ null; same sign $\rightarrow +1$; different sign $\rightarrow -1$.
+
+All purely combinational. Verified: 6,561 exhaustive tests per operation on FPGA silicon, zero errors.
+
+\subsection{Folding Division}
+
+\subsubsection{The Mechanism}
+
+Standard division asks: ``How many times does $B$ fit into $A$?'' --- an iterative counting procedure.
+
+Folding division asks: \textbf{``At which fold does the field exhaust itself?''}
+
+\begin{enumerate}
+    \item Field starts with energy $|A|$ (numerator magnitude)
+    \item Each fold removes $|B|$ units (denominator magnitude)
+    \item When remaining field $< |B|$, it falls into the dead zone
+    \item Number of folds = quotient $q$
+    \item Residual energy = remainder $r$
+\end{enumerate}
+
+Formally:
+\begin{equation}
+A = q \cdot B + r, \quad |r| < |B|
+\end{equation}
+
+\subsubsection{Implementation (\texttt{arcloom\_mathloom\_div.v})}
+
+This is the one clocked MathLoom module. FSM with two states:
+
+\begin{lstlisting}[language=Verilog]
+State IDLE:
+    if (start && b_in != 0):
+        accumulator = |a_in|
+        denominator = |b_in|
+        count = 0
+        -> FOLDING
+
+State FOLDING:
+    compare |accumulator| vs |denominator|  // arcloom_bt_compare
+    if accumulator >= denominator:
+        accumulator = accumulator - denominator  // arcloom_bt_adder
+        count = count + 1
+    else:
+        quotient = count (sign-corrected)
+        remainder = accumulator
+        done = 1
+        -> IDLE
+\end{lstlisting}
+
+Each iteration: one clock cycle. Worst case for 4-trit operands (range $\pm 40$): 40 cycles. The \texttt{cycle\_count} output (6 bits) tracks actual iterations.
+
+\subsubsection{Why It's Not Just Iterative Subtraction}
+
+The hardware is subtract-and-compare. But the framing as ``field exhaustion'' connects division to the SPPU's fundamental operation:
+
+\begin{itemize}
+    \item \textbf{SPPU:} Input field energy (weighted sum) either exceeds the dead-zone barrier (commits) or doesn't (stays null). The committed trits are the ``quotient'' --- how many strands the field could force. The null trits are the ``remainder'' --- insufficient energy to fold further.
+
+    \item \textbf{Folding division:} Numerator field energy either exceeds the denominator (sustains another fold) or doesn't (falls into dead zone). The fold count is the quotient. The residual is the remainder.
+\end{itemize}
+
+Same principle: force vs barrier, iterated until exhaustion. The SPPU IS a divider --- input energy divided by coupling structure. \texttt{arcloom\_mathloom\_div} makes this explicit as standalone arithmetic.
+
+\subsubsection{Fractional Division}
+
+To compute $A/B$ with $N$ fractional digits: left-shift $A$ by $N$ positions (multiply by $3^N$ --- append $N$ null trits on the right, zero cost). Fold. The quotient's lower $N$ digits are the fractional part. Truncation-as-rounding guarantees these are the optimal $N$-digit approximation. No correction pass.
+
+$1/3$ is exact in balanced ternary: $(+1) \cdot 3^{-1} = 0.1_{\text{BT}}$. This is impossible in binary (infinite repeating fraction).
+
+\subsubsection{Verification}
+
+41,430 simulation tests covering integers, fractions, complex cases, edge cases. Zero errors. 18 tests verified on FPGA silicon. Full folding division on silicon pending (scheduled session).
+
+%==============================================================================
+\section{Krimelack: Structural Memory}
+%==============================================================================
+
+\subsection{What It Stores}
+
+Krimelack stores \textbf{where the loom settled}, not what the input looked like. Each entry (``motif'') is a 48-bit snapshot of the full loom state (24 trits). This is the structural fingerprint --- the configuration the coupling network was forced into by a particular input field.
+
+\subsection{Architecture}
+
+\begin{itemize}
+    \item \textbf{Storage:} 32-entry circular buffer, 48 bits per entry
+    \item \textbf{Addressing:} 5-bit write pointer, content-addressed recall
+    \item \textbf{Hash table:} 8-bit XOR-folded hash per motif for fast duplicate detection
+    \item \textbf{Total capacity:} $32 \times 48 = 1,536$ bits (192 bytes)
+\end{itemize}
+
+\subsection{Commit Gating}
+
+Four conditions must simultaneously pass for a commit to be accepted:
+\begin{equation}
+\text{commit\_eligible} = (U^* \leq U_{\text{settle}}) \wedge (R \geq R_{\text{commit}}) \wedge (\neg\text{safe\_mode}) \wedge (\neg\text{duplicate})
+\end{equation}
+
+\begin{itemize}
+    \item $U^* \leq U_{\text{settle}}$: Uncertainty below threshold (loom is confident)
+    \item $R \geq R_{\text{commit}}$: Resonance above threshold (structural coherence)
+    \item $\neg\text{safe\_mode}$: System not in protective mode
+    \item $\neg\text{duplicate}$: State not already stored (checked via hash + full comparison)
+\end{itemize}
+
+These gates ensure krimelack only stores meaningful, confident, non-redundant structural states. Low-quality or uncertain states are rejected.
+
+\subsection{Duplicate Detection}
+
+\begin{enumerate}
+    \item XOR-fold the 48-bit state into an 8-bit hash: $h = s[7:0] \oplus s[15:8] \oplus s[23:16] \oplus s[31:24] \oplus s[39:32] \oplus s[47:40]$
+    \item Compare $h$ against all stored hashes (parallel, one cycle)
+    \item On hash match: perform full 48-bit equality check
+    \item If full match: \texttt{commit\_rejected}, do not store
+\end{enumerate}
+
+\subsection{Recall (Pattern Matching)}
+
+Recall is \textbf{combinational} --- parallel scoring across all 32 stored motifs in a single cycle:
+
+\begin{equation}
+\text{score}(j) = \sum_{i=0}^{23} \mathbb{1}\left[\text{query}_i \neq 0 \wedge \text{motif}_{j,i} \neq 0 \wedge \text{query}_i = \text{motif}_{j,i}\right]
+\end{equation}
+
+Only committed trits on \textbf{both} sides (query and stored motif) count toward the score. Null trits on either side contribute nothing --- same principle as null trits contributing nothing to the SPPU accumulator.
+
+The module outputs \texttt{best\_match} (48-bit motif with highest score) and \texttt{match\_score} (0--255). If no motifs have any matching committed trits, \texttt{recall\_valid} stays low.
+
+\subsection{Why This Isn't Template Matching}
+
+Template matching compares an input against a stored reference image or pattern. The comparison is ``how similar is this input to my stored template?''
+
+Krimelack doesn't compare inputs. It compares \textbf{loom settlements.} The same physical field structure, passing through the same coupling network, produces the same settlement. Recognition isn't ``does this look like what I stored?'' --- it's ``did the physics settle to the same place?''
+
+One exposure to learn. No training. No iteration. No gradient descent. Show it once, krimelack commits the settlement. Show it again, the loom settles identically (because the field structure is identical), recall fires.
+
+Memory per object: $\sim$4\,KB (107 gates $\times$ 9 values $\times$ 4 bytes for vision; 48 bits for a single loom motif). Krimelack capacity: 32 motifs = 192 bytes in hardware, $\sim$128\,KB if storing full DSF sequences in extended memory.
+
+%==============================================================================
+\section{How ArcLoom Computes}
+%==============================================================================
+
+\subsection{What a Von Neumann Processor Does}
+
+Every conventional processor --- ARM, x86, RISC-V, GPU cores --- operates by:
+\begin{enumerate}
+    \item Fetch instruction from memory (program counter $\rightarrow$ address bus $\rightarrow$ instruction register)
+    \item Decode instruction (opcode $\rightarrow$ control signals)
+    \item Execute operation (ALU/FPU performs arithmetic or logic)
+    \item Write result (to register file or memory)
+    \item Increment program counter
+    \item Repeat
+\end{enumerate}
+
+Even in parallel architectures (GPU, SIMD, superscalar), each thread or lane executes this cycle. The computation is \textbf{sequential instruction execution with state transitions.}
+
+\subsection{What ArcLoom Does Instead}
+
+ArcLoom has:
+\begin{itemize}
+    \item No program counter
+    \item No instruction memory
+    \item No fetch-decode-execute cycle
+    \item No register file
+    \item No arithmetic logic unit (in the settling path)
+    \item No clock (in the SPPU)
+\end{itemize}
+
+The full signal path in \texttt{arcloom\_top}:
+
+\begin{enumerate}
+    \item \textbf{XADC:} Reads analog voltage from sensor --- 12-bit ADC, clocked at sample rate ($\sim$1\,MSPS)
+    \item \textbf{BSIL:} Converts 12-bit value into 5 input strands (15 trits) via threshold comparison with gaps --- clocked, maintains history for derivatives
+    \item \textbf{SPPU:} Takes 15 input trits, runs them through two levels of \texttt{arcloom\_local\_field} with fixed coupling weights, produces 9 settling trits and 3 decision trits --- \textbf{purely combinational, no clock, one propagation delay}
+    \item \textbf{UF Pipeline:} Clocked sequential processing chain that analyzes loom state over time and generates DSF feedback bias into the SPPU. Internal functions are proprietary (DSF-AI trade secret).
+    \item \textbf{Krimelack:} Commits/recalls loom states --- clocked for commits, combinational for recall
+    \item \textbf{L6 TCL:} Counts non-null trits, fires \texttt{structural\_lock} when effective dimensionality $< 9$ --- \textbf{purely combinational}
+\end{enumerate}
+
+\subsection{The Coupling Weights ARE the Program}
+
+In a CPU, the program is in instruction memory. Change the program, same hardware does different things.
+
+In ArcLoom, the coupling weights are Verilog parameters:
+\begin{lstlisting}[language=Verilog]
+parameter signed [7:0] W_CTX_DIST  [0:4] = '{8'd30, 8'd10, ...};
+parameter signed [7:0] W_DCSN_STEER [0:20] = '{8'd25, -8'd25, ...};
+\end{lstlisting}
+
+These are \textbf{fixed at synthesis time}, compiled into the LUT configuration by Vivado. They are not loaded from memory. They are not computed at runtime. They ARE the logic gates.
+
+Changing the weights and resynthesizing produces a \textbf{physically different circuit.} Different LUT truth tables, different wire routing, different gate-level netlist. It's not the same circuit running a different program --- it's a different circuit.
+
+\subsection{Settling vs Computing}
+
+A CPU \textbf{computes}: applies operations to data sequentially, producing intermediate results that build toward a final answer.
+
+ArcLoom \textbf{settles}: input trits apply pressure through coupling weights, the dead-zone threshold determines which output trits commit, and the answer exists on the output wires after one propagation delay.
+
+The SPPU's Level 1 (input $\rightarrow$ context/momentum) produces 6 intermediate trits. Level 2 (all 21 trits $\rightarrow$ decision) produces 3 decision trits. Total: two levels of combinational logic, $\sim$5\,ns input-to-decision on Zynq-7020.
+
+No iteration. No convergence check. No feedback loop in the SPPU. One pass. The answer is the unique configuration that satisfies all coupling constraints simultaneously.
+
+\subsection{Structural Lock: Proof of Dimensional Exhaustion}
+
+L6 TCL (\texttt{arcloom\_l6\_tcl.v}) is a purely combinational observer:
+\begin{lstlisting}[language=Verilog]
+// Count non-null (committed) trits
+n_collapsed = count of trits where (trit != 2'b00)
+n_effective = N_TRITS - n_collapsed  // remaining degrees of freedom
+
+// Structural lock fires when freedom drops below Euler knee
+structural_lock = (n_effective < KNEE) && (!disruption_active)
+\end{lstlisting}
+
+With \texttt{N\_TRITS = 24} and \texttt{KNEE = 9}: when 16+ trits are committed (8 or fewer remain null), \texttt{structural\_lock} fires. This means the coupling has eliminated all but a handful of degrees of freedom. The remaining null trits don't have enough combined weight to change any committed trit --- the outcome is topologically inevitable.
+
+This is \textbf{dimensional exhaustion in hardware}: the answer isn't calculated; it's what remains after every other possibility has been eliminated by the coupling constraints.
+
+\subsection{Comparison: Why ArcLoom Cannot Be a CPU}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Capability} & \textbf{Binary CPU} & \textbf{ArcLoom SPPU} \\
+\midrule
+Arbitrary branching & Yes (program counter) & No (no instructions) \\
+General memory access & Yes (load/store any address) & No (32 fixed motifs, content-addressed) \\
+Iteration / loops & Yes (branch backward) & No (single-pass combinational) \\
+Recursion / stack & Yes (push/pop) & No (no stack) \\
+Bit manipulation & Yes (shift, mask, XOR) & No (operates on coupled fields) \\
+Turing complete & Yes & MathLoom: yes (via iteration in FSM) \\
+\midrule
+Sensor $\rightarrow$ decision latency & Milliseconds & Nanoseconds \\
+Power for perception & Milliwatts & Microwatts \\
+Training required & N/A (programmed) & No \\
+Domain transfer & Rewrite software & Change weights \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+ArcLoom does not compete with CPUs. It replaces the \textbf{perception accelerator} --- the component that converts sensor input into structured decisions. The correct deployment is ArcLoom SPPU as a peripheral alongside a binary CPU that handles I/O, networking, task scheduling, and general computation.
+
+\subsection{Comparison with Hopfield Networks}
+
+The closest prior art is the Hopfield associative memory (1982):
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Property} & \textbf{Hopfield Network} & \textbf{ArcLoom SPPU} \\
+\midrule
+Weight symmetry & Required ($W_{ij} = W_{ji}$) & Asymmetric, hierarchical \\
+Training & Hebbian learning from examples & No training (weights from structure) \\
+Settling & Iterative energy minimization & Single combinational pass \\
+States per node & Binary $\{0, 1\}$ or $\{-1, +1\}$ & Ternary $\{-1, 0, +1\}$ \\
+Null state & None (every node always committed) & Native (physical rest state) \\
+Convergence guarantee & To local minimum (may be spurious) & Unique output per input (deterministic) \\
+Clock & Required (iterative updates) & None (wire propagation only) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%==============================================================================
+\section{The Name: Why ``ArcLoom''}
+%==============================================================================
+
+\textbf{Arc:} A coupling connection between two trits. From the $\psi$-Lattice formalism: a mode overlap between cells in the coherence field. The coupling weight matrix defines the complete set of arcs. Each arc carries constraint (influence), not data.
+
+\textbf{Loom:} The fabric of strands (trit channels) woven together by arcs (couplings). A physical loom constrains thread positions through tension. The ternary loom constrains trit states through coupling weights. The output pattern emerges from the constraint structure, not from sequential computation.
+
+\textbf{SPPU:} Sensor Processing and Perception Unit. One tile of the loom fabric that processes one structural situation per propagation delay.
+
+%==============================================================================
+\section{Synthesis and Verification Status}
+%==============================================================================
+
+\subsection{FPGA Resource Utilization (6-strand version, Zynq-7020)}
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Resource} & \textbf{Used} & \textbf{Notes} \\
+\midrule
+LUTs & 2,205 & SPPU is pure LUTs (combinational) \\
+Flip-Flops & 675 & In BSIL, UF pipeline, krimelack, AXI only \\
+DSP blocks & 0 & No multiply-accumulate hardware used \\
+BRAM & 0 & Krimelack fits in distributed RAM \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Verified on Silicon}
+
+\begin{itemize}
+    \item MathLoom addition: 6,561/6,561 (zero errors)
+    \item MathLoom multiplication: 6,561/6,561 (zero errors)
+    \item MathLoom comparison: 6,561/6,561 (zero errors)
+    \item MathLoom division: 18/18 on silicon (zero errors)
+    \item BSIL sensor encoding: calibrated for Sharp GP2Y0A41SK0F
+    \item SPPU 8-strand settling: produces distinct decisions for distinct inputs
+    \item Krimelack commit/recall: motif storage and matching verified
+    \item L6 structural lock: fires at Euler knee
+    \item TB6612FNG motor control: all 4 directions
+    \item Full chain: Sharp sensor $\rightarrow$ XADC $\rightarrow$ BSIL $\rightarrow$ SPPU $\rightarrow$ motors (zero CPU)
+\end{itemize}
+
+\subsection{Verified in Simulation Only}
+
+\begin{itemize}
+    \item Folding division: 41,430 test vectors (zero errors)
+    \item Vision pipeline: 5 objects discriminated, 0.11--0.36 match gaps
+    \item Computational completeness: fractions, sqrt, trig via fold
+    \item Domain agnosticism: same kernel processes financial, sensor, and image data
+\end{itemize}
+
+%==============================================================================
+\section{Familiarity Feedback: Clockless Habituation}
+%==============================================================================
+
+\subsection{The Corner Problem}
+
+A purely combinational SPPU with fixed coupling weights and a fixed dead zone produces the same output for the same input every time. This is deterministic and correct --- but it means the system cannot escape a repeated situation. A robot in a corner sees the same sensor readings, settles to the same decision (reverse), returns to the same position, and repeats indefinitely.
+
+Traditional solutions add a clock: timers, counters, randomness, state machines that track ``how long have I been stuck.'' All of these violate the clockless principle of the SPPU and introduce the information-energy tax the architecture was designed to eliminate.
+
+\subsection{The Biological Principle}
+
+Nothing in nature has a clock. Yet biological systems escape repetition through at least four mechanisms, all sharing one principle:
+
+\begin{description}
+    \item[Synaptic Depletion] A neuron fires repeatedly and its neurotransmitter supply at the synapse decreases. The signal weakens not because time passed, but because the resource was consumed by repeated use.
+    \item[Receptor Saturation] Olfactory receptors fill with the same molecule and stop responding. Novel molecules use different receptors at full sensitivity.
+    \item[Neural Adaptation] Photoreceptors physically change sensitivity based on sustained stimulation. The substrate itself alters its response characteristics.
+    \item[Refractory Period] After firing, ion channels require physical recovery. The neuron cannot fire again regardless of input strength.
+\end{description}
+
+The common principle: \textbf{the act of responding to a specific input depletes the system's ability to respond to that same input again.} Not time. Not a counter. The medium itself remembers what it has been doing, and doing the same thing exhausts the response.
+
+\subsection{Krimelack Recall as Dead-Zone Feedback}
+
+ArcLoom already has the mechanism. Krimelack recall is \textbf{combinational} --- the loom settles, the 48-bit state is compared against all stored motifs in parallel, and a match score appears on the output wire in one propagation delay.
+
+The architectural modification: \textbf{wire the match score back into the SPPU's dead zone.}
+
+\begin{equation}
+\Delta_{\text{eff}} = \Delta_{\text{base}} + \text{match\_score}
+\label{eq:familiarity}
+\end{equation}
+
+Each \texttt{arcloom\_local\_field} instance receives the krimelack match score as an additional input. The dead zone comparator (Equation~\ref{eq:deadzone}) uses $\Delta_{\text{eff}}$ instead of the fixed $\Delta$.
+
+This creates a combinational feedback loop:
+
+\begin{enumerate}
+    \item SPPU settles $\rightarrow$ 48-bit loom state
+    \item Loom state $\rightarrow$ krimelack recall $\rightarrow$ match score
+    \item Match score $\rightarrow$ raises dead zone in SPPU
+    \item Raised dead zone $\rightarrow$ some trits that barely committed drop to null
+    \item Different loom state $\rightarrow$ different match score
+    \item Loop finds equilibrium: the settlement that is \textbf{maximally unlike} anything in krimelack while remaining consistent with the coupling pressures
+\end{enumerate}
+
+No clock. No timer. No register in the feedback path. Purely combinational.
+
+\subsection{Behavior}
+
+\textbf{Novel input} (empty krimelack or no matching motif): match score $\approx 0$, effective dead zone equals base ($\Delta_{\text{base}} = 20$), full sensitivity, system responds normally.
+
+\textbf{First repetition} (one matching motif): match score moderate, dead zone rises to $\sim$30--35. Trits with coupling pressure in the range $[20, 35]$ that previously committed now fall to null. Different trit pattern $\rightarrow$ different decision. The system tries a different response.
+
+\textbf{Multiple similar experiences} (several motifs resembling the current state): match score high, dead zone rises to 40+. Only trits with very strong coupling pressure (well above 40) can commit. Most trits drop to null. The system is forced into a maximally novel response --- the only decisions it can still make are ones it has \textit{never} made in this situation before.
+
+\textbf{Completely new situation} (after turning away from the corner): different sensor readings $\rightarrow$ different loom state $\rightarrow$ low match score $\rightarrow$ dead zone returns to base $\rightarrow$ full sensitivity restored.
+
+This is habituation: \textbf{familiarity breeds resistance.} The system's own memory of having been in a state before makes it harder to commit to the same response. The depletion is experiential, not temporal.
+
+\subsection{Combinational Loop Stability}
+
+The feedback loop (SPPU $\rightarrow$ krimelack $\rightarrow$ dead zone $\rightarrow$ SPPU) is combinational. In digital logic, combinational feedback either:
+
+\begin{enumerate}
+    \item \textbf{Finds a stable fixed point:} The loom state produces a match score that produces a dead zone that produces that same loom state. This fixed point is the most novel response consistent with the coupling pressures --- the desired behavior.
+
+    \item \textbf{Oscillates between two states:} The loom state A produces a match score that pushes the dead zone high enough to flip some trits, producing state B. State B produces a different match score that lowers the dead zone, flipping back to state A. The decision outputs flicker, producing visible hesitation --- which is the \textit{correct} behavior for genuine indecision.
+\end{enumerate}
+
+If oscillation is too rapid or unstable, the feedback gain can be reduced by scaling the match score:
+
+\begin{equation}
+\Delta_{\text{eff}} = \Delta_{\text{base}} + (\text{match\_score} \gg k)
+\end{equation}
+
+where $k = 1, 2, 3$ reduces the feedback strength by factors of 2, 4, 8 respectively. The optimal $k$ is determined experimentally.
+
+\subsection{On TSAC ASIC: Native Substrate Habituation}
+
+On a ferroelectric TSAC, this mechanism becomes a free physical property of the material. Sustained polarization in one direction causes \textbf{dielectric fatigue} --- the potential barrier between wells rises with sustained identical state. This is a real, well-documented effect in ferroelectric materials (typically considered a defect; here it is the feature):
+
+\begin{itemize}
+    \item Trit commits to $+1$ at coupling pressure 25 (above base barrier of 20)
+    \item Sustained $+1$ polarization $\rightarrow$ barrier rises: 20 $\rightarrow$ 22 $\rightarrow$ 25 $\rightarrow$ 28
+    \item Barrier exceeds coupling pressure (28 $>$ 25) $\rightarrow$ trit falls to null
+    \item Different trit pattern $\rightarrow$ different decision
+    \item Null state (rest) $\rightarrow$ barrier recovers $\rightarrow$ fresh sensitivity
+\end{itemize}
+
+The RC time constant of the ferroelectric material IS the habituation rate. No circuit. No logic. No krimelack feedback needed for the substrate-level mechanism. Physics does it natively.
+
+On the ASIC, two layers of habituation would operate simultaneously:
+\begin{itemize}
+    \item \textbf{Substrate layer} (TSAC fatigue): fast, local, per-trit. Physical depletion of the commitment mechanism.
+    \item \textbf{Cognitive layer} (krimelack feedback): slower, global, pattern-level. Experiential familiarity across the full loom state.
+\end{itemize}
+
+This mirrors biology, where receptor saturation (fast, local) and cortical habituation (slow, global) operate at different scales on the same sensory input.
+
+\subsection{Relationship to Cognition}
+
+Familiarity feedback is not just an engineering solution to corner trapping. It is a fundamental property of any system that learns from experience:
+
+\begin{itemize}
+    \item \textbf{Novelty seeking:} The system naturally gravitates toward unfamiliar states because familiar states are harder to commit to. This is curiosity as a physical property, not a programmed reward signal.
+    \item \textbf{Attention:} Novel stimuli receive full coupling sensitivity. Repeated stimuli receive diminished sensitivity. Attention to novelty emerges from the dead-zone dynamics, not from a separate attention mechanism.
+    \item \textbf{Boredom:} Sustained identical input eventually raises the dead zone high enough that NO trits can commit. The system goes silent --- all null. This is the loom equivalent of ``I've seen this enough, there is nothing left to perceive here.'' Change the input and full sensitivity returns.
+    \item \textbf{Creativity:} When familiar responses are suppressed, the system is forced to settle on states it has never produced before. The only available decisions are novel ones. This is not random exploration --- it is structured novelty constrained by the coupling weights.
+\end{itemize}
+
+%==============================================================================
+\section{Coupling Weight Derivation: The Proprietary Layer}
+%==============================================================================
+
+\subsection{The Separation of Public and Secret}
+
+ArcLoom's architecture is patented. The Verilog HDL is public. Anyone can see:
+\begin{itemize}
+    \item The SPPU structure (8 strands, 2-level coupling, dead-zone thresholding)
+    \item The BSIL interface (ADC to ternary conversion)
+    \item The MathLoom arithmetic primitives
+    \item The Krimelack memory architecture
+    \item The L6 structural lock mechanism
+    \item The fact that \textbf{coupling weights determine application behavior}
+\end{itemize}
+
+What is \textbf{not} public --- and never will be --- is \textbf{how the coupling weights are derived.}
+
+\subsection{The Problem: Where Do Weights Come From?}
+
+The SPPU with arbitrary weights produces arbitrary outputs. The weights must encode the structural relationships of the target domain: which sensor states couple to which decisions, how strongly, and with what polarity.
+
+Current state (April 2026): weights are hand-approximated. Lesson \#22 from the PYNQ deployment log: ``Coupling weights and BSIL thresholds were approximated, not calibrated to Sharp sensor's voltage curve. Loom makes decisions but they don't always make physical sense.'' Evidence: ``Retreat'' fires at medium distance instead of close.
+
+The weights need to come from \textbf{structural analysis of the sensor domain} --- not guessing, not training, not gradient descent.
+
+\subsection{DSF-AI: The Weight Derivation Engine}
+
+DSF-AI (Decision Surface Field --- Artificial Intelligence) is the proprietary system that generates coupling weights. It takes sensor characterization data as input and produces the signed 8-bit coupling weight arrays that define the SPPU's behavior for a target domain.
+
+The internal method by which DSF-AI derives structurally correct weights from raw sensor data is a trade secret. It is not based on machine learning, gradient descent, or statistical training. It requires no labeled datasets. It is deterministic: the same sensor characterization data produces the same weights every time.
+
+DSF-AI has been proven across multiple domains --- financial time series, IR distance sensing (Sharp GP2Y0A41SK0F), and raw camera pixel data --- using the same underlying derivation method with zero modification per domain.
+
+\subsection{Why This Is a Trade Secret, Not a Patent}
+
+Patents require full public disclosure. The weight derivation method is proprietary and will not be published. None of it is visible from examining the hardware. The weights are just signed 8-bit integers burned into LUT configurations. Reverse-engineering the weights from the bitstream tells you nothing about how they were generated --- the same way knowing a neural network's architecture tells you nothing about reproducing its training data.
+
+\subsection{The Business Model}
+
+\begin{enumerate}
+    \item \textbf{Hardware is public IP} (patent): Anyone can build an SPPU from the published architecture.
+    \item \textbf{Weight derivation is private IP} (trade secret): Only DSF-AI can generate working weights for a target domain.
+    \item \textbf{Deployment model:} Customer provides sensor characterization data. DSF-AI processes it. Customer receives a weights file (binary, loadable into FPGA or burnable into ASIC ROM). Customer never sees the derivation process.
+\end{enumerate}
+
+The moat: the architecture is copyable. The weight derivation is not. Without DSF-AI, you have a coupling fabric that produces meaningless outputs. With DSF-AI, the same fabric produces structurally correct, domain-appropriate decisions from raw sensor input with zero training data.
+
+\subsection{Competitive Differentiation}
+
+Every other approach to generating ``perception weights'' uses machine learning:
+\begin{itemize}
+    \item Requires thousands to millions of labeled training examples
+    \item Non-deterministic (different training runs produce different weights)
+    \item Weights are opaque (no structural interpretation)
+    \item Fails on out-of-distribution inputs (no training data = no capability)
+    \item Requires GPU infrastructure for training
+\end{itemize}
+
+DSF-AI weight derivation:
+\begin{itemize}
+    \item Requires only the sensor's characterization curve (voltage vs physical units)
+    \item Deterministic (same sensor data = same weights, every time)
+    \item Weights have structural interpretation (each weight encodes a specific coupling relationship identified by DSF-AI)
+    \item Generalizes to any sensor domain (financial, IR distance, camera, medical) without retraining
+    \item Runs on commodity hardware (no GPU needed)
+    \item Zero training data --- structure is extracted from the sensor physics, not from labeled examples
+\end{itemize}
+
+%==============================================================================
+\section{Glossary of Terms}
+%==============================================================================
+
+\begin{description}
+
+\item[Arc] A coupling connection between two trits in the loom fabric. Defined by a signed 8-bit weight that determines the strength and polarity of influence one trit exerts on another. From the $\psi$-Lattice formalism: a mode overlap between coherence-field cells.
+
+\item[ASIC] Application-Specific Integrated Circuit. A custom chip fabricated for a single purpose, as opposed to a general-purpose processor or reprogrammable FPGA.
+
+\item[BSIL] Binary Sensor Ingestion Layer. The clocked module that converts a 12-bit binary ADC reading into ternary strands via threshold comparison with deliberate gaps. Maintains a 2-sample history for derivative computation (direction, acceleration).
+
+\item[Balanced Ternary] A number system where each digit is $\{-1, 0, +1\}$ and the positional value is $3^i$. Negation is trivial (flip signs). Truncation equals rounding. No two's complement needed.
+
+\item[Commit] The act of writing a loom state (motif) into Krimelack memory. Subject to gating conditions: low uncertainty, high resonance, no duplicates, not in safe mode.
+
+\item[Coupling Weights] Signed 8-bit integers that define the influence between trits in the SPPU. Fixed at synthesis time (compiled into LUT configurations). They ARE the program --- different weights produce a physically different circuit. Derived from DSF-AI structural analysis (trade secret).
+
+\item[Dead Zone] The threshold band $[-\Delta, +\Delta]$ (currently $\Delta = 20$) within which the accumulated coupling force is insufficient to commit an output trit. Output remains null. Physically: the potential barrier height between the null well and the committed wells.
+
+\item[Dimensional Exhaustion] The state where coupling constraints have eliminated all but one possible output configuration. Detected by L6 TCL when effective dimensionality drops below the Euler knee. The answer isn't computed --- it's what remains when every alternative has been excluded.
+
+\item[DRP] Dynamic Reconfiguration Port. The internal bus used to read XADC conversion results from the Zynq-7000's analog-to-digital converter without ARM CPU involvement.
+
+\item[DSF] Decision Surface Field. A multi-dimensional structural state vector generated by the UF pipeline. Encodes the loom's structural state for feedback bias and weight derivation. Internal composition is proprietary (DSF-AI trade secret).
+
+\item[DSF-AI] Decision Surface Field --- Artificial Intelligence. The proprietary system that generates coupling weights from sensor characterization data. Internal method is a trade secret. Never exposed to customers or in publications.
+
+\item[Euler Knee] The threshold (currently 9 out of 24 trits) below which effective dimensionality triggers structural lock. Named for the inflection point in dimensional collapse curves.
+
+\item[FPGA] Field-Programmable Gate Array. Reconfigurable silicon consisting of Look-Up Tables (LUTs), flip-flops, and routing fabric. Used for ArcLoom prototyping on the Xilinx Zynq-7020 (PYNQ-Z2 board).
+
+\item[Familiarity Feedback] The mechanism by which krimelack's match score feeds back into the SPPU's dead zone, raising the commitment barrier for states the system has experienced before. Produces habituation, novelty seeking, and corner escape without any clock or timer. On TSAC ASIC, augmented by native ferroelectric dielectric fatigue at the substrate level.
+
+\item[Folding Division] Joseph's novel division method: the numerator is treated as a field with energy $A$; each ``fold'' subtracts the denominator $B$; when the remaining energy falls below $B$ (into the dead zone), the fold count is the quotient and the residual is the remainder. Same principle as SPPU dead-zone settling applied to arithmetic.
+
+\item[Krimelack] Structural memory module. Stores 32 motifs (48-bit loom state snapshots) in a circular buffer. Commits are gated by quality criteria. Recall is combinational parallel pattern matching across all stored motifs in one cycle. Named from the ArcLoom specification's coherence-field memory formalism.
+
+
+\item[L6 TCL] Layer 6, Topological Constraint Layer. A purely combinational observer that counts committed (non-null) trits and fires \texttt{structural\_lock} when effective dimensionality drops below the Euler knee. Detects dimensional exhaustion --- the condition where the coupling has determined the output and further input cannot change it.
+
+\item[Loom] The fabric of coupled trit strands. 8 strands $\times$ 3 trits = 24 trits = 48 wires. The coupling weights between strands determine how input states constrain output states. Named for the physical analogy: a weaving loom constrains thread positions through tension; the ternary loom constrains trit states through coupling pressure.
+
+\item[LUT] Look-Up Table. The fundamental logic element of an FPGA. A small SRAM (on Zynq-7020: 6 inputs, 1 output) that implements any Boolean function of its inputs by storing the complete truth table. Vivado compiles Verilog into networks of LUTs. The SPPU is implemented entirely as LUTs (no flip-flops, no DSP blocks, no BRAM in the settling path).
+
+\item[MathLoom] The balanced ternary arithmetic subsystem. Implements addition (constraint-satisfaction ripple carry), multiplication (trit-by-trit with shift-add), comparison (subtract and check sign), and folding division (iterative field exhaustion). Used at I/O boundaries, NOT inside the loom settling path.
+
+\item[Motif] A single stored entry in Krimelack. 48 bits representing the full 24-trit loom state at the moment of commit. The structural fingerprint of a perceived situation.
+
+\item[Null] The uncommitted trit state (\texttt{2'b00}). Not ``zero value'' and not ``low confidence.'' Physically: the trit resting in the center potential well because coupling force was insufficient to push it over the barrier. Electrically: both wires LOW, zero switching activity, zero contribution to downstream computation.
+
+\item[PYNQ-Z2] The development board used for ArcLoom prototyping. Contains a Xilinx Zynq-7020 SoC (dual ARM Cortex-A9 + Artix-7 FPGA fabric). The SPPU runs on the FPGA fabric (PL); the ARM cores handle I/O, WiFi, and the Jupyter/Flask interface.
+
+\item[SafeMode] A protective state triggered when the UF pipeline's stability metric $S(\text{UF})$ drops below threshold. Neutralizes all DSF output (D=0, M=0, U*=1.0), suspends krimelack commits, and holds decisions until recovery criteria are met. Prevents the loom from acting on structurally incoherent input.
+
+\item[SPPU] Sensor Processing and Perception Unit. One tile of the ArcLoom coupling fabric. Takes sensor input (via BSIL), settles through two levels of combinational coupling, produces decision output in one propagation delay ($\sim$5\,ns). The core computational primitive --- not a processor in the Von Neumann sense, but a constraint-satisfying coupling network.
+
+\item[Strand] One channel of 3 trits (6 wires) in the loom. The 8-strand loom has: 5 input strands (distance, direction, acceleration, cam\_edge, cam\_motion) and 3 settling strands (context, momentum, decision).
+
+\item[Structural Lock] The output signal from L6 TCL indicating dimensional exhaustion. When \texttt{structural\_lock} = 1, the coupling has committed enough trits that the remaining null trits cannot change the outcome regardless of their state. The decision is topologically inevitable.
+
+\item[Trit] A ternary digit with three stable states: $+1$, $-1$, or null (0). Encoded as 2 bits on current FPGA silicon (\texttt{01}, \texttt{10}, \texttt{00}). Target ASIC uses a single Tri-Stable Attractor Cell per trit.
+
+\item[TSAC] Tri-Stable Attractor Cell. The target ASIC implementation of a single trit as a physical element with three stable states (ferroic thin-film or multi-threshold CMOS). One device per trit. Null is the physical rest state with zero switching energy.
+
+\item[UF Pipeline] Unified Field Pipeline. The clocked sequential processing chain that analyzes loom state over time and generates DSF feedback bias. This is the ``slow path'' that adds temporal context to the ``fast path'' (combinational SPPU). Internal functions are proprietary (DSF-AI trade secret).
+
+\item[XADC] Xilinx Analog-to-Digital Converter. A hard silicon block inside the Zynq-7000 that reads analog voltages from dedicated pins. Used to read the Sharp IR distance sensor without ARM CPU involvement. Accessed via DRP (Dynamic Reconfiguration Port) from the PL fabric.
+
+\end{description}
+
+%==============================================================================
+\section{Conclusion}
+%==============================================================================
+
+ArcLoom is not a faster CPU. It is not a better neural network. It is a \textbf{different computational primitive}: a ternary coupling fabric that converts sensor input into structured decisions through constraint satisfaction and dimensional exhaustion rather than instruction execution.
+
+The null trit is the architectural innovation --- a physical state of genuine uncommitment that propagates as electrical silence, eliminating the energy tax of evaluating irrelevant information. The dead-zone threshold is the mechanism --- a potential barrier that creates tri-stability from coupling pressure. The single-pass combinational settling is the consequence --- no clock, no iteration, no convergence, just wire propagation through coupled logic producing the unique answer in nanoseconds.
+
+The coupling weights are the program. Krimelack is the memory. L6 TCL is the termination proof. Together they form a perception accelerator that operates at power levels and latencies impossible for any instruction-executing architecture.
+
+\vspace{2em}
+\noindent\rule{\textwidth}{0.4pt}
+\begin{center}
+\small\textit{ArcLoom SPPU --- Proven on Xilinx Zynq-7020 FPGA, April 2026}\\
+\small\textit{Patent pending. Coupling weight derivation method: trade secret.}
+\end{center}
+
+\end{document}

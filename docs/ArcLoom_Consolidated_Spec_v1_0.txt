@@ -1,0 +1,935 @@
+ArcLoom System Specification v1.0 (Consolidated)
+Date: 2026-01-06
+
+Contents:
+0 Executive summary
+1 Scope
+2 Normative references
+3 Terms and definitions
+4 Symbols and abbreviated terms
+5 Conformance
+6 System overview
+7 Architecture and process flow (Input -> Process -> Output)
+8 Subsystem requirements
+  8.1 Timebase and determinism manager
+  8.2 Couplers and input acquisition (L0 prechecks)
+  8.3 UF kernel (L0-L4) requirements
+  8.4 ArcLoom loom core (structural settling + commit)
+  8.5 Krimelacks structural memory
+  8.6 Structural numerics (ternary tokens and symbolic indexing)
+  8.7 Weave runtime and WeaveSpec (programming surface)
+  8.8 Binary Story Ingestion Layer (BSIL) interoperability
+  8.9 Output rendering and control
+  8.10 Governance, hardening, SafeMode, recovery
+9 Mathematical framework
+10 Validation and benchmarking
+11 Fabrication and implementation recommendations
+12 Intended uses and application profiles
+13 Security, privacy, and data governance
+14 Patent drafting notes (non-normative)
+15 Recommended next steps
+Annex A WeaveSpec v0.1 canonical schema (informative)
+Annex B BSIL canonical schemas (informative)
+Annex C Parameter baselines and tolerances (informative)
+Annex D Glossary (extended)
+References
+
+0 Executive summary
+This specification defines ArcLoom as a deterministic structural processing unit that transforms raw multi-domain streams into bounded episode descriptors, computes a Decision Surface Vector (DSF) per episode, and uses DSF to drive a structural commit mechanism and folded structural memory (Krimelacks). ArcLoom is programmable via declarative Weaves and can ingest legacy binary software as behavior stories via BSIL.
+
+1 Scope
+This document specifies the ArcLoom architecture, mathematical operators, required invariants, data schemas, validation procedures, and fabrication-oriented implementation guidance. It is intended to be sufficient for (a) a manufacturer to build a prototype or productized integrated circuit or module, and (b) a patent attorney to draft claims and embodiments.
+
+
+In scope (normative):
+- Deterministic structural processing pipeline: UF L0-L4 (gate + DSF) as the kernel front-end.
+- ArcLoom loom core: deterministic commit semantics from bounded DSF and gate evidence.
+- Krimelacks structural memory: motif/strand storage, folding locality, landmark indexing.
+- Weave programming surface: WeaveSpec canonical format and runtime requirements.
+- Binary interoperability: BSIL capture -> UF ingestion -> ArcLoom motif formation.
+- Governance and safety: hardening triggers/actions; SafeMode and recovery; output holds.
+- Validation: noise/perturbation/adversarial/memory stress tests and BSIL determinism replay.
+
+Out of scope (v1.0):
+- Claims of non-causal or "future-to-present" physics. IRF is used as an engineering pattern for mode detection and early scenario dominance only.
+- Any requirement to execute binary instructions natively in the ArcLoom core (ArcLoom is not a CPU).
+- Specific industrial process node commitments (e.g., 5 nm vs 28 nm) beyond the fabrication recommendations in Section 11.
+
+
+2 Normative references
+The following referenced documents are indispensable for the application of this document. For dated references, only the edition cited applies. For undated references, the latest edition applies.
+
+
+[UF-v1.4] Unified Framework (UF) Spec v1.4.0 skeleton. Kernel pipeline L0-L4; DSF; invariants; validation; hardening; SafeMode.
+[IRF-2026] Information Resonance Fields and Premonition-Like Inference in High-Dimensional Histories (speculative concept paper). Used as an engineering pattern for mode/epoch dominance and information-gain metrics (no paranormal claims).
+[UFCP-2026] A Process-Based Coherence Field Bridging Classical and Quantum Dynamics (Not-Math Framework). Used as a conservative process-field anchor for optional coherence-field embodiments.
+[BSIL-v0.1] ArcLoom Interop Spec v0.1 - Binary Story Ingestion Layer (BSIL). (This document, Annex B references the canonical schemas.)
+[WS-v0.1] WeaveSpec v0.1 - Canonical Weave Description Format. (This document, Annex A references the canonical schema.)
+
+
+3 Terms and definitions
+This clause defines terms used in this document. The keywords SHALL, SHOULD, and MAY are to be interpreted as described in ISO/IEC Directives.
+
+- ArcLoom: The structural processing system defined by this specification.
+- Structural field F(t): A time-indexed vector-valued stream in R^d capturing multi-domain inputs after coupling and preprocessing.
+- State Embedding Vector SEV(t): A derived tuple (F, ΔF, σ, κ, r, N) computed in UF L0.
+- Negative space N(t): A binary indicator that a time sample is structurally low-activity (low variance, low drift, low curvature) and is informative as absence.
+- Gate G_k: A contiguous time interval [t_a, t_b] formed by UF L1 boundary operator D(t).
+- TVR_k: Time-Volume-Relevance vector for gate k, capturing duration, integrated structural volume, and relevance.
+- Mosaic projection P_l(G_k): Quantized embedding of a gate into lattice l for structural classification.
+- Mosaic divergence C_k: Count/measure of disagreement across mosaic projections for a gate.
+- ISF_k: Interpretive Structural Field output by UF L2.
+- URF_k: Unified Resonance Field output by UF L3, after contextual gating.
+- DSF_k: Decision Surface Vector output by UF L4: (D_k, M_k, R_k, U*_k, C_k, P_k, B_k).
+- Weave: A declarative configuration (app) that binds couplers, laws, goals, memory and commit policies, and governance to shape ArcLoom behavior.
+- WeaveSpec: The canonical serialized description format for a Weave (JSON in v0.1).
+- Krimelacks memory: A folded structural memory storing strands/motifs and landmark indices to preserve locality and enable cue-based recall.
+- Strand: A committed, time-ordered structural history segment (a stored episode chain).
+- Motif: A reusable structural chunk extracted from one or more strands.
+- Landmark: A high-salience motif used as a recall anchor; not a numeric address.
+- BSIL: Binary Story Ingestion Layer: interoperability mechanism that captures legacy software behavior as a story field F_bin(t).
+- SafeMode: A UF hardening global state where decision dynamics freeze, DSF is neutralized, schema formation is suspended, and outputs are held.
+- SafeHold: Output hold behavior (emit nothing or neutral output) when SafeMode or output risk triggers are active.
+
+4 Symbols and abbreviated terms
+This clause lists symbols and abbreviations used in mathematical definitions.
+
+
+Abbreviations:
+- UF: Unified Framework kernel (L0-L4)
+- NSF: Normalized Structural Field
+- SEV: State Embedding Vector
+- TVR: Time-Volume-Relevance vector
+- ISF: Interpretive Structural Field
+- URF: Unified Resonance Field
+- DSF: Decision Surface Vector
+- BSIL: Binary Story Ingestion Layer
+- WVB: Window Vector Bundle (ArcLoom latency/recall mitigation structure; see 8.6)
+- CI: Conformance Indicator
+
+Symbols (selected):
+- F(t) in R^d : structural input field
+- DeltaF(t) = F(t) - F(t-Delta t)
+- sigma(t): windowed variance measure
+- kappa(t): curvature measure (second difference norm)
+- N(t) in {0,1}: negative space operator
+- D(t): gate boundary operator
+- tau_D: gate boundary threshold
+- R(k) in [0,1]: resonance scalar per gate
+- U(k) in [0,1]: uncertainty per gate
+- B(k) in [B_min, B_max]: breathing (bandwidth) state
+- S(UF): global stability functional
+
+
+5 Conformance
+This clause defines conformance requirements for an implementation to claim compliance with ArcLoom. Conformance is established by satisfying mandatory requirements (SHALL) and passing the validation suite in Clause 10.
+
+
+5.1 Conformance statement (normative)
+An implementation SHALL claim conformance only if:
+(a) it implements the end-to-end pipeline in Clause 7,
+(b) it implements UF L0-L4 operators and invariants as specified in Clause 8.3 and Clause 9,
+(c) it implements hardening/SafeMode as specified in Clause 8.10,
+(d) it implements deterministic arithmetic rules in Clause 8.1 and Clause 9,
+(e) it passes the validation suite in Clause 10.
+
+5.2 Conformance indicator (CI) labels (normative)
+Implementations SHALL declare:
+- CI-UF: UF kernel conformance (L0-L4, invariants, SafeMode)
+- CI-LOOM: loom core conformance (commit semantics and memory artifacts)
+- CI-WEAVE: Weave runtime conformance (WeaveSpec canonicalization + mounting)
+- CI-BSIL: BSIL conformance (capture determinism + replay)
+
+5.3 Determinism classes (options + recommendation)
+Option A (Reference): IEEE-754 float64 with fixed rounding mode, no fused-multiply-add, and deterministic reduction ordering.
+Option B (Hardware): fixed-point arithmetic with explicit scaling/clamping per capture profile and specified rounding rules.
+
+Recommended option: Option B for silicon implementations, because it produces reproducible results across chips and toolchains.
+
+
+6 System overview
+ArcLoom is a modular system organized as a deterministic pipeline with explicit governance. The core kernel front-end is UF L0-L4; ArcLoom adds a loom core (structural settling + commit), a folded structural memory (Krimelacks), and a programming surface (Weaves).
+
+
+6.1 High-level block diagram (informative)
+
+  [Couplers] ---> F(t) ---> [Timebase + Input Health] ---> [UF Kernel L0-L4] ---> DSF_k ----+
+                                                                                           |
+                                                                                           v
+                                          +-------------------[Governance / Hardening]----+
+                                          |
+                                          v
+                               [ArcLoom Loom Core: settle + commit]
+                                          |
+                                          v
+                         [Krimelacks Structural Memory: strands/motifs/landmarks]
+                                          |
+                                          v
+                        [Weave Runtime (WeaveSpec): laws/goals/readout policies]
+                                          |
+                                          v
+                               [Output Control + Render Couplers] ---> y(t)
+
+  [BSIL] (optional) captures legacy binary behavior and emits F_bin(t) into UF L0.
+
+
+7 Architecture and process flow
+This clause specifies the end-to-end processing flow. Each stage is defined as a deterministic transformation from an input artifact to an output artifact. Artifacts are serializable for audit and validation.
+
+
+7.1 Acquire
+Input: raw physical/electronic signals s_i(t)
+Process: coupling, amplification, anti-alias filtering, ADC (if used), time-stamping
+Output: raw field F_raw(t) in R^d_raw
+
+7.2 Normalize and verify (UF L0)
+Input: F_raw(t)
+Process: input health verification; compute DeltaF, sigma, kappa, negative space; construct SEV(t)
+Output: NSF = {SEV(t)}
+
+7.3 Gate segmentation and mosaic projection (UF L1)
+Input: NSF
+Process: boundary operator D(t); form gates G_k; compute TVR_k; project into mosaics P_l(G_k)
+Output: gate descriptors {G_k, TVR_k, P_l(G_k), C_k}
+
+7.4 Interpretive metrics (UF L2)
+Input: gate descriptors
+Process: compute weights w_k, contrast CV_k, regime Reg_k, uncertainty U_k, anomaly suppression IAS_k
+Output: ISF_k
+
+7.5 Resonance (UF L3)
+Input: ISF_k
+Process: compute scalar resonance R(k) and contextual gate g_k; output URF_k = g_k * R(k)
+Output: URF_k
+
+7.6 Decision surface (UF L4)
+Input: URF_k
+Process: compute DSF_k = (D_k, M_k, R_k, U*_k, C_k, P_k, B_k) with bounded breathing and invariant checks
+Output: DSF stream
+
+7.7 Loom settle
+Input: DSF stream + gate evidence
+Process: apply stability/entropy heuristics; identify near-deterministic segments; form candidate motifs
+Output: settle candidates (motifs, strand segments) with confidence bounds
+
+7.8 Commit + fold (Krimelacks)
+Input: settle candidates
+Process: commit policy; fold/pack into memory; update landmark indices; maintain bounded growth
+Output: committed strands/motifs + updated memory indices
+
+7.9 Render outputs
+Input: DSF + memory recall results + Weave policies
+Process: Weave-specific readout transforms; output gating; SafeHold enforcement
+Output: bounded output streams y(t) and/or actions a(t)
+
+
+8 Subsystem requirements
+This clause defines normative requirements for ArcLoom subsystems. Each subclause is written as Input -> Process -> Output and includes SHALL-level requirements.
+
+8.1 Timebase and determinism manager
+The Timebase and Determinism Manager (TDM) provides a canonical time axis T and enforces deterministic execution ordering. It also provides recursive drift compensation and constructs Window Vector Bundles (WVBs) to mitigate latency and multi-stream misalignment.
+
+
+8.1.1 Time axis and monotonicity (normative)
+- The TDM SHALL produce a canonical monotonically increasing time index T = {t0, t1, ...}.
+- If any input timestamp monotonicity fails, the TDM SHALL raise an Input Health Fault and trigger SafeMode entry conditions (see 8.10).
+
+8.1.2 Drift estimation and correction (normative)
+- The TDM SHALL estimate per-coupler drift DeltaTau_i(t) relative to the canonical time axis.
+- The drift estimator SHALL be deterministic: given identical timestamp sequences, it SHALL output identical drift estimates.
+- The TDM SHALL support a recursive management strategy:
+  - (a) short-horizon drift tracking (fast loop)
+  - (b) long-horizon drift tracking (slow loop)
+  - (c) cross-checking using reference channels where available
+  - (d) bounded correction: |DeltaTau_i| <= DeltaTau_max configured per capture profile
+
+8.1.3 Window Vector Bundles (WVB) for latency mitigation (normative)
+- The TDM SHALL construct Window Vector Bundles WVB_j that summarize aligned windows across couplers.
+- Each WVB_j SHALL contain:
+  - window bounds [t_a, t_b],
+  - per-coupler drift corrections applied,
+  - an alignment residual metric e_align,
+  - a canonical SEV summary vector for UF L1 boundary detection.
+- WVB generation SHALL be deterministic and SHALL be serializable.
+
+8.1.4 Deterministic scheduling (normative)
+- The TDM SHALL define a total order over:
+  - (a) input sample ingestion,
+  - (b) gate boundary evaluation,
+  - (c) reductions (integrals, means, variances),
+  - (d) memory commits.
+- If parallel execution is used, reductions SHALL follow a fixed tree order to preserve bit-identical results.
+
+
+8.2 Couplers and input acquisition
+Couplers convert physical or digital sources into the canonical structural field F(t). Couplers SHALL implement input integrity protections, pre-error checks, and deterministic encoding.
+
+
+8.2.1 Coupler categories (informative)
+- Analog couplers: microphones, cameras (via ISP), IMUs, pressure, force, LIDAR, radar, bio-sensors.
+- Digital couplers: CAN bus, Ethernet, serial logs, file change streams, application telemetry.
+- Behavior couplers (BSIL): UI events, API call summaries, file/network flows, render loop traces.
+
+8.2.2 Deterministic sampling and encoding (normative)
+- Each coupler SHALL define its sampling policy (rate, triggering, buffering) in the capture profile.
+- The coupler SHALL output deterministic sample vectors: identical physical/digital inputs under identical sampling conditions MUST produce identical F_raw(t) within the quantization bounds of the capture profile.
+
+8.2.3 Input pre-error checking (normative)
+Before emitting a sample, a coupler SHALL check and report:
+- saturation flags (ADC rails, sensor overflow),
+- missing data flags,
+- timestamp monotonicity local to that coupler,
+- basic plausibility bounds (per channel min/max),
+- calibration age and status.
+
+8.2.4 Relevance hints r(t) (normative)
+- Couplers MAY provide a relevance hint scalar r(t) in [0,1].
+- If provided, r(t) SHALL be deterministic and SHALL be based on explicitly specified rules (e.g., threshold crossings, event markers), not learned heuristics unless the learning model is frozen and versioned.
+
+
+8.3 UF kernel requirements
+The UF kernel (L0-L4) is the front-end structural segmentation and decision surface generator. ArcLoom SHALL implement UF L0-L4 operators, invariants, and hardening hooks as defined in this clause.
+
+
+8.3.1 L0 Structural normalization (normative)
+Given F(t) in R^d and window W:
+DeltaF(t) = F(t) - F(t-Delta t)
+Fmean_W(t) = (1/W) * SUM_{i=0..W-1} F(t - i*Delta t)
+sigma(t) = (1/W) * SUM_{i=0..W-1} ||F(t - i*Delta t) - Fmean_W(t)||^2
+kappa(t) = ||F(t+Delta t) - 2F(t) + F(t-Delta t)||
+
+Negative space operator:
+N(t) = 1  iff  sigma(t) < sigma_min AND ||DeltaF(t)|| < delta_min AND kappa(t) < kappa_min
+else N(t) = 0
+
+SEV(t) = (F(t), DeltaF(t), sigma(t), kappa(t), r(t), N(t))
+
+Perturbation stability requirement:
+||SEV(F+eps) - SEV(F)|| <= C_SEV * ||eps||
+
+8.3.2 L1 Gate formation and mosaics (normative)
+Boundary operator:
+D(t) = alpha1*||DeltaF(t)|| + alpha2*sigma(t) + alpha3*kappa(t)
+A boundary occurs when D(t) >= tau_D.
+
+Gate G_k = [t_a, t_b] where for all t in (t_a,t_b): D(t) < tau_D.
+
+TVR_k = (T_k, V_k, R_k):
+T_k = t_b - t_a
+V_k = INT_{t_a..t_b} (beta1*||DeltaF|| + beta2*sigma + beta3*kappa) dt
+R_k = INT_{t_a..t_b} r(t) dt
+
+Mosaic projection in lattice l:
+P_l(G_k) = ( floor(T_k / h1(l)), floor(V_k / h2(l)), floor(R_k / h3(l)) )
+
+Mosaic divergence:
+C_k = |{P_1(G_k), ..., P_L(G_k)}|
+
+8.3.3 L2 Interpretive metrics (normative)
+Compute weight w_k in [0,1], contrast CV_k, score S_k, regime Reg_k, uncertainty U_k, anomaly suppression IAS_k.
+
+Example uncertainty functional:
+U_k = lambda1*(C_k-1)/(L-1) + lambda2*(delta_g(G_k)/delta_max) + lambda3*N(G_k)
+
+8.3.4 L3 Resonance (normative)
+Resonance vector R_vec,k = ( w_k, ||CV_k||/||CV||_max, S_k, 1/(1+C_k), 1-U_k )
+Scalar resonance:
+R(k) = (1/Z) * SUM_i lambda_i * R_vec,k[i] , with Z=SUM_i lambda_i
+
+Hysteresis flag:
+Hyst_k = 1 iff |R(k) - R(k-1)| > h_max
+
+Contextual gate:
+g_k = 1 iff (U_k <= U_max) AND (IAS_k=0) AND (Hyst_k=0)
+
+URF_k = g_k * R(k)
+
+8.3.5 L4 Decision surface (normative)
+DeltaR(k) = R(k) - R(k-1)
+Directional:
+D_k = +1 if DeltaR(k) > eps_D
+      0 if |DeltaR(k)| <= eps_D
+     -1 if DeltaR(k) < -eps_D
+Momentum:
+M_k = R(k) - 2R(k-1) + R(k-2)
+Reversal:
+R_k = 1 iff D_k * D_{k-1} < 0
+Adjusted uncertainty:
+U*_k = U_k + eta_H*Hyst_k + eta_IAS*IAS_k
+Pressure:
+P_k = |D_k - D_{k-1}|
+Breathing:
+B_k = clamp( B_{k-1} + xi*(1-U*_k)*DeltaR(k) - chi*U*_k,  B_min, B_max )
+
+DSF_k = (D_k, M_k, R_k, U*_k, C_k, P_k, B_k)
+
+
+8.4 Loom core
+The ArcLoom loom core converts a DSF stream and gate evidence into committed structural artifacts (motifs and strands). It performs deterministic settling (reducing transient variation) and applies commit policies to decide what becomes structural history.
+
+
+8.4.1 Deterministic settle window (normative)
+- The loom core SHALL process DSF_k in windows W_s of K_s consecutive gates.
+- The windowing policy SHALL be deterministic and anchored to canonical time T.
+
+8.4.2 Stability and determinism indices (normative)
+For a window W_s ending at gate k, define:
+- mean uncertainty:  Ubar = (1/K_s) * SUM_{j=k-K_s+1..k} U*_j
+- divergence max:    C_max = max_{j in window} C_j
+- breathing variance: Var(B) over the window
+- DSF bounded variation: ||DSF_j - DSF_{j-1}|| averaged over the window
+
+A window is SETTLED iff:
+Ubar <= U_settle  AND  C_max <= C_settle  AND  Var(B) <= B_var_settle
+and no hardening triggers occurred within the window.
+
+8.4.3 Information gain proxy (IRF-inspired, engineering use only) (normative)
+The loom core SHALL compute an information-gain proxy per window:
+IG = H_prev - H_new
+where H is the entropy of a discrete distribution over scenario modes in the mode library.
+Implementation SHALL NOT assume any non-causal physics; IG is computed from observed data only.
+
+8.4.4 Motif extraction (normative)
+- When a window is SETTLED, the loom core SHALL extract a motif:
+  Motif = (summary(SEV), summary(DSF), landmarks, boundary hashes)
+- Motif extraction SHALL be deterministic and SHALL produce the same motif given identical inputs.
+
+8.4.5 Commit rules (normative)
+A motif SHALL be committed to memory only if:
+- SETTLED condition holds, and
+- IG >= IG_min OR resonance mean >= R_commit, and
+- SafeMode = 0
+
+Commit SHALL be idempotent: reprocessing identical input SHALL NOT create duplicate motifs with different IDs.
+
+8.4.6 Commit event log (CEL) (normative)
+Every commit SHALL append an event with:
+- motif_id, strand_id
+- gate interval [k_a, k_b]
+- commit reason (SETTLED, IG spike, operator marker, etc.)
+- deterministic checksums of inputs used
+
+
+8.5 Krimelacks structural memory
+Krimelacks Structural Memory stores committed motifs and strands and provides cue-based recall. Its defining property is folded locality: motifs that co-occur in time, space, or structural similarity SHALL be stored near each other in the physical/virtual layout.
+
+
+8.5.1 Memory entities (normative)
+Krimelacks memory SHALL store:
+- Motif records: motif_id -> motif payload
+- Strand records: strand_id -> ordered motif references with temporal edges
+- Landmark index: cue signature -> candidate motif/strand list
+- Provenance: commit event log (CEL) with checksums
+
+8.5.2 Folded locality mapping (normative)
+The memory SHALL implement a locality mapping Lmap such that:
+- motifs adjacent in time within a strand have a high probability of being placed in adjacent physical pages/tiles
+- motifs with high structural similarity (distance <= d_sim) are clustered
+
+A compliant implementation SHALL document its Lmap, e.g.:
+- space-filling curve mapping (Hilbert / Z-order) over motif feature space
+- hierarchical tiling with periodic re-folding
+
+8.5.3 Cue-based recall (normative)
+Recall SHALL accept a cue vector q (derived from SEV/ISF/DSF) and return a bounded set of candidates:
+Recall(q) -> { (motif_id, score), ... } with |set| <= N_max
+
+Scores SHALL be deterministic and computed by a specified distance metric.
+
+8.5.4 Bounded growth and pruning (normative)
+The memory SHALL maintain bounded growth:
+- motif_count <= M_max
+- strand_count <= S_max
+- index_size <= I_max
+Pruning rules SHALL be deterministic, e.g. least-recalled motifs under low relevance, subject to retention policies.
+
+8.5.5 Thermal drift and aging compensation (normative)
+If non-volatile multi-level cells are used, the memory subsystem SHALL implement:
+- periodic read-verify
+- refresh/rewrite when drift exceeds thresholds
+- ECC appropriate to the chosen memory technology
+All refresh decisions SHALL be logged deterministically.
+
+Recommended strategy: recursive management loops (fast verify, slow re-balance) as in 8.1.2.
+
+
+8.6 Structural numerics
+Structural Numerics provides non-binary primitives for ArcLoom control and representation. ArcLoom SHALL use ternary tokens for directional and branching semantics, and SHALL use symbolic indexing for recall and latency mitigation. This subsystem defines how structural quantities are quantized and cached.
+
+
+8.6.1 Ternary tokens (normative)
+ArcLoom SHALL define a canonical ternary type T3 with values:
+- -1 (negative / retreat / inhibit)
+-  0 (hold / neutral)
+- +1 (positive / advance / excite)
+
+The UF directional signal D_k SHALL be represented as T3.
+
+8.6.2 Ternary branching without instruction execution (normative)
+ArcLoom branching SHALL be expressed as Weave policies that map DSF and recall results to:
+- output gating decisions (T3)
+- commit policies (T3)
+- attention/weighting policies (T3 vectors)
+This is not an instruction pointer model.
+
+8.6.3 Symbolic indexing (normative)
+Each motif SHALL have:
+- a feature embedding e_m in R^p
+- a symbolic signature sig_m (hash of quantized embedding + provenance)
+
+The landmark index SHALL map from sig-like cues to candidates.
+Symbolic hashing SHALL be deterministic and SHALL specify:
+- quantization step sizes
+- hash function
+- collision resolution rules
+
+8.6.4 Window Vector Bundle cache (normative)
+The TDM SHALL maintain a bounded cache of WVBs and their derived summaries to reduce recall latency.
+Cache eviction SHALL be deterministic (e.g., FIFO by window start time, or least-referenced with stable tie-breakers).
+
+8.6.5 Exact arithmetic position (informative)
+ArcLoom is not designed around arbitrary-precision integer arithmetic as a primitive. Where exactness is required (e.g., checksums, hashes, counters),
+the implementation SHALL use standard exact integer arithmetic in a documented width (e.g., 64-bit) and SHALL specify overflow behavior.
+
+
+8.7 Weave runtime
+Weaves are ArcLoom programs expressed declaratively. The Weave Runtime interprets Weaves to configure couplers, UF parameters, loom commit policies, memory retention policies, and output rendering transforms. The runtime SHALL be deterministic and SHALL not rely on hidden state.
+
+
+8.7.1 Weave lifecycle (normative)
+A Weave SHALL progress through:
+- parse -> validate -> canonicalize -> mount -> active -> unmount
+
+8.7.2 Canonicalization (normative)
+Given a WeaveSpec JSON document:
+- field ordering SHALL be canonicalized
+- numeric fields SHALL be normalized to specified units/scales
+- hashes of Weaves SHALL be computed over canonical form
+
+8.7.3 Policy evaluation (normative)
+Weave policies SHALL be functions of:
+- DSF_k
+- recall results
+- timebase state
+- explicit external events (if any)
+Policies SHALL be deterministic and side-effect-free except through the defined output APIs.
+
+8.7.4 Capability declaration (normative)
+A Weave SHALL declare required capabilities:
+- coupler access
+- output domains (text/audio/motion/etc.)
+- memory retention class
+The runtime SHALL deny mounting if required capabilities are unavailable or disallowed by governance.
+
+8.7.5 Output safety and holds (normative)
+All Weaves SHALL respect SafeMode and output hold rules (see 8.10).
+
+
+8.8 BSIL
+BSIL provides interoperability with the existing binary ecosystem without making ArcLoom a CPU. BSIL captures the behavior of a legacy binary system as a structured, time-indexed story field F_bin(t) which is ingested by UF L0.
+
+
+8.8.1 Capture channels (normative)
+A BSIL implementation SHALL define a Capture Profile specifying:
+- which channels are captured (UI, filesystem, network, graphics loop, API calls, etc.)
+- sampling rates and event aggregation rules
+- privacy filters (see Clause 13)
+
+8.8.2 Deterministic story field construction (normative)
+Given an execution trace E, BSIL SHALL construct:
+F_bin(t) in R^d_bin
+by deterministic feature extraction rules.
+All feature extraction parameters SHALL be versioned.
+
+8.8.3 Deterministic replay test (normative)
+BSIL conformance SHALL include a replay test:
+- run the same workload twice under controlled conditions
+- the resulting F_bin(t) SHALL match within the capture profile tolerances
+- UF outputs SHALL remain invariant within deterministic arithmetic rules
+
+8.8.4 No instruction execution requirement (normative)
+ArcLoom core conformance SHALL NOT require the ability to execute binary instructions.
+Interop is achieved through story capture and motif learning only.
+
+
+8.9 Output rendering
+Output subsystems transform ArcLoom internal artifacts into external actions or signals. Outputs SHALL be bounded, auditable, and governable. In robotics, outputs MAY include actuator commands; in media, outputs MAY include audio/video/text.
+
+
+8.9.1 Output intent and gating (normative)
+A Weave SHALL compute an output intent u_out(k) for each gate k.
+Before emission, Output Control SHALL apply:
+- SafeMode and SafeHold rules
+- rate limits (per domain)
+- magnitude limits (per actuator/channel)
+- sanity checks (e.g., actuator constraints, audio amplitude limits)
+
+8.9.2 Output determinism (normative)
+Given identical DSF, recall results, and Weave policies, the output intent and gating decisions SHALL be identical.
+
+8.9.3 Output event log (normative)
+Every emitted output SHALL be logged with:
+- timestamp(s) and gate index
+- output domain and payload checksum
+- gating decision and reason codes
+
+
+8.10 Governance and hardening
+Governance provides safety boundaries that prevent unstable structural behavior and unsafe outputs. Hardening and SafeMode SHALL be implemented as deterministic state machines driven by UF invariants and system health signals.
+
+
+8.10.1 Hardening triggers (normative)
+Hardening Trigger Conditions (HTCs) SHALL include at minimum:
+- C_k > C_max  (mosaic divergence violation)
+- U_k > U_max  (uncertainty violation)
+- B_k outside [B_min, B_max]  (breathing violation)
+- schema/motif growth beyond configured bounds
+- stability collapse: S(UF) < S_min
+- DSF instability: ||DSF_k - DSF_{k-1}|| > eps_DSF absent a valid resonance transition
+- input health faults (timestamp failure, saturation storms, missing data storms)
+
+8.10.2 Hardening actions (normative)
+When any HTC fires, the system SHALL apply one or more deterministic actions:
+- gate suppression: g_k = 0
+- DSF neutralization: DSF_k := (0,0,0,1,C_k,0,B_{k-1})
+- uncertainty spike: U_k := 1
+- breathing contraction toward B_min
+- schema/memory freeze or merge
+- output SafeHold (no external action)
+
+8.10.3 SafeMode (normative)
+SafeMode SHALL be entered iff S(UF) < S_min OR an explicit critical fault is raised.
+In SafeMode:
+- decision dynamics freeze
+- commit is disabled
+- outputs are held or neutralized
+- memory mutation is disabled except required self-preservation (e.g., refresh)
+
+8.10.4 Recovery rules (normative)
+The system SHALL exit SafeMode only when all recovery rules hold for a configured dwell time:
+- S(UF) >= S_min
+- C_k <= C_max
+- U_k <= U_max
+- B_k in range
+- input health faults cleared
+
+
+9 Mathematical framework
+This clause defines the mathematical operators used by ArcLoom. All implementations SHALL ensure deterministic evaluation of these operators under the chosen determinism class (Clause 5).
+
+
+9.1 Deterministic discretization (normative)
+- Continuous-time integrals in this specification SHALL be implemented by a specified numerical scheme.
+Recommended scheme: trapezoidal rule over canonical samples.
+- All window statistics (means, variances) SHALL define:
+  - window boundaries
+  - sample inclusion rules
+  - deterministic reduction order
+
+9.2 Global stability functional S(UF) (normative)
+ArcLoom SHALL compute a global stability metric:
+S(UF) = lambda_c*(1 - Coh) + lambda_h*(1 - H_s) + lambda_b*(1 - Var(B)) + lambda_u*(1 - Ubar) + lambda_d*(1 - Drift(T))
+All terms SHALL be normalized to [0,1].
+
+SafeMode condition:
+SafeMode = 1  iff  S(UF) < S_min  OR critical fault.
+
+9.3 Robustness index R(UF) (normative)
+Given perturbation trials {UF^(i)}_{i=1..K}:
+R(UF) = 1 - (1/K) * SUM_i | S(UF) - S(UF^(i)) |
+
+9.4 Mode library and entropy (IRF-inspired, deterministic engineering use) (normative)
+ArcLoom MAY maintain a mode library of P scenario modes {Phi_i}.
+For each gate k, compute deterministic mode scores s_i(k) from observed features (no future terms).
+Convert to a probability vector:
+p_i(k) = exp(s_i(k)) / SUM_j exp(s_j(k))
+
+Entropy:
+H(k) = - SUM_i p_i(k) log p_i(k)
+
+Information gain proxy:
+IG(k) = H(k-1) - H(k)
+
+A window IG is a sum or mean of IG(k) over its gates.
+IG is used only for commit prioritization (Clause 8.4), not as a claim of non-causal prediction.
+
+9.5 Optional coherence-field embodiment (UFCP anchor, informative)
+A conservative process-field model may be used for specialized embodiments:
+psi = sqrt(rho) * exp(i*phi) with Hermitian kinetic operator Omega_g and symmetric interaction kernel W.
+Energy and norm conservation require Hermitian Omega_g and symmetric W.
+This optional module is NOT required for ArcLoom conformance.
+
+
+10 Validation
+This clause defines the validation and benchmarking suite required for conformance. Tests SHALL be deterministic and produce auditable artifacts.
+
+
+10.1 UF kernel validation (normative)
+ArcLoom SHALL pass UF-style validation including:
+- Noise robustness: bounded deviation under F_eps(t) = F_0(t) + eps*u(t)
+- Adversarial structured inputs: drift/curvature/variance/divergence stress
+- Parameter perturbation: bounded changes to Theta shall not violate invariants
+- Memory and schema stress: bounded schema/motif growth; drift bounded
+- Multi-lattice conflict: mosaic divergence remains bounded
+- Breathing synchronization: breathing tracks regime without runaway
+- Shock tests: SafeMode triggers iff S(UF) < S_min and recovers afterward
+
+10.2 Loom commit validation (normative)
+Implementations SHALL include tests:
+- Idempotent commit: identical input produces identical motif IDs and CEL entries
+- Settle threshold stability: small bounded noise does not cause commit thrash
+- Pruning determinism: identical recall/usage traces produce identical pruning outcomes
+
+10.3 BSIL validation (normative)
+- Deterministic replay: repeated capture of the same workload matches within tolerance
+- Privacy filter test: configured redactions must be applied deterministically
+- UF invariants under BSIL: ingestion must not violate kernel invariants
+
+10.4 Output safety validation (normative)
+- SafeHold enforcement: no outputs when SafeMode is active
+- Bound enforcement: actuator/audio outputs remain within specified limits
+- Log completeness: OEL entries for all emitted outputs
+
+10.5 Validation artifacts (normative)
+The system SHALL output a Trace Pack containing:
+- configuration hashes (Weave + capture profile)
+- input hashes (or commitments if too large)
+- UF intermediate artifacts
+- CEL and OEL logs
+- pass/fail summary
+
+
+11 Fabrication
+This clause provides fabrication-oriented recommendations for implementing ArcLoom as an integrated circuit or module using known materials and manufacturing practices. It distinguishes a recommended baseline build from optional advanced builds.
+
+
+11.1 Recommended baseline build (explicit recommendation)
+Recommendation: build ArcLoom v1.0 as a heterogeneous mixed-signal SoC using standard silicon CMOS, with:
+- Mixed-signal coupler front-end (AFE + ADCs) for sensor ingestion
+- Deterministic vector engine (DSP-style MAC + fixed-point) for UF L0-L4
+- On-chip SRAM for hot WVB cache and UF working state
+- Non-volatile memory (NVM) for Krimelacks motifs/strands (see 11.3)
+- Hardware state machine for SafeMode/hardening and output holds
+
+Rationale: this is manufacturable today, supports deterministic operation, and can be fielded in robotics without requiring exotic materials.
+
+11.2 Compute block mapping (normative guidance)
+- UF L0: window statistics + finite differences -> DSP/vector operations
+- UF L1: boundary detection + simple quantization -> small integer logic
+- UF L2/L3/L4: weighted sums, clamps, hysteresis -> fixed-point arithmetic + LUTs
+- Loom core: window condition checks + hashing -> integer logic + vector reductions
+
+11.3 Krimelacks memory technology (options + recommendation)
+Option A: ReRAM crossbar (multi-level possible) for dense motif storage + locality clustering.
+Option B: PCM (phase-change memory) for stable multi-level states and endurance.
+Option C: eMRAM + SRAM hierarchy (lower density, higher endurance).
+
+Recommended option: Option B (PCM) for early prototypes if the foundry/IP is available, because multi-level stability supports ternary/symbolic storage and drift can be managed via verify/refresh.
+If PCM is unavailable, Option A (ReRAM) is the second recommendation.
+
+11.4 Interconnect and folding locality
+Recommendation: implement folded locality with a hierarchical mesh plus space-filling mapping of motif embeddings to tiles (Hilbert/Z-order).
+Use on-chip network QoS to prioritize WVB cache access and recall queries.
+
+11.5 Packaging and thermal
+- Provide on-die temperature sensors and feed them into the TDM drift compensation loops.
+- Use standard flip-chip BGA or interposer packaging with thermal spreader.
+- Ensure SafeMode entry on thermal runaway thresholds.
+
+11.6 Materials (optional, not required)
+Advanced materials such as synthetic diamond substrates or graphene interconnects MAY improve thermal and interconnect properties, but are not required for a manufacturable v1.0 and are not assumed for conformance.
+
+
+12 Intended uses
+This clause describes intended uses and application profiles. It does not add conformance requirements but guides integrators and patent drafting.
+
+
+12.1 Robotics (recommended first deployment profile)
+ArcLoom is well suited to robotics where the world is continuous, multi-sensory, and time-structured.
+Recommended uses:
+- sensor fusion and episode segmentation (gates) for event-aware control
+- anomaly detection via resonance and uncertainty spikes
+- cue-based recall of prior episodes for navigation and task execution
+- bounded actuator output using DSF and SafeHold constraints
+
+12.2 Instrumentation and monitoring
+- structural health monitoring (bridges, machines) using mode dominance and resonance spikes
+- process monitoring (manufacturing lines) with deterministic episode logs
+
+12.3 Interactive media and "story computing"
+- ingest audio/video/user interactions as structural episodes
+- build reusable motifs (themes, styles, patterns) and recall them as content primitives
+- output rendering Weaves for text, music, and visuals
+
+12.4 Legacy ecosystem transition (BSIL)
+- capture and learn workflows from existing binary software
+- build Weaves that reproduce workflows through structural recall rather than instruction execution
+
+12.5 Not intended (v1.0 guidance)
+ArcLoom is not intended to replace high-precision arithmetic engines for workloads whose primary value is exact integer/floating arithmetic throughput (e.g., cryptographic mining).
+
+
+13 Security/privacy
+ArcLoom systems may ingest sensitive real-world data. This clause specifies governance requirements for privacy, retention, and auditability.
+
+
+13.1 Privacy filters (normative for BSIL-capable systems)
+- A system with BSIL SHALL implement configurable privacy filters at capture time.
+- Filters SHALL be deterministic and versioned (same config -> same redactions).
+- Filters SHALL support at minimum:
+  - removal/obfuscation of identifiers (names, emails, device IDs)
+  - removal of raw content payloads with retention of structural summaries
+
+13.2 Retention classes (normative)
+Memory artifacts SHALL be tagged with a retention class:
+- ephemeral: may be dropped quickly
+- session: retained for a session
+- persistent: retained until pruning policy removes it
+- archival: retained until explicit administrative action
+
+13.3 Audit and traceability (normative)
+- Recall queries and output emissions SHALL be logged.
+- Trace packs SHALL be tamper-evident via checksums/hashes (exact arithmetic integers).
+
+
+14 Patent drafting notes
+This clause is non-normative and is included to preserve the engineering-to-claims mapping. It lists candidate claim elements and embodiment variations. It is not legal advice.
+
+
+14.1 Candidate apparatus claim elements
+- A structural processing apparatus comprising:
+  - one or more couplers generating a time-indexed structural field F(t)
+  - a deterministic kernel forming gates and computing DSF per gate
+  - a loom core that commits settled windows into motifs/strands
+  - a folded structural memory storing motifs/strands with locality mapping
+  - an output controller enforcing SafeHold rules
+
+14.2 Candidate method claim elements
+- A method comprising:
+  - verifying input health and computing SEV(t)
+  - segmenting into gates using boundary operator D(t)
+  - computing resonance and DSF
+  - committing motifs when a settle predicate holds
+  - recalling by cue signatures rather than numeric addresses
+
+14.3 Embodiment variations (examples)
+- Different memory technologies (PCM/ReRAM/eMRAM)
+- Different locality fold mappings (space-filling curves, hierarchical tiles)
+- Different coupler sets (robotics, media, instrumentation)
+- Optional BSIL capture for legacy workflows
+
+
+15 Recommended next steps
+This clause provides an explicit recommended next-step plan for moving from specification to prototype.
+
+
+Recommended next steps (explicit recommendation):
+1) Start with the Robotics application profile (Clause 12.1) because it matches ArcLoom's strengths and provides measurable validation targets.
+2) Build a software reference implementation of UF L0-L4 + loom commit + memory (Determinism Class A) to validate operators and thresholds.
+3) Define one Capture Profile and one Weave (minimal) and run Clause 10 validation tests (noise/adversarial/memory stress).
+4) Freeze a baseline parameter set (Annex C) and generate golden trace packs for regression.
+5) Engage a mixed-signal SoC manufacturer with the baseline build in Clause 11.1; implement Determinism Class B (fixed-point) and re-run validation.
+6) Add BSIL only after the core pipeline is stable and SafeMode/holds are proven.
+
+
+Annex A WeaveSpec schema
+
+A.1 Canonical top-level fields (informative)
+{
+  "weave_id": "string",
+  "version": "string",
+  "capabilities": { "inputs": [...], "outputs": [...] },
+  "capture_profile_ref": "string",
+  "uf_profile": { "params": {...} },
+  "loom_profile": { "settle": {...}, "commit": {...} },
+  "memory_profile": { "retention": "...", "bounds": {...}, "fold_map": {...} },
+  "policies": {
+    "output_intent": "deterministic expression",
+    "commit_policy": "deterministic expression",
+    "recall_policy": "deterministic expression"
+  },
+  "governance": { "safemode": {...}, "privacy": {...} }
+}
+
+A.2 Example minimal weave (informative)
+{
+  "weave_id": "robotics-minimal",
+  "version": "0.1",
+  "capabilities": {"inputs":["imu","mic"], "outputs":["motor_cmd"]},
+  "capture_profile_ref": "robotics_cp_01",
+  "uf_profile": {"params":{"tau_D":0.42,"U_max":0.85}},
+  "loom_profile": {"settle":{"K_s":8,"U_settle":0.35},"commit":{"R_commit":0.72}},
+  "memory_profile": {"retention":"persistent","bounds":{"M_max":200000},"fold_map":{"type":"hilbert"}},
+  "policies": {
+    "output_intent": "use DSF.D_k as ternary direction and DSF.B_k as gain",
+    "commit_policy": "commit when SETTLED and IG>=IG_min",
+    "recall_policy": "recall by cue from latest motif summary"
+  },
+  "governance": {"safemode":{"hold_outputs":true}}
+}
+
+
+Annex B BSIL schema
+
+B.1 Capture profile schema (informative)
+{
+  "capture_id": "string",
+  "channels": ["ui","fs","net","api","render"],
+  "aggregation": {"ui":"event", "fs":"1s_bucket", "net":"packet_summary"},
+  "privacy": {"redact": ["names","emails"], "drop_payloads": true},
+  "tolerances": {"timestamp_jitter_ms": 2, "bucket_ms": 10}
+}
+
+B.2 Story field record (informative)
+For each time t:
+F_bin(t) = [f1(t), f2(t), ..., fd(t)]
+with metadata:
+{
+  "t": "int64 ns",
+  "flags": {"dropped": false, "saturated": false},
+  "relevance": 0.0..1.0
+}
+
+
+Annex C Parameters
+
+C.1 Example baseline (illustrative only)
+UF:
+- W (variance window) = 32 samples
+- sigma_min = 1e-4 (after normalization)
+- delta_min = 1e-3
+- kappa_min = 1e-3
+- tau_D = 0.4
+- U_max = 0.85
+- C_max = 8 mosaics disagreeing (example)
+- B_min = 0.1, B_max = 1.0
+Loom:
+- K_s (settle gates) = 8
+- U_settle = 0.35
+- C_settle = 3
+- B_var_settle = 0.02
+- R_commit = 0.72
+- IG_min = 0.05
+
+C.2 Determinism tolerances (illustrative)
+- If fixed-point: specify Q formats per channel and saturation behavior.
+- If float: specify rounding mode and reduction ordering; disable fused operations.
+
+
+Annex D Glossary
+
+- Coh (coherence): a normalized metric of cross-layer consistency (implementation-defined but bounded).
+- Drift(T): a metric of timebase drift and gate drift over time; used in S(UF).
+- Breathing: ArcLoom bandwidth modulation state; contracts under uncertainty; expands under confidence.
+- Fold map: a deterministic mapping from motif feature space to physical/virtual memory layout.
+
+
+References
+
+[UF-v1.4] Unified Framework (UF) Spec v1.4.0 skeleton (provided by user).
+[IRF-2026] Information Resonance Fields and Premonition-Like Inference in High-Dimensional Histories (provided by user).
+[UFCP-2026] A Process-Based Coherence Field Bridging Classical and Quantum Dynamics (Not-Math Framework) (provided by user).
+[BSIL-v0.1] ArcLoom Interop Spec v0.1 - Binary Story Ingestion Layer (generated earlier in this project).
+[WS-v0.1] WeaveSpec v0.1 - Canonical Weave Description Format (generated earlier in this project).
+
+

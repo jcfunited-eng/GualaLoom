@@ -1,0 +1,664 @@
+ArcLoom Specification v0.3
+--------------------------
+Date: 2026-01-06
+Locked decisions: D1 ψ-lattice core; D2 arcs=mode overlaps; D3 UF L0–L4 = observability/gating/safety.
+New: Law-Field (program=constraints), goals/boundaries, canonical MapInject, mode lifecycle, horizon projection.
+Determinism: identical inputs+params => identical outputs.
+
+0. Document Control and Decision Register
+-----------------------------------------
+
+This spec makes no hidden design decisions. Any item not explicitly locked is recorded below.
+
+Locked (approved):
+• D1 Core substrate: Coherence‑Field Lattice (ψ‑lattice).
+• D2 Arcs: mode overlaps and overlap‑squared weights.
+• D3 UF L0–L4: observability/gating/safety only; emit DSF.
+
+Open decisions (presented with options + recommendation; NOT locked until you approve):
+• OD‑1 Lattice integration method:
+   A) exact unitary exponential     B) Crank‑Nicolson     C) split‑step
+   Recommended: B (stable, norm‑preserving for Hermitian operators).
+
+• OD‑2 Input fault policy for timestamp anomalies:
+   A) drop record     B) reorder within jitter window J_max     C) SafeMode immediately
+   Recommended: B; then SafeMode if repeated violations.
+
+• OD‑3 SafeMode adapter hold vector:
+   A) last-value hold     B) neutral hold vector     C) domain safe state
+   Recommended: B (neutral hold) as default; domains may override with explicit approval.
+
+• OD‑4 Canonical MapInject matrix construction:
+   A) fixed orthonormal map (manufacturer chosen)
+   B) deterministic hashed map from configuration seed
+   C) learned map (out of scope for v0.3 determinism guarantees)
+   Recommended: A for lab prototypes; B for scalable reproducibility across builds.
+
+• OD‑5 Mode‑bank expansion rule:
+   A) “commit‑centroid” synthesis from committed ψ snapshots
+   B) “memory‑motif” synthesis from Krimelacks motif clusters
+   C) external import only (no runtime growth)
+   Recommended: A for early prototypes (simplest, deterministic).
+
+• OD‑6 Law‑set selection policy when multiple laws apply:
+   A) highest relevance‑weight law set
+   B) minimum action increment (ΔS_total)
+   C) fixed priority stack
+   Recommended: B (minimum ΔS_total) because it is intrinsic and deterministic.
+
+
+Outline
+-------
+1. Introduction
+2. Concepts Page
+3. System Process Flow Overview
+4. Mathematics Used Page
+5. Time Management (Input Time, Structural Time, Lattice Time)
+6. Input Integrity, Pre‑Error Checking, Negative‑Space Checks
+7. UF Observability & Safety Layer (L0–L4)
+8. Canonical Injection Mapping (MapInject) and Scheduling
+9. Coherence‑Field Lattice Core (ψ‑lattice)
+10. Law‑Field Layer (Program = Constraints)
+11. Goal & Boundary Terms
+12. Mode Bank Lifecycle, Arc Weights, Determinism, Commit
+13. Horizon Projection (Future‑Weighted Behavior)
+14. Krimelacks Folded Structural Memory
+15. Output Controls and Minimal Universal Adapter
+16. Determinism, Validation, Hardening
+17. Interfaces and Data Schemas
+18. Glossary
+19. Recommended Next Steps + Approval Checklist
+
+1. Introduction
+---------------
+ArcLoom is a deterministic architecture for <b>reality handling</b>. It does not run a program counter or interpret an instruction stream. Instead, it segments time‑stamped inputs into structural episodes, injects them into a conservative coherence lattice, and applies selectable <b>Law‑Fields</b> (constraints) plus <b>Goals</b> (boundary terms) to shape settling. When uncertainty collapses (entropy drop), ArcLoom commits history into folded structural memory and emits bounded outputs.
+
+2. Concepts Page
+----------------
+Defines ArcLoom primitives and the new Law‑Field notion: programs are constraint fields and boundary terms.
+
+3. System Process Flow Overview
+-------------------------------
+ArcLoom is one deterministic pipeline. UF L0–L4 produce gates and DSF and enforce safety; MapInject turns gate evidence into controlled injections; ψ‑lattice evolves under laws/goals; mode overlap yields arc weights; commits update folded memory; outputs are bounded and SafeMode‑compliant.
+
+3.1 Pipeline
+------------
+
+(0) Input Ingress + Time Manager
+    raw records ─► timestamp checks ─► jitter handling ─► missing-sample policy ─► sanitized stream F̃(t)
+
+(1) UF Observability/Gating/Safety (L0–L4)
+    F̃(t) ─► L0 SEV(t)+N(t) ─► L1 Gates Gₖ + mosaics ─► L2 interpretive metrics ─►
+            L3 resonance URFₖ ─► L4 DSFₖ (bounded; SafeMode control)
+
+(2) Canonical Injection Mapping (MapInject)
+    evidence eₖ={ISFₖ,URFₖ,DSFₖ,N(Gₖ),TVRₖ,...} ─► J(k) injection field + N_int(k) schedule
+
+(3) Law‑Field + Goal selection
+    select law set 𝓛_k and goal/boundary set 𝓖_k (deterministic policy)
+
+(4) Coherence‑Field Lattice Evolution (ψ‑lattice)
+    ψ(k,τ) evolves for τ=1..N_int(k) under:
+      H_total = H_base + H_mem + H_law(𝓛_k) + H_goal(𝓖_k) + H_safety
+      plus injection J(k)
+
+(5) Mode overlaps (“arcs”)
+    Aᵢ(k)=⟨Φᵢ,ψ(k)⟩  ─►  pᵢ(k)=|Aᵢ|²/Σ|Aⱼ|²
+
+(6) Determinism + Entropic Flip Commit
+    Hₖ, Detₖ ─► if thresholds met ⇒ commit(k)=1 ⇒ Fact Strand
+
+(7) Krimelacks Folded Memory Update
+    Fact Strands ─► motif extraction ─► adjacency update ─► deterministic folding locality map
+
+(8) Horizon Projection (optional but normative when enabled)
+    free‑evolve ψ with J=0 for H steps ─► projected arcs/DSF bundles
+
+(9) Output Controls + Minimal Universal Adapter
+    DSFₖ + arcs + memory + projection(optional) ─► bounded outputs yₖ (SafeMode compliant)
+
+
+4. Mathematics Used Page
+------------------------
+Normative equations and operators used in v0.3, including Law‑Field and Goal terms.
+
+4 Operator set
+--------------
+
+4.1 UF structural operators (kernel)
+
+ΔF(t)=F̃(t)−F̃(t−Δt)
+σ(t)=(1/W) Σ_{i=0}^{W−1} ||F̃(t−iΔt)−F̄_W(t)||²
+κ(t)=||F̃(t+Δt)−2F̃(t)+F̃(t−Δt)||
+
+Negative space:
+N(t)=1 if σ(t)<σ_min AND ||ΔF(t)||<δ_min AND κ(t)<κ_min else 0
+
+Gate boundary:
+D(t)=α₁||ΔF(t)||+α₂σ(t)+α₃κ(t)
+Boundary at t when D(t)≥τ_D
+
+Gate:
+Gₖ=[tₐ,t_b] where ∀t∈(tₐ,t_b): D(t)<τ_D
+
+DSFₖ (bounded):
+DSFₖ=(Dₖ,Mₖ,Revₖ,U*ₖ,Cₖ,Pₖ,Bₖ), with Dₖ∈{−1,0,+1}
+
+4.2 Canonical injection mapping (MapInject)
+
+Evidence vector (one example canonical packing):
+eₖ = concat( norm(TVRₖ), ISFₖ, URFₖ, DSFₖ, N(Gₖ) )
+
+Injection amplitude:
+aₖ = clamp( a0 · wₖ · URFₖ · (1−U*ₖ) · (1−N(Gₖ)), [0, a_max] )
+
+Injection field:
+J(k) = aₖ · normalize( P_in · eₖ )
+Constraint: ||J(k)|| ≤ J_max and SafeMode ⇒ J(k)=0
+
+4.3 ψ‑lattice state
+
+ψₙ = √ρₙ · exp(iϕₙ)
+
+4.4 Total evolution with Law‑Fields and Goals
+
+Base equation (discrete form):
+iℏ dψ/dτ = [H_base + H_mem + H_law(𝓛_k) + H_goal(𝓖_k) + H_safety] ψ + J(k)
+
+Constraints:
+• H_total SHALL be Hermitian (to preserve norm).
+• Interactions (W) SHALL be symmetric.
+
+Norm target:
+||ψ||² = Σ_n |ψₙ|² (conserved within ε_norm per gate)
+
+4.5 Law‑Field terms (canonical family)
+
+A law set 𝓛_k selects a weighted sum of law operators:
+H_law(𝓛_k) = Σ_{j∈𝓛_k} γ_j L_j
+
+Canonical law operators (examples; each MUST be Hermitian):
+• Symmetry law:   L_sym = (I − T)†(I − T)  for a unitary transform T
+• Consistency law: L_cons = Σ_edges (|n⟩⟨n| − |m⟩⟨m|)² weighted by motif adjacency
+• Sparsity/compactness law (bounded): add potential term U_comp(ρ)=λ_comp Σ_n f(ρₙ) with f convex
+
+4.6 Goal/boundary terms
+
+H_goal(𝓖_k) = Σ_{g∈𝓖_k} η_g G_g
+where each G_g is Hermitian and bounded.
+
+One canonical goal term uses a readout operator O_out:
+E_goal = || O_out ψ − y_target ||²
+Implement via gradient potential equivalent in H_goal.
+
+4.7 Mode overlaps and determinism
+
+Aᵢ(k)=⟨Φᵢ,ψ(k)⟩
+pᵢ(k)=|Aᵢ|² / Σⱼ |Aⱼ|²
+Hₖ=−Σ_i pᵢ(k) log pᵢ(k)
+Detₖ=1 − Hₖ/H₀
+
+Commit condition:
+commit(k)=1 iff Detₖ≥Det_commit AND max_i pᵢ(k)≥p_commit
+
+4.8 Horizon projection (free evolution)
+
+Given current ψ(k), compute ψ̂(k+h) by evolving H steps with J=0 and fixed (𝓛_k,𝓖_k).
+Compute projected p̂ᵢ(k+h) and projected DSF̂(k+h) over h=1..H.
+
+4.9 Output bounds
+
+Adapter output yₖ satisfies:
+||yₖ|| ≤ Y_max
+SafeMode ⇒ yₖ = Y_hold
+
+
+5. Time Management
+------------------
+Manages three clocks (t,k,τ) plus horizon steps h, with deterministic scheduling and bounded latency.
+
+5 Time rules
+------------
+
+5.1 Clocks
+
+t  : input time (monotonic)
+k  : structural time (gate index)
+τ  : lattice time (integration steps within gate)
+h  : horizon step index (projection steps)
+
+5.2 Lattice step allocation per gate
+
+N_int(k) = clamp_int( N_min + round( N_range · Sched(k) ), [N_min, N_max] )
+
+Recommended Sched(k) (deterministic):
+Sched(k) = (1 − U*ₖ) · wₖ · (1 − N(Gₖ))
+
+5.3 Drift bundles (bounded)
+
+Keep last W_g gate baselines μ:
+DriftVec(k) = (μₖ−μₖ−1, μₖ−μₖ−2, ...)
+
+5.4 Output staleness
+
+stale(yₖ)=1 iff (k−k_emit) > TTL_g
+stale ⇒ adapter emits SafeHold
+
+
+6. Input Integrity
+------------------
+Deterministic pre‑error checking and negative‑space checks prevent corrupt inputs from destabilizing UF, ψ‑lattice, laws, goals, or outputs.
+
+6 Checks
+--------
+
+6.1 Health checks (normative)
+
+Invalid record if ANY:
+• t_i ≤ t_{i−1}
+• ||ΔF(t)|| > Δ_max
+• σ(t) ∉ [0, σ_max)
+• F(t) ∉ D ⊂ ℝᵈ
+
+6.2 Sanitization policy (OD‑2)
+
+Options:
+A drop record     B reorder within jitter J_max     C SafeMode immediately
+Recommended: B, then SafeMode if repeated.
+
+6.3 Negative‑space checks
+
+N(t)=1 if σ(t)<σ_min AND ||ΔF(t)||<δ_min AND κ(t)<κ_min else 0
+N(Gₖ)=1 if mean_{t∈Gₖ} N(t) ≥ ν_NS else 0
+
+Constraint:
+If N(Gₖ)=1 then injection amplitude aₖ ≤ a_NS_max
+
+
+7. UF Layer
+-----------
+UF L0–L4 are the deterministic observability/gating/safety layer and the sole producer of DSF. ArcLoom does not extend UF semantics; it consumes UF outputs.
+
+7 UF adoption note
+------------------
+
+ArcLoom adopts UF operators and safety constraints as normative and unchanged:
+• L0 SEV/NSF and negative space
+• L1 gate formation and mosaics
+• L2 interpretive metrics
+• L3 resonance URF
+• L4 DSF (sole kernel interface)
+• Validation suite and hardening framework (SafeMode, triggers/actions/recovery)
+
+
+8. MapInject
+------------
+Defines a canonical deterministic MapInject that couples gate evidence to ψ‑lattice injection and integration scheduling without hidden heuristics.
+
+8 MapInject block
+-----------------
+
+8.1 Evidence packing (normative form)
+
+eₖ = concat( norm(TVRₖ), ISFₖ, URFₖ, DSFₖ, N(Gₖ) )
+All components are bounded and normalized.
+
+8.2 Injection amplitude
+
+aₖ = clamp( a0 · wₖ · URFₖ · (1−U*ₖ) · (1−N(Gₖ)), [0, a_max] )
+
+8.3 Injection field
+
+Choose P_in by OD‑4.
+J(k) = aₖ · normalize( P_in · eₖ )
+
+Constraints:
+• ||J(k)|| ≤ J_max
+• SafeMode ⇒ J(k)=0
+• N(Gₖ)=1 ⇒ aₖ ≤ a_NS_max
+
+8.4 Scheduling coupling
+
+N_int(k) uses Section 5 rule and may also be clamped by stability:
+SafeMode ⇒ N_int(k)=N_min
+
+
+9. ψ-lattice core
+-----------------
+The ψ‑lattice is the core evolving substrate. It evolves deterministically under a Hermitian total operator and symmetric couplings, plus bounded injections.
+
+9 ψ core equations
+------------------
+
+9.1 Representation
+
+ψ ∈ ℂ^N with ψₙ = √ρₙ e^{iϕₙ}
+
+9.2 Evolution (normative)
+
+iℏ dψ/dτ = H_total(k) ψ + J(k)
+
+H_total(k)=H_base + H_mem + H_law(𝓛_k) + H_goal(𝓖_k) + H_safety
+
+Constraints:
+• H_total(k) Hermitian
+• W symmetric
+
+OD‑1 integration method (recommended B):
+A exact unitary exponential
+B Crank‑Nicolson
+C split‑step
+
+9.3 Lattice invariants
+
+| ||ψ||²(k) − ||ψ||²(k−1) | ≤ ε_norm
+finite values only (no NaN/INF)
+
+
+10 Law-Field
+------------
+ArcLoom ‘programs’ are Law‑Fields: selected constraint sets applied as Hermitian operators and bounded potentials. Laws shape settling, constrain interpretations, and maintain structural consistency without an instruction stream.
+
+10 Law block
+------------
+
+10.1 Law‑set representation
+
+A law set is:
+𝓛 = { (id_j, γ_j, params_j) }  for j=1..K
+
+10.2 Law operators (normative constraints)
+
+Every L_j MUST be Hermitian (L_j = L_j†).
+Any potential term added via U_j(ρ) MUST be bounded below to avoid runaway.
+
+Canonical families:
+
+(A) Symmetry law
+Choose a unitary transform T (e.g., permutation, reflection, rotation).
+L_sym = (I − T)†(I − T)   (Hermitian, positive semidefinite)
+
+(B) Consistency law (motif adjacency)
+Let A be motif adjacency over lattice partitions.
+L_cons = Σ_(n,m in edges) a_nm (|n⟩⟨n| − |m⟩⟨m|)^2
+
+(C) Compactness law (bounded potential)
+U_comp(ρ)=λ_comp Σ_n f(ρₙ), with f convex and increasing.
+
+10.3 Law selection policy (OD‑6)
+
+Options:
+A relevance‑weight selection
+B minimum ΔS_total selection
+C fixed priority stack
+
+Recommended: B
+
+
+11 Goals
+--------
+Goals and boundary terms bias ArcLoom toward desired outputs while remaining deterministic and bounded. They are expressed as Hermitian goal operators or bounded potentials.
+
+11 Goal block
+-------------
+
+11.1 Goal representation
+
+A goal set:
+𝓖 = { (id_g, η_g, target_g, params_g) }
+
+11.2 Canonical goal term with readout operator
+
+Choose a bounded readout operator O_out (maps ψ to ℝ^m):
+y_pred = O_out ψ
+
+Goal energy:
+E_goal = || y_pred − y_target ||²
+
+Implement in H_goal as a Hermitian penalty operator equivalent to the gradient of E_goal.
+
+11.3 Safety constraints
+
+SafeMode ⇒ H_goal = 0 (goals do not push the lattice)
+Bound:
+||H_goal|| ≤ H_goal_max
+
+
+12 Mode lifecycle
+-----------------
+Defines a deterministic lifecycle for the Mode Bank Φᵢ so that ‘content’ can grow from committed histories without hidden training randomness.
+
+12 Mode block
+-------------
+
+12.1 Overlap and determinism (locked)
+
+Aᵢ(k)=⟨Φᵢ,ψ(k)⟩
+pᵢ(k)=|Aᵢ(k)|² / Σⱼ |Aⱼ(k)|²
+Hₖ=−Σ_i pᵢ log pᵢ
+Detₖ=1−Hₖ/H₀
+commit(k)=1 iff Detₖ≥Det_commit AND p_max≥p_commit
+
+12.2 Mode bank lifecycle (OD‑5)
+
+Option A (recommended): commit‑centroid synthesis
+When commit(k)=1 for mode i*, capture a fixed window of ψ snapshots:
+  Snap(k) = {ψ(k−s)...ψ(k)} for s in [0..S_cap]
+Form a candidate template:
+  Φ_new = normalize( Σ_{ψ in Snap(k)} ψ )
+Insert deterministically if it is sufficiently novel:
+  novelty(Φ_new, Φ_i) ≥ τ_novel for all i
+Tie‑break by lowest index.
+
+Option B: memory‑motif synthesis
+Φ_new derived from motif cluster centroids mapped back into ψ space.
+
+Option C: external import only (no growth)
+
+
+13 Horizon projection
+---------------------
+Horizon projection provides ‘future‑weighted’ behavior by deterministic free evolution of the current ψ state under fixed laws and goals, without claiming future‑to‑present physics.
+
+13 Projection block
+-------------------
+
+13.1 Free evolution (normative)
+
+For h=1..H:
+  ψ̂(k+h) = FreeEvolve( ψ̂(k+h−1), H_total(𝓛_k,𝓖_k), J=0 )
+
+Compute:
+  p̂ᵢ(k+h)=|⟨Φᵢ,ψ̂(k+h)⟩|² / Σⱼ|⟨Φⱼ,ψ̂(k+h)⟩|²
+  Det̂(k+h)=1−Ĥ(k+h)/H₀
+
+Optionally compute DSF̂(k+h) by projecting UF-consistent surrogates from ψ̂ (bounded).
+
+13.2 Projection usage
+
+Projection influences outputs only through bounded weighting:
+  yₖ = Adapter( DSFₖ, memory, projection Π_k )
+Constraint: projection weight ≤ w_proj_max
+
+
+14 Memory
+---------
+Krimelacks memory stores committed strands as motifs and deterministically folds locality so structurally related motifs remain near each other.
+
+14 Memory block
+---------------
+
+14.1 State
+
+V motifs, W_adj weights, pos locality mapping.
+
+14.2 Updates
+
+Reinforce:
+  W_adj(u,v) ← W_adj(u,v) + η_mem · score(u,v,strand)
+
+Decay:
+  W_adj(u,v) ← (1−λ_mem) · W_adj(u,v)
+
+Merge:
+  if W_adj(u,v) ≥ τ_merge then merge(u,v) deterministically.
+
+14.3 Folding
+
+Cost(pos)=Σ_{u,v} W_adj(u,v)·dist(pos(u),pos(v))
+Update pos to reduce Cost within tolerance ε_fold.
+
+
+15 Outputs
+----------
+Outputs are bounded, time-managed, and SafeMode-compliant. A minimal universal adapter provides a general output interface without implementing domain-specific ‘hidden computers’.
+
+15 Output block
+---------------
+
+15.1 Output controls (normative)
+
+||yₖ|| ≤ Y_max
+SafeMode ⇒ yₖ = Y_hold
+stale ⇒ yₖ = Y_hold
+DSF stability inherited from UF:
+||DSFₖ − DSFₖ₋1|| ≤ ε_DSF unless |ΔR(k)|>ε_D
+
+15.2 Minimal universal adapter (normative interface)
+
+Define a fixed bounded map:
+yₖ = clamp_vec( A_y · zₖ, [−1, +1] )
+
+where zₖ is the kernel summary vector:
+zₖ = concat( DSFₖ, topK(pᵢ(k)), Detₖ, commit_flag, memory_summary, projection_summary )
+
+A_y is a fixed deterministic matrix (manufacturer/configured).
+
+OD‑3 determines Y_hold policy (recommended neutral hold).
+
+
+16 Validation
+-------------
+ArcLoom must remain deterministic and bounded under noise, adversarial inputs, drift, long sequences, and shocks. Hardening and SafeMode are mandatory.
+
+16 Hardening block
+------------------
+
+16.1 Determinism rules (normative)
+
+• No hidden randomness.
+• Stable tie‑breaks (lowest index).
+• Fixed numeric precision and ordering.
+
+16.2 Invariants (extend UF)
+
+UF invariants:
+0 ≤ R(k) ≤ 1, 0 ≤ Uₖ ≤ 1, Cₖ ≤ C_max, B_min ≤ Bₖ ≤ B_max
+
+ArcLoom lattice invariants:
+| ||ψ||²(k) − ||ψ||²(k−1) | ≤ ε_norm
+finite values only
+
+Commit rate limit:
+commits per window ≤ commit_max
+
+16.3 Hardening/SafeMode
+
+ArcLoom inherits UF SafeMode triggers.
+When SafeMode=1:
+• J(k)=0
+• H_goal=0
+• commit(k)=0
+• memory updates freeze
+• outputs hold to Y_hold
+
+
+17 Schemas
+----------
+Defines deterministic record formats for inputs, kernel outputs, law/goal selections, lattice telemetry, commits, projections, memory snapshots, and outputs.
+
+17 Schema block
+---------------
+
+17.1 Input record
+
+{ t, F:[d], r(optional), L_hint(optional), G_hint(optional), source_id(optional) }
+
+17.2 Kernel record per gate
+
+{
+  k, gate:[t_a,t_b],
+  ISF, URF_k, DSF_k, SafeMode, faults,
+  N_gate: N(G_k)
+}
+
+17.3 Law/goal selection
+
+{ k, L_k:[(id,γ,params)], G_k:[(id,η,target,params)], selection_policy_id }
+
+17.4 Lattice telemetry
+
+{ k, N_int, norm, norm_error, energy_surrogate }
+
+17.5 Commit event
+
+{ k, commit, mode_id, p_max, Det_k, strand_ref }
+
+17.6 Projection bundle (optional)
+
+{ k, H, p_hat:[H x topK], Det_hat:[H], DSF_hat(optional bounded) }
+
+17.7 Output record
+
+{ k, y_k:[m], bounded:true/false, stale:true/false }
+
+
+18 Glossary
+-----------
+Glossary of key terms used in ArcLoom v0.3.
+
+19 Next steps
+-------------
+Concrete next steps for making v0.3 testable, plus the approval checklist to lock remaining open decisions.
+
+19 Next steps block
+-------------------
+
+Recommended option (explicit): lock OD‑1..OD‑6 next, then produce v0.4 with no open decisions.
+
+Non‑developer steps:
+1) Choose ONE sample input stream (anything time‑stamped, any domain).
+   • It can be short (minutes) and low dimensional.
+
+2) Choose safety posture:
+   • Use neutral SafeHold outputs (OD‑3) until you explicitly define domain-safe states.
+
+3) Approve the open decisions in Section 0:
+   OD‑1 integration method (recommended B)
+   OD‑2 timestamp fault policy (recommended B)
+   OD‑3 SafeHold policy (recommended B)
+   OD‑4 P_in construction (recommended A or B)
+   OD‑5 mode bank growth (recommended A)
+   OD‑6 law selection policy (recommended B)
+
+4) After approvals, generate v0.4:
+   • all selected options become SHALL
+   • includes a one‑page “how to interpret outputs” guide
+   • includes a one‑page “validation checklist” (noise, drift, adversarial, shock)
+
+Approval checklist (copy/paste and answer with your choice):
+OD‑1: A / B / C
+OD‑2: A / B / C
+OD‑3: A / B / C
+OD‑4: A / B / C
+OD‑5: A / B / C
+OD‑6: A / B / C
+
+
+References
+----------
+
+• UF Spec v1.4.0 skeleton: deterministic L0–L4 operators; DSF; invariants; validation + hardening framework.
+• IRF speculative framework: histories Ω, eigenmodes Φᵢ, amplitudes Aᵢ(t), entropy/determinism index, entropic flip; used here as engineering inspiration (mode/entropy mechanics).
+• UFCP / Not‑Math coherence field: ψ=√ρ e^{iϕ}; Hermitian action; symmetric couplings; norm conservation; falsifiability conditions.
+

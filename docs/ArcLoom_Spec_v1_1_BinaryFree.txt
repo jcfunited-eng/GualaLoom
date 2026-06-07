@@ -1,0 +1,408 @@
+ArcLoom Specification v1.1 — Binary‑Free Structural Processing Unit (SPU)
+=========================================================================
+Date: 2026-01-07
+Status: Full replacement profile; CPU/binary ambiguity removed.
+Core premise: ArcLoom is binary‑free at the architectural primitive level.
+
+Normative references
+====================
+UF Spec v1.4.0 is normative for the kernel operators, invariants, and SafeMode. IRF and UFCP/Not‑Math are informative framing/engineering constraints.
+
+0. Scope
+========
+Defines ArcLoom SPU as deterministic field→gates→DSF→commit→motif memory→output, binary‑free at primitive level.
+
+1. Conformance
+==============
+This clause defines what it means for an implementation to be ArcLoom‑conformant, including explicit binary‑free compliance requirements and determinism requirements.
+
+1.1–1.2 Conformance clauses
+===========================
+
+1.1 Conformance levels
+
+ArcLoom implementations SHALL declare one of the following determinism classes:
+
+• Class A (Reference‑Deterministic): identical inputs + identical configuration ⇒ byte‑identical trace outputs in the reference simulator.
+• Class B (Device‑Deterministic): identical inputs + identical configuration ⇒ identical gate boundaries and DSF within specified numeric tolerances under device noise bounds.
+
+1.2 Binary‑Free Compliance (mandatory)
+
+An ArcLoom SPU implementation SHALL satisfy ALL:
+
+BF‑1: No binary instruction execution engine (no ISA, no program counter, no fetch/decode/execute).
+BF‑2: No architectural requirement that internal state is stored as bits.
+BF‑3: Any discrete state used for control SHALL be ternary or multi‑level (≥3 stable states).
+BF‑4: Safety and governance SHALL NOT depend on an embedded binary microcontroller executing a binary firmware loop.
+BF‑5: If any binary device exists in the surrounding system (e.g., external gateway), it SHALL be outside the SPU boundary and SHALL be treated as an external coupler.
+
+Note: BF‑2 does not forbid semiconductor fabrication. It forbids binary as the native architectural primitive.
+
+2. System overview
+==================
+ArcLoom is not organized as an instruction machine. It is organized as a deterministic operator fabric that transforms a time‑indexed field into structural history, then uses that history to shape future handling.
+
+2.1–2.2 Block model
+===================
+
+2.1 Block decomposition (normative)
+
+ArcLoom SPU SHALL implement the following blocks:
+
+A) Coupler Array (CA): interfaces to sensors, actuators, and optional external gateways.
+B) Kernel Fabric (KF): implements UF L0–L4 operators and emits DSF per gate.
+C) Loom Fabric (LF): performs structural settle/commit, motif formation, motif recall, and fold locality.
+D) Krimelacks Memory (KM): folded structural memory for motifs/strands + landmarks.
+E) Governance and Safety (GS): hardening triggers/actions, SafeMode, output holds, traceability.
+
+2.2 Interfaces (normative)
+
+• Input interface: F(t) ∈ R^d (time‑indexed), plus optional relevance r(t).
+• Kernel output interface: DSF_k (per gate k), with SafeMode flags.
+• Loom internal artifacts: strands, motifs, landmarks, arc weights, determinism metrics.
+• Output interface: bounded outputs y(t) with SafeHold/disable rules.
+
+3. Mathematical determinism
+===========================
+ArcLoom determinism is enforced by bounded operators, explicit invariants, and explicit safety actions. The UF kernel is the normative definition of the field→gate→DSF transformation.
+
+3.1–3.3 Maths used (summary)
+============================
+
+3.1 Normative UF kernel operators (summary)
+
+L0 Structural Field Normalization:
+∆F(t)=F(t)−F(t−∆t)
+σ(t) = (1/W) Σ_{i=0}^{W−1} ||F(t−i∆t) − \bar F_W(t)||^2
+κ(t)=||F(t+∆t)−2F(t)+F(t−∆t)||
+Negative space:
+N(t)=1 if σ(t)<σ_min ∧ ||∆F(t)||<δ_min ∧ κ(t)<κ_min else 0
+SEV(t)=(F(t),∆F(t),σ(t),κ(t),r(t),N(t))
+
+L1 Gate formation:
+D(t)=α1||∆F(t)||+α2σ(t)+α3κ(t)
+Boundary if D(t)≥τ_D
+Gate G_k=[t_a,t_b] with D(t)<τ_D inside
+
+L3 Resonance:
+R(k) = (1/Z) Σ_i λ_i * features_i  ; g_k gates resonance based on uncertainty/hysteresis
+
+L4 Decision Surface Vector (DSF):
+DSF_k=(D_k,M_k,R_k,U*_k,C_k,P_k,B_k)
+Direction D_k ∈ {−1,0,+1} from ∆R(k) thresholds.
+
+3.2 Invariants (normative)
+
+Implementations SHALL maintain:
+0 ≤ R(k) ≤ 1
+0 ≤ U_k ≤ 1
+C_k ≤ C_max
+B_min ≤ B_k ≤ B_max
+
+3.3 SafeMode (normative)
+
+SafeMode=1 ⇔ S(UF) < S_min
+In SafeMode, DSF is neutralized and outward actions are held.
+
+4. Binary‑free representation model
+===================================
+This clause defines how ArcLoom represents discrete commitments and control without binary primitives. Continuous quantities MAY exist, but any discrete control or commit token SHALL be ternary or multi‑level.
+
+4.1–4.3 Representation rules
+============================
+
+4.1 Ternary token set (normative)
+
+ArcLoom SHALL use balanced ternary tokens:
+T = { −1, 0, +1 }
+
+At minimum, the DSF directional component D_k SHALL be represented as a ternary token.
+
+4.2 Multi‑level scalar representation (normative)
+
+Other DSF components (e.g., resonance R_k, uncertainty U*_k, breathing B_k) MAY be represented as:
+• continuous analog variables, or
+• multi‑level quantized variables with ≥3 stable levels.
+
+If quantized, quantization SHALL NOT be binary (≥3 levels).
+
+4.3 Binary‑free governance state machine (normative)
+
+Governance states (Normal, SafeHold, SafeMode, Recovery) SHALL be encoded with ≥3‑state logic.
+No binary microcontroller loop may be required to enforce SafeMode or output holds.
+
+5. Loom Fabric
+==============
+The Loom Fabric turns DSF sequences into structural history. A commit event is the formation of a stable motif/strand when ambiguity collapses (entropy drop / dominance). This is where ArcLoom becomes more than a filter.
+
+5.1–5.2 Commit/recall
+=====================
+
+5.1 Commit metric (normative)
+
+ArcLoom SHALL define a dominance metric over candidate arcs/motifs:
+p_max(k) = max_i p_i(k)
+and a determinism/entropy metric Det(k) (implementation-defined) that increases as ambiguity collapses.
+
+A commit SHALL occur only if:
+p_max(k) ≥ p_commit  AND  Det(k) ≥ det_commit  AND  SafeMode=0
+
+5.2 Recall (normative)
+
+Recall SHALL be cue-driven:
+Given cue q, return motif m* = argmax_m Similarity(q,m)
+Similarity MUST be deterministic and bounded.
+
+Landmarks (recommended):
+Implementations SHOULD maintain a limited set of high-salience motifs to stabilize recall latency without “addressing.”
+
+6. Krimelacks Memory
+====================
+Krimelacks Memory stores motifs/strands as folded adjacency so related structure stays physically near. This supports fast cue‑driven recall without random addressing as the primary primitive.
+
+6.1–6.3 Krimelacks rules
+========================
+
+6.1 Memory objects (normative)
+
+• Strand: ordered record of gates + DSF trace + metadata.
+• Motif: reusable structural chunk extracted from one or more strands.
+• Landmark: high-salience motif used to stabilize recall.
+
+6.2 Folding (normative)
+
+Memory layout SHOULD maximize proximity of motifs with high co‑activation:
+Distance(m_i, m_j) SHOULD decrease as CoActivate(m_i, m_j) increases.
+
+6.3 Decay and retention (normative)
+
+Memory MUST implement bounded growth:
+motif_budget and strand_budget are mandatory.
+Decay half‑life SHALL be declared and deterministic.
+
+7. Programming model
+====================
+ArcLoom is programmable through Weaves: declarative bundles of couplers, laws, goals, commit/memory policy, and governance. Weaves are mounted, not executed as instruction streams.
+
+7.1–7.3 Weave rules
+===================
+
+7.1 Weave definition (normative)
+
+A Weave SHALL specify:
+• Couplers (inputs/outputs)
+• UF profile (kernel parameters and bounds)
+• Law‑fields and goals (constraint weights)
+• Commit policy (det_commit, p_commit, rate limits)
+• Memory policy (budgets, decay, landmarks)
+• Governance (SafeMode behavior, output holds, logging)
+
+7.2 Canonical Weave format (normative)
+
+WeaveSpec v0.1 JSON is the canonical interchange format.
+Internal representation in the SPU SHALL be binary‑free and MAY use ternary/multi‑level parameter lattices.
+
+7.3 No instruction semantics (normative)
+
+A weave SHALL NOT contain opcodes, instruction sequences, or program counter semantics.
+
+8. Binary interoperability
+==========================
+Binary interoperability is supported without importing binary execution into ArcLoom. A separate external gateway captures legacy program behavior as a story field and feeds it into ArcLoom as ordinary input.
+
+8.1–8.3 Interop rules
+=====================
+
+8.1 External gateway requirement (normative)
+
+Binary story ingestion SHALL be performed by an external boundary device (BSIL gateway).
+The gateway MAY be implemented using conventional computers, but it SHALL be outside the ArcLoom SPU boundary.
+
+8.2 ArcLoom boundary purity (normative)
+
+Within the ArcLoom SPU boundary:
+• No binary program execution is permitted.
+• Legacy programs are never represented as bitstreams in native memory.
+• Only structural stories (gates, DSF traces, motifs) are ingested.
+
+8.3 Consent and export (normative)
+
+Capture consent SHALL be explicit.
+Export policies SHALL be enforceable and deterministic.
+
+9. Couplers and robotics
+========================
+ArcLoom is designed to couple directly to physical sensors and actuators. Robotics suitability depends on low-latency gating, safe bounded outputs, and strong drift/aging management.
+
+9.1–9.3 Coupler rules
+=====================
+
+9.1 Input couplers (normative)
+
+Inputs SHALL be time-indexed streams with declared schema and bounds.
+Health verification SHALL reject non‑monotone time, out‑of‑domain values, and structural spikes beyond ∆max.
+
+9.2 Output couplers (normative)
+
+Outputs SHALL declare:
+• max rate (events/sec),
+• max magnitude,
+• SafeHold behavior (usually “emit nothing” or “hold last safe output”),
+• SafeMode behavior (disable outputs).
+
+9.3 Latency (normative)
+
+A weave SHALL declare target latency class:
+• Control: gate lengths and update cadence suitable for control loops.
+• Perception: longer gates acceptable.
+Implementations SHALL report measured gate durations and output latency.
+
+10. Governance and safety
+=========================
+ArcLoom safety is enforced by UF hardening triggers/actions and SafeMode. Governance is mandatory and does not rely on binary firmware loops.
+
+10.1–10.3 Governance rules
+==========================
+
+10.1 Mandatory UF hardening (normative)
+
+Implementations SHALL implement UF hardening triggers (HTCs), actions (HAs), SafeMode, and recovery rules (HRRs).
+
+10.2 SafeMode behavior (normative)
+
+In SafeMode:
+• DSF MUST be replaced by a neutral hold vector.
+• New schema/motif formation MUST be suspended.
+• Outward actions MUST be disabled (SafeHold).
+• Recovery requires satisfaction of all HRRs.
+
+10.3 Traceability (normative)
+
+All hardening triggers, actions, and recovery transitions MUST be logged deterministically.
+
+11. Validation and benchmarking
+===============================
+Validation ensures ArcLoom remains bounded under noise, adversarial inputs, parameter drift, memory stress, mosaic conflicts, and shocks.
+
+11.1–11.3 Validation
+====================
+
+11.1 Kernel validation (normative)
+
+Implementations SHALL pass the UF v1.4.0 validation suite:
+• Noise robustness
+• Adversarial structured input tests
+• Parameter perturbation tests
+• Memory/schema stress tests
+• Multi-lattice conflict tests
+• Breathing synchronization tests
+• Global stability shock tests
+
+11.2 Loom validation (normative)
+
+Implementations SHALL additionally validate:
+• Commit rate boundedness (max_commits_per_min)
+• Recall determinism (same cue → same motif)
+• Motif budget boundedness (no runaway growth)
+• Output reversibility where applicable
+
+11.3 Reporting (normative)
+
+Validation reports SHALL include:
+• parameter set Θ
+• determinism class
+• invariant violations list (must be empty for PASS)
+• SafeMode occurrences and recovery times
+
+12. Fabrication recommendations
+===============================
+This clause provides fabrication recommendations that preserve binary‑free architectural primitives. It lists candidate device technologies and recommends a first manufacturable profile without embedding a binary CPU.
+
+12.1–12.3 Fabrication
+=====================
+
+12.1 Candidate device profiles (options)
+
+Profile F‑1: Ternary differential signaling fabric + multi‑level nonvolatile memory (ML‑NVM)
+• Ternary states encoded as (−V, 0, +V) or differential pairs producing three stable attractors.
+• Motif storage in multi‑level PCM or multi‑level RRAM arrays.
+• Operator fabric implemented as continuous‑time or event‑driven circuits; no binary instruction engine.
+
+Profile F‑2: Photonic resonator fabric + phase‑coded multi‑level memory
+• Modes encode motifs; resonance performs recall; phase encodes multi‑level tokens.
+• Higher integration risk and thermal sensitivity.
+
+Profile F‑3: Magnetic / spintronic multi‑stable fabric + resistive memory
+• Multi‑stable magnetic states as motifs; coupling networks settle.
+• Integration/tooling maturity risk.
+
+12.2 Recommended fabrication profile (explicit)
+
+RECOMMENDED: Profile F‑1.
+Reason: It is the closest to present manufacturing practice while still meeting binary‑free primitive requirements (BF‑1..BF‑5). It does not require a CPU or binary ISA; it uses ternary/multi‑level attractors and multi‑level memory.
+
+12.3 Manufacturing deliverables (normative)
+
+A manufacturer package SHALL include:
+• declared determinism class (A or B)
+• BF compliance evidence
+• validation report set (Clause 11)
+• PVT drift characterization and SafeMode boundary verification
+• retention/endurance characterization for KM memory
+
+13. Intended uses
+=================
+This clause defines intended uses and non‑intended uses to keep expectations aligned with what the architecture is designed to do.
+
+13.1–13.2 Uses
+==============
+
+13.1 Intended uses (normative)
+
+ArcLoom is intended for:
+• Robotics and autonomous systems (direct sensor→structure→safe actuation)
+• Multi-sensor fusion and instrumentation (episode formation and early warning)
+• Communication and monitoring (structural pattern dominance detection)
+• Media interaction (speech/music/vision as coupled structures; motif recall)
+
+13.2 Non‑intended uses (normative)
+
+ArcLoom is NOT intended to be:
+• a binary CPU replacement executing legacy binaries internally,
+• a drop‑in ISA‑compatible processor.
+
+Legacy compatibility is provided only via the external gateway (Clause 8).
+
+14. Glossary
+============
+Defines terms used in this document.
+
+15. Patent‑oriented summary (informative)
+=========================================
+
+This clause is informative and intended to help an IP professional quickly identify patentable elements. It is not legal advice.
+
+Potential novel claim anchors:
+• A binary‑free structural processing unit whose native primitive is field→gate→DSF→commit→motif memory (no instruction execution engine).
+• Deterministic gating and decision surface emission (DSF) with mandatory safety invariants and SafeMode.
+• Folded structural memory (Krimelacks) where co‑activation drives physical locality, enabling cue‑driven recall without random addressing as the primary primitive.
+• Weave‑based programmability: declarative mounting of couplers/laws/goals/commit policies; no opcode semantics.
+• External binary story ingestion gateway that converts legacy software behavior into structural episodes, enabling compatibility without binary execution inside the SPU.
+
+16. Recommended next steps
+==========================
+
+Recommended next step (explicit, non‑developer):
+1) Choose your first target domain: <b>Robotics</b> is recommended because it benefits most from direct sensor→structure→safe actuation.
+2) Define one “hello weave” in plain language (e.g., “balance + obstacle avoidance + safe stop”).
+3) Build/obtain an external logging setup that records your sensor streams as F(t) (no coding required if using standard logger tools).
+4) Validate the UF kernel on those logs (noise robustness + shock tests). Only after PASS, enable commit/motif storage.
+
+If you want, describe your robot’s sensors/actuators in plain words, and I will draft a first WeaveSpec and capture profile aligned with this v1.1 spec.
+
+References
+==========
+
+• UF Spec v1.4.0 skeleton (normative kernel operators and safety model).
+• IRF concept paper (informative commit framing via modes/epochs and determinism index).
+• UFCP / Not‑Math (informative conservative process-field stability discipline).

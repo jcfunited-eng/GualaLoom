@@ -1,0 +1,770 @@
+% ============================================================
+%  ArcLoom SPPU Architecture Specification
+%  Version 1.3 — May 2026
+%  Confidential — Internal Use Only
+% ============================================================
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue}
+
+\definecolor{tfe-gold}{RGB}{180, 140, 60}
+\definecolor{tfe-dark}{RGB}{30, 30, 30}
+\definecolor{tfe-gray}{RGB}{100, 100, 100}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{tfe-gray}{\small ArcLoom SPPU Architecture v1.3}}
+\lhead{\textcolor{tfe-gray}{\small Confidential --- Internal Use Only}}
+\rfoot{\textcolor{tfe-gray}{\small Page \thepage}}
+
+\titleformat{\section}{\large\bfseries\color{tfe-dark}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{tfe-dark}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\itshape\color{tfe-dark}}{}{0em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{ArcLoom SPPU}}\\[6pt]
+  {\large Architecture Specification}\\[4pt]
+  {\large Fixed-Weight Ternary Classifier with Native Uncertainty}\\[8pt]
+  {\color{tfe-gray}\small Version 1.3 \quad|\quad May 2026 \quad|\quad Confidential}\\[4pt]
+  {\color{tfe-gray}\small Joseph Forrester \quad|\quad DSF-AI Architecture}
+\end{center}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+% ============================================================
+\section{What This Is}
+
+The ArcLoom SPPU is a fixed-weight combinational classifier
+implemented in balanced ternary ($-1, 0, +1$) logic. It is
+architecturally a feedforward threshold network --- comparable
+to a single-hidden-layer perceptron --- with one critical
+difference: the null output state ($0$) is a first-class
+architectural result representing genuine structural uncertainty,
+not a failure to classify.
+
+The SPPU computes. It is a circuit. We do not claim otherwise.
+
+What distinguishes it from prior perceptron implementations:
+\begin{enumerate}[nosep]
+  \item \textbf{Native three-state output:} Each output trit
+        produces $+1$, $-1$, or $0$ (dead zone). The dead zone
+        is not a design artifact --- it is the system's honest
+        statement that the input evidence is insufficient to
+        commit this dimension. No conventional binary or ternary
+        classifier architecture treats uncommitted output as a
+        first-class result.
+  \item \textbf{Balanced ternary encoding:} Sensor inputs are
+        encoded as 8-trit balanced ternary values via BSIL-BT.
+        The coupling weights are the positional values $3^i$,
+        which means the weighted sum \textbf{reconstructs the
+        original sensor value} from its BT encoding. This is
+        the definition of positional notation --- not a discovery,
+        but a deliberate architectural choice that eliminates
+        quantization loss in the encoding-to-coupling path.
+  \item \textbf{Per-strand signed polarity:} The $3^i$ magnitude
+        weights are fixed by the encoding. Selectivity comes from
+        the \textbf{sign} applied per strand per decision field.
+        For example, the steer decision uses $+3^i$ for the left
+        sensor and $-3^i$ for the right sensor. The magnitude
+        reconstructs; the sign couples. These are different
+        functions and should not be conflated.
+  \item \textbf{Zero dynamic power between evaluations:} The
+        decision path is purely combinational with no clock.
+        Power consumption is zero between sensor events. This
+        is shared with any combinational logic block; the
+        contribution here is that the classifier function is
+        useful enough to justify a dedicated ASIC.
+  \item \textbf{Structural memory (Krimelack):} A content-addressable
+        motif store provides cue-based recall. Match scores feed
+        back into the dead zone, raising the commitment barrier
+        for familiar states. This provides clockless habituation
+        without timers.
+\end{enumerate}
+
+\textbf{What this is not:} This is not a general-purpose processor.
+It does not execute instructions. It is not programmable in the
+conventional sense. It is a fixed-function sensor classifier with
+configurable parameters (baselines, dead zones, strand polarities)
+set by an external calibration service (DSF-AI). It is comparable
+in scope to a neuromorphic classifier tile, not to a CPU or GPU.
+
+% ============================================================
+\section{Relation to Prior Art}
+
+\subsection{Perceptron Comparison}
+
+The local field computation for each output trit is:
+\begin{equation}
+  h_j = \sum_{i} s_k \cdot w_i \cdot t_i + h_j^{ext}
+\end{equation}
+where $w_i = 3^{i \bmod 8}$ is the positional weight (fixed),
+$s_k \in \{-1, 0, +1\}$ is the per-strand sign for decision
+field $j$ (configured by DSF-AI), and $t_i \in \{-1, 0, +1\}$
+is the input trit value.
+
+The activation function is a three-way threshold:
+\begin{equation}
+  t_j = \begin{cases}
+    +1 & \text{if } h_j > \tau_j \\
+    -1 & \text{if } h_j < -\tau_j \\
+    0  & \text{if } |h_j| \leq \tau_j
+  \end{cases}
+\end{equation}
+
+This is structurally a perceptron with a dead band. We acknowledge
+the prior art. The differences that justify a dedicated architecture
+are:
+
+\begin{itemize}[nosep]
+  \item The dead band produces a \textbf{three-valued output}
+        where the third value means ``insufficient evidence.''
+        A standard perceptron produces a binary decision regardless
+        of input ambiguity.
+  \item The weights factor into \textbf{fixed magnitude} ($3^i$,
+        determined by the number system) and \textbf{configurable
+        sign} ($s_k$, determined by the application). This
+        separation means the classifier can be reconfigured for
+        different sensor arrangements without changing the
+        arithmetic hardware.
+  \item The balanced ternary encoding provides \textbf{free rounding}
+        via truncation and \textbf{trivial negation} via bit-swap,
+        both of which simplify the hardware.
+  \item The Krimelack feedback loop provides \textbf{clockless
+        habituation} --- the dead zone rises for repeated patterns
+        without any timer or counter.
+\end{itemize}
+
+\subsection{Neuromorphic Comparison}
+
+The appropriate comparison class is neuromorphic silicon, not
+general-purpose processors. Per-event energy comparison:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Architecture} & \textbf{Per-event energy} & \textbf{Latency} & \textbf{Uncertainty} \\
+\midrule
+Intel Loihi 2 & $\sim$100 pJ/spike & $\sim$1 $\mu$s & Encoded as rate \\
+IBM TrueNorth & $\sim$26 pJ/spike & $\sim$1 ms (tick) & Probabilistic \\
+SpiNNaker 2 & $\sim$10 nJ/inference & $\sim$1 ms & Encoded as rate \\
+\textbf{SPPU tile} & $\sim$0.1--1 pJ/event & $\sim$5--10 ns & \textbf{Native (null trit)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Caveats:} The SPPU energy estimate includes only the
+combinational decision path. It excludes BSIL encoding (clocked,
+BRAM access), Krimelack recall (combinational but larger), and
+any host interface. A like-for-like comparison requires measuring
+the complete sensor-to-decision path on the FPGA prototype, which
+has not yet been done. The table above is an estimate, not a
+measurement. We will not claim a specific power advantage until
+measured.
+
+The SPPU latency advantage (ns vs $\mu$s--ms) is architectural:
+combinational evaluation has no tick/timestep overhead. This is
+verifiable on the FPGA prototype via propagation delay measurement.
+
+The uncertainty representation is the clearest architectural
+distinction. Neuromorphic systems encode uncertainty as spike rate
+or probability. The SPPU's null trit is a discrete, deterministic
+signal: the classifier did not have enough evidence to commit.
+This is qualitatively different from ``low confidence'' --- it is
+a hardware-level admission of ignorance.
+
+% ============================================================
+\section{SPPU Tile}
+
+\subsection{Architecture}
+
+Each SPPU tile is a combinational classifier. No clock input.
+The output appears within one propagation delay of the inputs
+changing.
+
+\textbf{Trit encoding:} 2 wires per trit.
+\begin{itemize}[nosep]
+  \item \texttt{00} = 0 (null / uncommitted / dead zone)
+  \item \texttt{01} = +1 (positive / excite)
+  \item \texttt{10} = -1 (negative / inhibit)
+  \item \texttt{11} = invalid (never produced)
+\end{itemize}
+
+\subsection{Strand Configuration (FPGA-Proven, 12-Strand)}
+
+12 input strands $\times$ 8 trits + 2 settling $\times$ 3 trits
++ 1 decision $\times$ 3 trits = 105 trits = 210 wires per SPPU.
+
+\begin{center}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{\#} & \textbf{Strand} & \textbf{Trits} & \textbf{Type} & \textbf{Source} \\
+\midrule
+0  & Front distance     & 8 & Input    & BSIL-BT (IR, baseline 80) \\
+1  & Front direction    & 8 & Input    & BSIL-BT (1st derivative) \\
+2  & Front acceleration & 8 & Input    & BSIL-BT (2nd derivative) \\
+3  & Left distance      & 8 & Input    & BSIL-BT (IR, baseline 111) \\
+4  & Right distance     & 8 & Input    & BSIL-BT (IR, baseline 144) \\
+5  & Camera Y upper     & 8 & Input    & BSIL-BT (brightness upper half, baseline 180) \\
+6  & Camera Y lower     & 8 & Input    & BSIL-BT (brightness lower half, baseline 180) \\
+7  & Camera edge upper  & 8 & Input    & BSIL-BT (texture upper half, baseline 145) \\
+8  & Camera edge lower  & 8 & Input    & BSIL-BT (texture lower half, baseline 145) \\
+9  & Camera U upper     & 8 & Input    & BSIL-BT (chrominance upper half, baseline 121) \\
+10 & Camera U lower     & 8 & Input    & BSIL-BT (chrominance lower half, baseline 121) \\
+11 & Structural density & 8 & Input    & BSIL-BT (high-edge lines/frame, baseline 145) \\
+   & Context            & 3 & Settling & Coupled from 96 input trits \\
+   & Momentum           & 3 & Settling & Coupled from 96 input trits \\
+   & Decision           & 3 & Output   & Coupled from 102 trits (96 + 6 settling) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Camera baselines derived from room measurement: Y=180, edge=145,
+U=121. These are calibrated values from DSF-AI, not design
+parameters.
+
+\subsection{Coupling Network}
+
+Two-level feedforward combinational circuit.
+
+\textbf{Level 1 (parallel):} Context and Momentum each compute
+3 trits from 96 input trits (12 strands $\times$ 8 trits) via
+weighted summation with dead-zone thresholding. 6 local field
+instances, each with 96 inputs.
+
+\textbf{Level 2:} Decision computes 3 trits from 102 trits
+(96 input + 6 settling) via weighted summation with dead-zone
+thresholding. 3 local field instances, each with 102 inputs.
+
+\textbf{Weight structure:} Each local field computes:
+\begin{equation}
+  h_j = \sum_{k=0}^{N_{strands}-1} s_{k,j} \cdot
+        \sum_{i=0}^{7} 3^i \cdot t_{k,i} + h_j^{ext}
+\end{equation}
+
+The inner sum ($\sum 3^i t_{k,i}$) reconstructs the sensor value
+from its BT encoding. The outer sign ($s_{k,j}$) determines how
+that sensor couples to decision field $j$. For example:
+
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Strand} & \textbf{Steer ($s_{k,0}$)} & \textbf{Speed ($s_{k,1}$)} & \textbf{Conf ($s_{k,2}$)} \\
+\midrule
+Front distance   & 0      & $+1$   & $+1$ \\
+Front direction  & 0      & $-0.5$ & $+1$ \\
+Left distance    & $+1$   & 0      & $+1$ \\
+Right distance   & $-1$   & 0      & $+1$ \\
+Camera Y upper   & 0      & 0      & $+1$ \\
+Camera edge upper & 0     & 0      & $+1$ \\
+\vdots           & \vdots & \vdots & \vdots \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The steer decision uses opposite signs for left ($+1$) and right
+($-1$), producing a differential signal that distinguishes ``wall
+on left'' from ``wall on right.'' This is not ``all sensors
+weighted equally'' --- the per-strand sign IS the selectivity.
+The $3^i$ magnitude is the encoding fidelity. They serve different
+functions.
+
+The $-0.5$ on front direction in the speed field is a damping
+term: direction spikes (transients) oppose the distance signal,
+preventing oscillation. Only persistent distance changes drive
+speed decisions.
+
+Camera strands currently couple to confidence only ($s_{k,2} = +1$)
+with zero weight for steer and speed. DSF-AI calibration will
+determine whether camera features should also modulate steer
+(e.g., visual asymmetry) or speed (e.g., target proximity).
+These signs are configurable parameters, not architectural
+constants.
+
+\subsection{Dead Zones}
+
+\begin{center}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Field} & \textbf{$\tau$ (ADC units)} & \textbf{Rationale} \\
+\midrule
+Context    & 500  & Calibrated to XADC noise floor \\
+Momentum   & 500  & Same noise floor \\
+Steer      & 250  & Lower for responsiveness \\
+Speed      & 500  & Moderate damping \\
+Confidence & 1000 & High bar for conviction \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Dead zones are calibration parameters derived by DSF-AI from
+sensor noise characterization. They are not arbitrary --- they
+represent the measured noise floor below which sensor signals
+are structurally ambiguous. The dead zone IS the null trit's
+physical meaning: ``the signal has not exceeded the noise.''
+
+\subsection{Gate Count Estimate (12-Strand, 8-Trit)}
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Component} & \textbf{Equivalent Gates} \\
+\midrule
+Level 1: 6 local field units (96 inputs each) & 7,200 \\
+Level 2: 3 local field units (102 inputs each) & 3,800 \\
+Dead-zone comparators (9 total) & 200 \\
+Input/output buffers & 100 \\
+\midrule
+\textbf{Total per SPPU tile} & \textbf{$\sim$11,300} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Gate count scales linearly with strand count $\times$ trit width.
+The 12-strand 8-trit configuration is $\sim$5$\times$ larger than
+the original 5-strand 3-trit design.
+
+\subsection{Power Analysis}
+
+\textbf{Decision path only} (combinational, no clock):
+\begin{equation}
+  P_{event} \approx N_{gates} \times C_{wire+gate} \times V_{dd}^2
+\end{equation}
+
+Using $N_{gates} = 200$ (average switching per event),
+$C_{wire+gate} = 5$ fF (gate + local wire in 7nm), $V_{dd} = 0.7$ V:
+\begin{equation}
+  P_{event} \approx 200 \times 5\text{fF} \times 0.49 \approx 490\text{ fJ/event}
+\end{equation}
+
+This estimate includes local wire capacitance (5$\times$ gate
+capacitance), which was omitted in v1.2.
+
+\textbf{BSIL encoding} (clocked): $\sim$10 pJ per sample
+(BRAM read + baseline subtraction + derivative computation).
+
+\textbf{Total sensor-to-decision:} $\sim$10.5 pJ at 7nm.
+At 1 kHz sample rate: $\sim$10.5 nW per tile.
+
+\textbf{Comparison:} Loihi 2 at $\sim$100 pJ/spike. The SPPU is
+$\sim$10$\times$ lower energy per event, not 10$^9\times$. The
+v1.2 claim of 10$^9\times$ versus Cortex-M0 was a misleading
+comparison against a general-purpose processor performing a
+different function.
+
+\subsection{Timing}
+
+Propagation delay for the 12-strand configuration in 7nm:
+\begin{itemize}[nosep]
+  \item Level 1 (96-input weighted sum + threshold): $\sim$5 ns
+  \item Level 2 (102-input weighted sum + threshold): $\sim$6 ns
+  \item Total input-to-decision: $\sim$11 ns
+\end{itemize}
+
+These are estimates based on gate-level fanout analysis. FPGA
+propagation delay has not been measured. We intend to measure
+this on the PYNQ prototype using input stimulus timing versus
+output transition, and will report measured values in a future
+revision.
+
+% ============================================================
+\section{MathLoom Arithmetic Unit}
+
+\subsection{Architecture}
+
+MathLoom provides balanced ternary arithmetic for BSIL encoding,
+threshold computation, and general-purpose calculation. The core
+ALU (add, multiply, compare) is combinational. The divider is
+clocked (iterative folding).
+
+\textbf{Verified operations:}
+\begin{center}
+\begin{tabular}{@{}lllr@{}}
+\toprule
+\textbf{Operation} & \textbf{Method} & \textbf{Tests} & \textbf{Failures} \\
+\midrule
+12-trit addition     & Ripple-carry          & 6,561  & 0 \\
+12-trit multiplication & Shift-and-add       & 6,561  & 0 \\
+12-trit comparison   & Subtraction + MSB     & 6,561  & 0 \\
+12-trit division     & Folding (iterative)   & 6,480  & 0 \\
+Complex division     & Paired folding        & 14,520 & 0 \\
+Matrix inversion     & Element-wise folding  & 6,016  & 0 \\
+Polynomial division  & Synthetic folding     & 14,406 & 0 \\
+Edge cases           & Division by $\pm$1, 0 & 8      & 0 \\
+\midrule
+\textbf{Total}       &                       & \textbf{41,430} & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Key Properties}
+
+\textbf{Truncation = rounding:} In balanced ternary, truncating
+to $N$ digits automatically rounds to the nearest representable
+value. Binary requires explicit rounding logic.
+
+\textbf{Folding division:} Iterative subtraction with native
+rounding. The remainder is a first-class output (not discarded
+as in floating-point division). $1/3$ is exact in balanced
+ternary.
+
+\textbf{Computational completeness:} Addition, multiplication,
+and folding division form a complete arithmetic basis. Square
+roots via Newton iteration, trigonometric functions via Taylor
+series or CORDIC — all verified in simulation.
+
+% ============================================================
+\section{BSIL-BT — Binary Sensor Ingestion Layer}
+
+Converts binary sensor data to balanced ternary trit strands.
+
+\textbf{Encoding:} Per-sensor baseline subtraction, clamp to
+$\pm$3280 (8-trit BT range), BRAM ROM lookup for BT conversion.
+First and second derivatives computed from consecutive samples.
+
+\textbf{Baselines} are configurable parameters set by DSF-AI
+calibration. Current FPGA values (measured from room background):
+\begin{itemize}[nosep]
+  \item IR sensors: front=80, left=111, right=144
+  \item Camera: Y=180, edge=145, U=121
+\end{itemize}
+
+BSIL-BT is the \textbf{only clocked component} in the
+sensor-to-decision path. It runs at the sensor sample rate
+(not a system clock). Between samples, dynamic power is zero.
+
+For the ASIC, baselines should be register-writable so DSF-AI
+can reconfigure at runtime without re-synthesis.
+
+% ============================================================
+\section{Krimelack — Structural Memory}
+
+Content-addressable motif store. 32 entries $\times$ 48 bits
+(24 trits) + 8-bit hash for duplicate detection.
+
+\textbf{Autonomous commit:} Triggered by L6 structural lock,
+gated by uncertainty ($U^* \leq 0.35$) and resonance
+($R \geq 0.72$) derived from L6 dimensional metrics. No
+external dependencies.
+
+\textbf{Forced commit:} Software-triggered via AXI register
+for calibration capture (turntable learning). Duplicate
+detection still enforced.
+
+\textbf{Recall:} Parallel comparison of current loom state
+against all stored motifs. Returns best match score. Score
+feeds back into SPPU dead zones via damped familiarity —
+familiar states raise the commitment barrier. This provides
+clockless habituation: repeated patterns become harder to
+commit, forcing the system toward novel states.
+
+% ============================================================
+\section{L6 — Dimensional Collapse Observer}
+
+Purely combinational. Counts non-null trits in the loom state.
+Fires structural lock when the count exceeds a threshold.
+
+Current FPGA: 105 trits, threshold at $105/e \approx 39$ trits
+remaining (66 collapsed).
+
+\textbf{On the threshold:} The $n/e$ value is derived from
+the inflection point of the unit-ball volume function in
+$n$-dimensional space ($V_n \propto \pi^{n/2} / \Gamma(n/2+1)$),
+where the volume begins to decrease faster than it increases
+with each additional constrained dimension. This is a
+mathematical property of high-dimensional geometry, not an
+arbitrary parameter.
+
+However, the application of this threshold to a balanced
+ternary state vector is an \textbf{architectural hypothesis},
+not a proven physical necessity. The threshold may need
+adjustment based on empirical testing. We present it as a
+principled starting point, not as a derived certainty.
+
+% ============================================================
+\section{Familiarity Feedback}
+
+\subsection{CMOS Implementation (Current)}
+
+Krimelack match score feeds back into the SPPU dead zone:
+\begin{equation}
+  \tau_{\text{eff}} = \tau_{\text{base}} + f(\text{match\_score})
+\end{equation}
+
+Damped: score changes must exceed a barrier (currently 15 units)
+to propagate. Prevents oscillation from small score fluctuations.
+
+\subsection{Speculative: Ferroelectric Substrate Habituation}
+
+\textit{This subsection describes a speculative future direction.
+No hardware implementation exists. No process technology has
+been identified. This is NOT part of the current architecture.}
+
+On a ferroelectric substrate (e.g., HfO$_2$-based FeFET), sustained
+polarization causes dielectric fatigue — the switching barrier
+rises with repeated identical state. This could provide per-trit
+habituation as a free physical property, eliminating the need for
+Krimelack feedback for local adaptation.
+
+\textbf{Open concerns:} Ferroelectric fatigue is traditionally a
+reliability failure mode, not a designed computational primitive.
+Endurance limits ($10^9$--$10^{12}$ cycles), retention drift,
+imprint, and device-to-device variation would need to be
+characterized and controlled. This remains a research question.
+
+% ============================================================
+\section{Architectural Separation: Razor and Blade}
+
+ArcLoom (razor) and DSF-AI (blade) are distinct systems with a
+clean interface.
+
+\subsection{ArcLoom (Razor) — Fixed Hardware}
+
+\begin{itemize}[nosep]
+  \item BSIL-BT: sensor encoding (configurable baselines)
+  \item SPPU: combinational classifier (configurable strand signs,
+        dead zones)
+  \item Krimelack: structural memory (autonomous + forced commit)
+  \item L6: dimensional collapse observer
+  \item MathLoom: balanced ternary ALU
+\end{itemize}
+
+The razor functions independently once configured. It does not
+require DSF-AI for real-time operation.
+
+\subsection{DSF-AI (Blade) — Calibration Service}
+
+\begin{itemize}[nosep]
+  \item Derives baselines from sensor background measurements
+  \item Derives dead zones from sensor noise characterization
+  \item Derives per-strand sign polarities from calibration data
+  \item Runs on cloud (production) or locally (demo/embedded)
+  \item Configures razor via register writes (AXI, I2C, or SPI)
+\end{itemize}
+
+\subsection{What DSF-AI Derives (Clarification)}
+
+The $3^i$ magnitude weights are \textbf{not derived} — they are
+determined by the balanced ternary number system. What DSF-AI
+derives:
+\begin{itemize}[nosep]
+  \item \textbf{Baselines:} what ``no signal'' looks like for each
+        sensor (e.g., room background Y=180)
+  \item \textbf{Dead zones:} the noise floor below which signals
+        are structurally ambiguous
+  \item \textbf{Strand sign polarities:} which sensors contribute
+        positively, negatively, or not at all to each decision field
+  \item \textbf{External field biases:} static offsets (e.g., the
+        $-800$ forward speed bias = ``go forward when idle'')
+\end{itemize}
+
+The razor without the blade is a combinational classifier with
+default parameters. The blade makes it application-specific.
+This is a viable razor/blade business model — the chip is general,
+the calibration is the value-add.
+
+% ============================================================
+\section{Intellectual Property}
+
+\subsection{Patentable Claims}
+
+\begin{enumerate}[nosep]
+  \item Combinational ternary classifier with dead-zone null output
+  \item BSIL-BT: binary-to-balanced-ternary sensor encoding via
+        BRAM lookup with configurable baseline
+  \item Krimelack: content-addressable structural memory with
+        commit gating and clockless habituation feedback
+  \item L6: dimensional collapse detection via non-null trit counting
+  \item Folding division: iterative BT division with native rounding
+  \item MathLoom: complete balanced ternary ALU (add, multiply,
+        divide, compare) on FPGA/ASIC
+\end{enumerate}
+
+\subsection{Trade Secret (DSF-AI, Separate Project)}
+
+\begin{enumerate}[nosep]
+  \item Calibration methodology (baseline, dead zone, polarity derivation)
+  \item UF pipeline (L0--L4) internal algorithms
+  \item Weight mapping from DSF output to strand configuration
+\end{enumerate}
+
+The FPGA/ASIC contains no trade secret code. The hardware is
+fully disclosed. The trade secret is the calibration methodology,
+not the classifier hardware.
+
+% ============================================================
+\section{Validation Status}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Claim} & \textbf{Status} & \textbf{Evidence} \\
+\midrule
+BT arithmetic (add/mul/cmp) & \textbf{Proven} & 19,683 on FPGA, 0 errors \\
+Folding division & \textbf{Proven} & 41,430 tests, 0 errors \\
+BSIL-BT encoding & \textbf{Proven} & 12 instances on FPGA \\
+Combinational classification & \textbf{Proven} & Live sensor on FPGA \\
+Autonomous obstacle avoidance & \textbf{Proven} & 351 samples, 176s floor test \\
+Camera in classifier (BT strands) & \textbf{Proven} & 12-strand, Y/edge/U on FPGA \\
+Krimelack commit/recall & \textbf{Proven} & 32 motifs, force commit via AXI \\
+L6 structural lock & \textbf{Proven} & 105-trit, KNEE=39 on FPGA \\
+Motor actuation from decisions & \textbf{Proven} & TB6612FNG, 4 directions \\
+\midrule
+Propagation delay measurement & \textbf{Not done} & Planned \\
+Per-event energy measurement & \textbf{Not done} & Planned \\
+Object recognition via Krimelack & \textbf{In progress} & Preliminary data, noisy \\
+Inter-SPPU coupling & \textbf{Not built} & Architecture defined only \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\section{Security Considerations}
+
+\subsection{Side-Channel Exposure}
+
+The SPPU is deterministic and combinational. Identical inputs
+produce identical outputs with identical timing. This means:
+\begin{itemize}[nosep]
+  \item Power consumption correlates with input Hamming weight
+  \item Propagation delay correlates with input pattern
+  \item EM emissions correlate with switching activity
+\end{itemize}
+
+For applications where sensor state is sensitive (medical
+implants, security systems), these channels leak information.
+Countermeasures for sensitive applications:
+\begin{itemize}[nosep]
+  \item Random dead-zone jitter (adds noise to timing)
+  \item Balanced encoding (constant switching activity)
+  \item Shielding (standard EM countermeasure)
+\end{itemize}
+
+For the current demo platform (obstacle avoidance robot), side
+channels are not a concern. For Tier 2 medical/safety
+applications, a threat model must be developed before deployment.
+
+\subsection{Glitch Propagation}
+
+Combinational logic is susceptible to glitches (transient
+incorrect outputs during input transitions). In synchronous
+designs, flip-flops filter glitches. The SPPU has no flip-flops
+in the decision path.
+
+\textbf{Mitigation:} The dead zone provides natural glitch
+immunity — a transient that does not exceed $\tau$ produces no
+output change. For signals near the dead-zone boundary, a
+glitch could momentarily flip a trit. The motor control outputs
+are latched (registered in the AXI wrapper), which filters
+sub-cycle glitches before they reach actuators.
+
+% ============================================================
+\section{What This Specification Does Not Cover}
+
+This document describes the SPPU architecture as validated on
+FPGA. It is \textbf{not} a fabrication-ready ASIC specification.
+The following are required for tape-out and are not included:
+
+\begin{itemize}[nosep]
+  \item Complete AXI register map
+  \item Reset, scan, JTAG, BIST, DFT strategy
+  \item PVT corners and operating points
+  \item FIT rate and reliability targets
+  \item SEU/SET analysis and mitigation
+  \item Clock domain crossing specification
+  \item Power delivery and thermal analysis
+  \item Pin count and package selection
+  \item Process node selection and PDK commitment
+  \item Yield model and defect coverage
+  \item Formal verification of dead-zone boundary behavior
+  \item Concrete benchmarks against named competitors on shared tasks
+\end{itemize}
+
+These will be addressed in a separate ASIC Implementation
+Specification when a fabrication partner and process node are
+selected.
+
+% ============================================================
+\section{Development Roadmap}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Phase} & \textbf{Status} & \textbf{Deliverable} \\
+\midrule
+FPGA proof of concept & Complete & PYNQ-Z2, 19,683 ops \\
+Direct HW sensor path & Complete & XADC, zero CPU \\
+Multi-sensor + camera  & Complete & 12-strand, 105-trit loom \\
+Structural recognition & In progress & Krimelack + camera motifs \\
+Object fetch demo      & Planned & Turntable capture, hunt \\
+Propagation delay measurement & Planned & ns-scale timing data \\
+Energy measurement     & Planned & pJ-scale per-event data \\
+ASIC implementation spec & Future & Fabrication-ready document \\
+Tape-out               & Future & Shuttle run \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\section{Version History}
+
+\begin{center}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+\textbf{Ver.} & \textbf{Changes} \\
+\midrule
+1.0 & Initial FPGA-validated architecture. \\
+1.1 & Familiarity feedback. Folding division verified. \\
+1.2 & $3^i$ coupling. Camera in SPPU. BSIL-BT. TFE removed.
+      12-strand configuration. L6 updated. \\
+1.3 & \textbf{Complete rewrite in response to technical review.}
+      Honest framing: SPPU is a fixed-weight ternary classifier,
+      not ``not computing.'' Prior art acknowledged (perceptron
+      with dead band). $3^i$ claim clarified: magnitude is
+      positional notation (not a discovery), selectivity comes
+      from per-strand sign (configurable). Power comparison
+      redone against neuromorphic silicon (Loihi, TrueNorth)
+      with wire capacitance included; 10$\times$ advantage, not
+      10$^9\times$. L6 threshold presented as architectural
+      hypothesis, not derived certainty. TSAC moved to
+      speculative appendix. Strand widths corrected throughout
+      (12$\times$8 = 96 input trits, not 15 or 40). Gate counts
+      recalculated for 12-strand configuration. Side-channel
+      analysis added. Glitch propagation addressed. Missing ASIC
+      content explicitly listed as out-of-scope. Comparison
+      tables redone against neuromorphic class. IP strategy
+      clarified: $3^i$ magnitudes fixed, strand signs and
+      baselines are what DSF-AI derives. Security considerations
+      section added. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{2em}
+\hrule
+\vspace{0.5em}
+{\color{tfe-gray}\small This document is confidential and for
+internal use only. The ArcLoom SPPU architecture is the
+intellectual property of Joseph Forrester / DSF-AI. The
+calibration methodology (DSF-AI blade) is a trade secret and is
+not disclosed in this document.}
+
+\end{document}

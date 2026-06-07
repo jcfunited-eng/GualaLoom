@@ -1,0 +1,914 @@
+% ============================================================
+%  ArcLoom Processor Architecture v4.0
+%  Pure Ternary Invariant Fabric & Hybrid Control Plane
+%  ISO-Grade Deterministic Specification
+%  Overleaf-compatible LaTeX
+% ============================================================
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{booktabs, array, longtable, tabularx, multirow}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{float}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue,
+}
+
+\definecolor{al-gold}{RGB}{180, 140, 60}
+\definecolor{al-dark}{RGB}{30, 30, 30}
+\definecolor{al-green}{RGB}{40, 120, 60}
+\definecolor{al-red}{RGB}{160, 40, 40}
+\definecolor{al-gray}{RGB}{100, 100, 100}
+\definecolor{al-blue}{RGB}{40, 80, 160}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{al-gray}{\small ArcLoom Processor Specification v4.0}}
+\lhead{\textcolor{al-gray}{\small Confidential --- Internal Use Only}}
+\rfoot{\textcolor{al-gray}{\small Page \thepage}}
+
+\titleformat{\section}{\large\bfseries\color{al-dark}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{al-dark}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\itshape\color{al-dark}}{}{0em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{axiom}{Axiom}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{requirement}{Requirement}[section]
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+% ============================================================
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{ArcLoom Processor Architecture}}\\[6pt]
+  {\large Pure Ternary Invariant Fabric \& Hybrid Control Plane}\\[4pt]
+  {\large ISO-Grade Deterministic Specification}\\[4pt]
+  {\large Version 4.0}\\[8pt]
+  {\color{al-gray}\small April 2026 \quad|\quad Confidential --- Internal Use Only}\\[4pt]
+  {\color{al-gray}\small Joseph Forrester \quad|\quad ArcLoom Systems / DSF-AI Architecture}
+\end{center}
+
+\vspace{1em}
+
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|Y|}
+\hline
+Document ID & ARC-PROC-SPEC-4.0 \\\hline
+Version & 4.0 \\\hline
+Status & Controlled specification \\\hline
+Effective Date & 2026-04-10 \\\hline
+Classification & Confidential --- Internal Use Only \\\hline
+Purpose & Define the ArcLoom processor architecture in both Pure Ternary
+          and Hybrid configurations, including physical geometry, deterministic
+          logic, error hardening, L6-TCL integration, and reference platform
+          design for autonomous robotic validation. \\\hline
+Primary Audience & Hardware architects, FPGA engineers, embedded systems
+                   engineers, DSF-AI integration engineers \\\hline
+Change Control & Semantic changes require revision-history entry and
+                 impact assessment \\\hline
+\end{tabularx}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\tableofcontents
+\clearpage
+
+% ============================================================
+% PART I: FOUNDATIONS
+% ============================================================
+
+\section{Introduction}
+
+\subsection{Purpose}
+
+The ArcLoom processor is a non-von Neumann computing architecture designed
+to serve as the hardware substrate for DSF-AI (Deterministic Structural
+Field AI). It replaces binary transistor switching with topological phase
+invariants, enabling direct physical computation of structural state
+without instruction-fetch-decode-execute overhead.
+
+This specification defines two configurations:
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Configuration A: Pure Ternary Invariant Fabric} ---
+        all computation performed through topological phase coupling.
+        No binary logic. No clock. No instruction set. The processor
+        \textit{is} the structural field.
+  \item \textbf{Configuration B: Hybrid ArcLoom Processor Platform (AHPP)} ---
+        a ternary invariant fabric supervised by a binary control coprocessor
+        (BCP) for industrial-grade error correction and validation.
+\end{enumerate}
+
+\subsection{Scope}
+
+This document covers:
+\begin{itemize}[nosep]
+  \item Mathematical foundations (balanced ternary, winding numbers, phase coupling)
+  \item Physical geometry (triple-node resonant ring)
+  \item Deterministic logic (resonance junctions, coupling matrix)
+  \item Error hardening (metastability resolution, parity chains, H1-C policy)
+  \item L6-TCL integration (dimensional grinder, structural lock)
+  \item I/O boundary (krimelack transduction rings)
+  \item Reference platform design (autonomous wheeled robot)
+  \item Bill of materials and build specifications
+\end{itemize}
+
+\subsection{Design Constraints (Diamond Hard)}
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Zero heuristics.} All thresholds derived from geometry or
+        frozen rational constants.
+  \item \textbf{Zero randomness.} No stochastic elements in the compute fabric.
+  \item \textbf{Deterministic.} Given identical inputs, the processor produces
+        identical outputs regardless of manufacturing variation (within
+        tolerance bounds).
+  \item \textbf{Domain agnostic.} The fabric computes structural state from
+        any temporal signal; the domain is encoded in the coupling matrix,
+        not the hardware.
+\end{enumerate}
+
+\subsection{Theoretical Basis}
+
+The ArcLoom architecture rests on three established mathematical foundations:
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Topological invariance:} Winding numbers of continuous phase
+        fields are integer-valued and resistant to continuous deformation
+        (noise). A winding number cannot change without a topological
+        discontinuity (``tearing'') of the phase field.
+  \item \textbf{Balanced ternary arithmetic:} The digit set $\{-1, 0, +1\}$
+        provides symmetric signed representation, efficient carry propagation,
+        and a native zero state (quiescence).
+  \item \textbf{Coupled oscillator dynamics:} Networks of phase-coupled
+        oscillators naturally minimize energy, producing deterministic
+        steady-state configurations that encode computational results.
+\end{enumerate}
+
+% ============================================================
+\section{Glossary of Terms}
+
+\begin{longtable}{@{}p{4cm}p{10.5cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+AIF & ArcLoom Invariant Fabric. The ternary computing substrate. \\
+AHPP & ArcLoom Hybrid Processor Platform. AIF + BCP combined system. \\
+ATF & ArcLoom Topology Fabric (synonym for AIF). \\
+Balanced Ternary & Number system with digits $\{-1, 0, +1\}$ (base 3). \\
+BCP & Binary Control Coprocessor. Conventional MCU/FPGA supervisor in
+      hybrid configuration. \\
+Coupling Matrix ($J_{ij}$) & Matrix defining phase-coupling strengths between
+                             oscillator rings. Encodes the computational
+                             topology. \\
+Dimensional Grinder & The L6-TCL mechanism that maps structural constraints
+                      to dimensional reduction. \\
+Doorway Event & A local collapse of phase amplitude below threshold $\epsilon$,
+                indicating topological vulnerability. \\
+H1-C & Hardening Level 1 with Correction. The deterministic error recovery
+       policy in hybrid mode. \\
+Krimelack & Sensory transduction ring. Converts analog environmental signals
+            into trit-compatible phase modulation. \\
+Metastability & The condition where the phase field sits at a saddle point
+                between two valid trit states, producing no valid output. \\
+Negative Space & Quiescent structural region that acts as an active potential
+                 well, driving inevitable state transitions. \\
+Parity Chain & A group of trits whose winding numbers must sum to a known
+               topological constant, providing geometric error correction. \\
+Resonance Junction & The ternary equivalent of a logic gate; computation
+                     occurs through energy minimization of coupled rings. \\
+SL-1 & Structural Lock Level 1. The L6-TCL output certifying geometric
+       inevitability. \\
+Topological Schmitt Trigger & Nonlinear coupling term that creates dead zones
+                              around saddle points, forcing metastability
+                              resolution. \\
+Trit & Ternary digit. The fundamental unit of ArcLoom computation.
+      $t \in \{-1, 0, +1\}$. \\
+Winding Number ($w$) & Integer topological invariant of a phase field around
+                       a ring. Encodes the trit state. \\
+\bottomrule
+\end{longtable}
+
+% ============================================================
+\section{Mathematical Foundations}
+
+\subsection{Balanced Ternary Representation}
+
+The fundamental unit of computation is the balanced ternary digit (trit):
+\begin{equation}
+  t \in \{-1, 0, +1\}
+\end{equation}
+
+An $n$-trit word $T = (t_0, t_1, \ldots, t_{n-1})$ has value:
+\begin{equation}
+  \text{val}(T) = \sum_{i=0}^{n-1} t_i \cdot 3^i
+  \label{eq:trit-value}
+\end{equation}
+where $t_0$ is the least-significant trit.
+
+\textbf{Properties:}
+\begin{itemize}[nosep]
+  \item Information density: $\log_2 3 \approx 1.585$ bits per trit
+  \item Symmetric signed representation without a sign bit
+  \item Negation by digit-wise sign flip: $\overline{t_i} = -t_i$
+  \item Native zero state ($w = 0$) represents structural quiescence
+\end{itemize}
+
+\subsection{Winding Number (Continuous)}
+
+\begin{definition}[Winding Number --- Continuous]
+The winding number of a continuous phase field $\phi(\theta)$ around a closed
+ring is:
+\begin{equation}
+  w = \frac{1}{2\pi} \oint \frac{d\phi}{d\theta}\, d\theta \in \mathbb{Z}
+  \label{eq:winding-continuous}
+\end{equation}
+\end{definition}
+
+The winding number is a \textbf{topological invariant}: it cannot change under
+continuous deformation of the phase field. Only a discontinuity (``tear'')
+in the field can alter $w$. This is the physical basis for noise resistance.
+
+\subsection{Winding Number (Discrete)}
+
+In a physical implementation with $N$ sample points around the ring:
+\begin{equation}
+  w = \frac{1}{2\pi} \sum_{i=0}^{N-1} \text{wrap}(\phi_{i+1} - \phi_i),
+  \qquad \phi_N \equiv \phi_0
+  \label{eq:winding-discrete}
+\end{equation}
+where $\text{wrap}(\Delta\phi)$ constrains the phase difference to $(-\pi, \pi]$.
+
+\subsection{Phase Coupling Energy}
+
+For a system of coupled oscillator rings, the total energy is:
+\begin{equation}
+  E_{sys} = -\sum_{i,j} J_{ij} \cos(\phi_i - \phi_j)
+  \label{eq:coupling-energy}
+\end{equation}
+where $J_{ij}$ is the coupling strength between oscillators $i$ and $j$.
+The system naturally evolves toward the energy minimum, producing
+deterministic steady-state configurations.
+
+\subsection{Nonlinear Coupling (Topological Schmitt Trigger)}
+
+To resolve metastability at saddle points, a nonlinear term is added to
+the coupling energy:
+\begin{equation}
+  E_{sys} = -\sum_{i,j} J_{ij} \left[ \cos(\Delta\phi_{ij})
+            + \alpha \cos^3(\Delta\phi_{ij}) \right]
+  \label{eq:schmitt}
+\end{equation}
+where:
+\begin{itemize}[nosep]
+  \item $\Delta\phi_{ij} = \phi_i - \phi_j$
+  \item $\alpha$ is a frozen rational constant determining the dead-zone width
+        around saddle points
+\end{itemize}
+
+The cubic term deepens the energy wells at valid trit states ($w \in \{-1,0,+1\}$)
+and raises the barrier at saddle points, forcing rapid resolution of ambiguous
+phase states.
+
+\subsection{$n$-Sphere Volume and Gamma Function}
+
+(Refer to L6-TCL Specification v1.0 for full derivation.)
+
+\begin{equation}
+  V_n(R) = \frac{\pi^{n/2}}{\Gamma\!\left(\frac{n}{2}+1\right)} R^n
+\end{equation}
+
+The capture threshold $\tau$ is derived from the gamma-function inflection:
+\begin{equation}
+  \tau = 1 - \frac{\Gamma\!\left(\frac{n_{start}}{2}+1\right)}
+                  {\Gamma\!\left(\frac{n_{eff}}{2}+1\right)}
+  \cdot \pi^{(n_{eff}-n_{start})/2}
+\end{equation}
+
+Structural Lock fires when $n_{eff} < n_{start}/e$.
+
+% ============================================================
+\section{Physical Geometry: The Triple-Node Resonant Ring}
+
+\subsection{Description}
+
+A single trit register consists of three nonlinear oscillators (Nodes $A$,
+$B$, $C$) arranged in an equilateral triangle and coupled via phase-shifting
+delay lines. The state of the register is the emergent winding number of
+the phase field across the three nodes.
+
+\subsection{State Encoding}
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Winding} & \textbf{State} & \textbf{Phase Relationship} & \textbf{Physical Meaning} \\
+\midrule
+$w = 0$  & Quiescent   & $\phi_A = \phi_B = \phi_C$ & Uniform coherence; no flow \\
+$w = +1$ & CW Flow     & $\phi_B = \phi_A + 2\pi/3$, $\phi_C = \phi_B + 2\pi/3$ & Clockwise phase progression \\
+$w = -1$ & CCW Flow    & $\phi_C = \phi_A + 2\pi/3$, $\phi_B = \phi_C + 2\pi/3$ & Counter-clockwise progression \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Stability Analysis}
+
+Each winding state occupies a local energy minimum of the coupling potential.
+Transitions between states require traversal of an energy barrier proportional
+to $J_{ij}$ and amplified by the nonlinear Schmitt term ($\alpha$). Small
+perturbations (noise) are insufficient to cross the barrier; only a structured
+input (a genuine signal) can drive a state transition.
+
+The energy barrier height between adjacent states is:
+\begin{equation}
+  \Delta E = J \cdot (1 + 3\alpha/4) \cdot (1 - \cos(2\pi/3))
+           = J \cdot (1 + 3\alpha/4) \cdot 1.5
+\end{equation}
+
+For $J = 1$ and $\alpha = 37/64$: $\Delta E \approx 2.37$ (dimensionless
+coupling units).
+
+% ============================================================
+\section{Configuration A: Pure Ternary Invariant Fabric}
+
+\subsection{Description}
+
+The Pure Ternary configuration removes all binary logic. Computation,
+error correction, and I/O are performed entirely through topological
+phase dynamics. There is no clock, no instruction set, and no
+fetch-decode-execute cycle.
+
+\subsection{Deterministic Logic via Resonance Junctions}
+
+A \textbf{Resonance Junction} is the ternary equivalent of a logic gate.
+Two or more input rings are coupled to one or more output rings. The
+coupled system evolves to its energy minimum, producing deterministic
+output states.
+
+\subsubsection{Ternary Addition}
+
+For a dual-ring adder computing $A + B = S + 3C$ (sum $S$, carry $C$):
+\begin{itemize}[nosep]
+  \item Input rings $R_A$ and $R_B$ hold winding numbers $w_A$ and $w_B$
+  \item Output ring $R_S$ settles to $w_S = (w_A + w_B) \bmod 3_{\pm}$
+        (balanced ternary modulo)
+  \item Carry ring $R_C$ settles to $w_C = \lfloor(w_A + w_B + 1)/3\rfloor - 1$
+\end{itemize}
+
+The coupling matrix for this junction is:
+\begin{equation}
+  J = \begin{pmatrix}
+    0 & 0 & J_{AS} & J_{AC} \\
+    0 & 0 & J_{BS} & J_{BC} \\
+    J_{AS} & J_{BS} & 0 & 0 \\
+    J_{AC} & J_{BC} & 0 & 0
+  \end{pmatrix}
+\end{equation}
+
+where coupling strengths are frozen rational constants derived from the
+energy landscape of balanced ternary addition.
+
+\subsection{The Coupling Matrix ($J_{ij}$): The Instruction Set}
+
+In a von Neumann architecture, the instruction set defines what operations
+the processor can perform. In ArcLoom, \textbf{the coupling matrix $J_{ij}$
+is the instruction set}. It encodes:
+\begin{itemize}[nosep]
+  \item Which rings are coupled (topology)
+  \item How strongly they are coupled (constraint strength)
+  \item The direction of coupling (symmetric or asymmetric)
+\end{itemize}
+
+\begin{requirement}[Coupling Matrix Derivation]
+$J_{ij}$ \textbf{must} be derived from the DSF-AI kernel structure. Each
+L0--L4 output maps to a specific coupling strength between specific ring
+pairs:
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Kernel Output} & \textbf{Coupling Target} & \textbf{$J_{ij}$ Derivation} \\
+\midrule
+$D_k$ (Displacement) & Direction ring pair & $J = D_k \cdot J_{base}$ \\
+$S_{UF}$ (Stability) & Convergence ring pair & $J = S_{UF} \cdot J_{base}$ \\
+$M_k$ (Motion) & Momentum ring pair & $J = |M_k| \cdot J_{base}$ \\
+$C_k$ (Cohesion) & Binding ring pair & $J = \frac{C_k}{1+C_k} \cdot J_{base}$ \\
+$P_k$ (Pressure) & Compression ring pair & $J = \frac{P_k}{1+P_k} \cdot J_{base}$ \\
+$B_k$ (Breathing) & Conviction ring pair & $J = |B_k| \cdot J_{base}$ \\
+$U^*_k$ (Uncertainty) & Freedom ring pair & $J = -(U^*_k) \cdot J_{base}$ \\
+$R_{rev,k}$ (Reversal) & Path-kill ring pair & $J = R_{rev,k} \cdot J_{max}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+$J_{base}$ is a frozen rational constant. $J_{max}$ is the maximum coupling
+strength (forces immediate state transition).
+\end{requirement}
+
+\subsection{Geometric Error Correction: Topological Parity Chains}
+
+\begin{definition}[Parity Chain]
+A parity chain is a group of $P$ trits whose winding numbers must sum
+to a known topological constant $K$:
+\begin{equation}
+  \sum_{i=1}^{P} w_i = K
+  \label{eq:parity}
+\end{equation}
+where $K$ is fixed at fabrication time and is itself a topological invariant.
+\end{definition}
+
+If manufacturing drift or noise causes one trit to wander, the parity
+constraint from its neighbors creates a restoring force:
+\begin{equation}
+  F_{restore,i} = -\lambda_{parity} \left( \sum_{j=1}^{P} w_j - K \right)
+  \label{eq:parity-force}
+\end{equation}
+where $\lambda_{parity}$ is a frozen rational coupling constant.
+
+\textbf{Recommended chain length:} $P = 5$. This provides single-trit
+error correction capability (any single trit error is detectable and
+correctable from the remaining 4).
+
+\subsection{Metastability Resolution: Topological Schmitt Trigger}
+
+When the phase field enters the saddle region between two valid states,
+the nonlinear coupling term (Equation~\ref{eq:schmitt}) creates an
+unstable equilibrium that forces resolution within a bounded time:
+
+\begin{equation}
+  t_{resolve} < \frac{1}{J \cdot \alpha \cdot \omega_0}
+\end{equation}
+
+where $\omega_0$ is the natural oscillator frequency. For typical parameters
+($J = 1$, $\alpha = 37/64$, $\omega_0 = 2\pi \times 100\text{ MHz}$):
+$t_{resolve} < 2.7$ ns.
+
+\subsection{Power Consumption Model}
+
+Power consumption is proportional to state-transition density, not clock
+frequency:
+\begin{equation}
+  P_{avg} = N_{rings} \cdot \rho_{transition} \cdot E_{transition}
+\end{equation}
+where:
+\begin{itemize}[nosep]
+  \item $N_{rings}$ = total ring count
+  \item $\rho_{transition}$ = state transitions per second (signal-dependent)
+  \item $E_{transition}$ = energy per state transition (coupling-dependent)
+\end{itemize}
+
+During quiescence ($\rho_{transition} \to 0$), power consumption approaches
+the static leakage floor. For structural detection tasks where most time
+is spent in quiescence, this is inherently efficient.
+
+% ============================================================
+\section{Configuration B: Hybrid ArcLoom Processor Platform (AHPP)}
+
+\subsection{Description}
+
+The AHPP pairs the ArcLoom Invariant Fabric (AIF) with a Binary Control
+Coprocessor (BCP). The BCP supervises timing, error correction, memory
+management, and safety monitoring. The AIF performs structural computation.
+
+This configuration is recommended for initial validation, commercial
+deployment, and domains requiring certified determinism (medical, automotive).
+
+\subsection{Architecture}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Component} & \textbf{Function} & \textbf{Implementation} \\
+\midrule
+AIF (Invariant Fabric) & Structural computation & FPGA phase field (Option P1) \\
+                       &                        & or analog oscillator array (Option P2) \\
+BCP (Binary Coprocessor) & Supervision, correction & MCU (STM32H7 or equivalent) \\
+Structural Timebase & Monotonic timing & Crystal oscillator + counter \\
+Doorway Detector & Amplitude monitoring & Comparator array \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Doorway Detection (Negative Space Monitoring)}
+
+The BCP continuously monitors the amplitude $a_i$ of each oscillator node.
+A doorway event occurs when amplitude collapses below threshold:
+
+\begin{equation}
+  \delta_j^{ext} = \begin{cases}
+    1 & \text{if } \min(a_i) < \epsilon_{gate} \\
+    0 & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+where $\epsilon_{gate}$ is a frozen threshold derived from the coupling
+energy landscape.
+
+\subsection{H1-C Hardening and Correction Policy}
+
+Upon detecting a doorway event, the BCP executes deterministic recovery:
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{STALL:} Computation halts. Event logged with structural
+        timestamp.
+  \item \textbf{Amplitude Healing:} The BCP restores amplitude at the slip
+        site to baseline.
+  \item \textbf{Relaxation:} $R$ extra relaxation cycles are executed
+        ($R$ is a frozen integer constant).
+  \item \textbf{Verification:} Winding number is re-read.
+        \begin{itemize}[nosep]
+          \item If $w$ matches pre-stall value: \textbf{Recovered STALL}.
+          \item If $w$ differs but parity chain is consistent: \textbf{Corrected}.
+          \item If parity chain is inconsistent: \textbf{Binary Fallback} ---
+                the BCP recomputes the kernel in binary to ensure output
+                determinism.
+        \end{itemize}
+\end{enumerate}
+
+\subsection{Binary Fallback}
+
+The BCP maintains a complete binary implementation of the L0--L4 kernel.
+If the AIF produces an uncorrectable result, the BCP substitutes its own
+binary-computed output. This guarantees deterministic output under all
+conditions, at the cost of losing the efficiency advantage for that
+computation cycle.
+
+% ============================================================
+\section{I/O Boundary: Krimelack Transduction Rings}
+
+\subsection{Description}
+
+The krimelack is the sensory interface between the physical environment
+and the trit fabric. It converts analog environmental signals into
+trit-compatible phase modulation without requiring analog-to-digital
+conversion.
+
+\subsection{Operating Principle}
+
+A krimelack is an oscillator ring whose natural frequency is modulated
+by an external physical signal (light intensity, temperature, pressure,
+distance, etc.). The modulated frequency shifts the ring's phase
+relationship with the fabric, changing its effective winding number.
+
+\begin{equation}
+  \omega_{krim}(t) = \omega_0 + \kappa \cdot s(t)
+\end{equation}
+
+where:
+\begin{itemize}[nosep]
+  \item $\omega_0$ = natural frequency (matched to fabric)
+  \item $\kappa$ = transduction coefficient (signal-type dependent)
+  \item $s(t)$ = raw analog sensor signal
+\end{itemize}
+
+The phase accumulation over time naturally produces winding-number
+transitions when the signal crosses structural thresholds:
+
+\begin{equation}
+  \Delta w = \left\lfloor \frac{1}{2\pi} \int_0^T [\omega_{krim}(t) - \omega_0]\, dt + \frac{1}{2} \right\rfloor
+\end{equation}
+
+\subsection{Sensor Types and Transduction}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Sensor} & \textbf{Signal $s(t)$} & \textbf{Transduction} & \textbf{Krimelack Type} \\
+\midrule
+Vision (camera) & Pixel intensity & Photoresistor $\to \omega$ modulation & Optical krimelack \\
+Depth (ToF/LIDAR) & Distance & Capacitive $\to \omega$ modulation & Range krimelack \\
+Motion (IMU) & Acceleration & Piezo $\to \omega$ modulation & Inertial krimelack \\
+Proximity (IR/US) & Object distance & Reflective $\to \omega$ modulation & Proximity krimelack \\
+Temperature & Thermal & Thermistor $\to \omega$ modulation & Thermal krimelack \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Output Transduction}
+
+The output boundary converts trit states into physical actuator commands.
+Motor control is achieved by coupling output rings to PWM generators
+(hybrid) or directly to motor driver oscillators (pure):
+
+\begin{equation}
+  v_{motor} = w_{out} \cdot v_{max} \qquad (w_{out} \in \{-1, 0, +1\})
+\end{equation}
+
+This produces: reverse ($-1$), stop ($0$), forward ($+1$). Proportional
+control is achieved through trit-word encoding (multiple trits per motor
+channel).
+
+% ============================================================
+\section{L6-TCL Integration: The Dimensional Grinder}
+
+\subsection{Description}
+
+The ArcLoom processor physically instantiates the L6 Topological Constraint
+Layer. The fabric's internal state space \textit{is} the $n$-dimensional
+manifold. As constraints are applied through the coupling matrix, the
+effective dimensionality of the fabric's state space reduces.
+
+\subsection{Constraint Mapping}
+
+Each L0--L4 kernel output modifies the coupling matrix, which in turn
+restricts the fabric's available phase configurations:
+
+\begin{equation}
+  n_{eff} = n_{start} - \sum_{i=1}^{k} \text{rank}(C_i)
+\end{equation}
+
+where $n_{start}$ is the total ring count (the fabric's maximum
+dimensionality) and each constraint $C_i$ removes one or more degrees
+of freedom by locking specific ring-pair phase relationships.
+
+\subsection{Structural Lock (SL-1)}
+
+When $n_{eff} < n_{start}/e$, the fabric physically enters the capture
+basin. The remaining phase configurations cannot sustain an alternative
+output. The processor issues SL-1: a hardware interrupt indicating
+geometric certainty.
+
+In the pure configuration, SL-1 manifests as a \textbf{global phase lock}
+--- all rings simultaneously settle to a single coherent state. In the
+hybrid configuration, the BCP detects this condition and asserts a
+hardware interrupt line.
+
+% ============================================================
+\section{Reference Platform: Autonomous Wheeled Robot}
+
+\subsection{Purpose}
+
+The reference platform is a wheeled robot that demonstrates ArcLoom's
+structural perception capabilities in a physical environment. The robot
+can:
+\begin{enumerate}[nosep]
+  \item Follow a human operator (person-following mode)
+  \item Navigate autonomously around obstacles (exploration mode)
+  \item Follow a predefined course (course-following mode)
+\end{enumerate}
+
+This validates the L0--L4 kernel operating on real sensory data through
+real krimelack transduction, processed by a real ArcLoom fabric, producing
+real motor commands.
+
+\subsection{Platform Specifications}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Specification} & \textbf{Notes} \\
+\midrule
+Chassis & 4WD wheeled platform, $\sim$30cm $\times$ 25cm & Aluminum or 3D-printed \\
+Drive & Differential drive, 2 powered + 2 caster & DC gear motors with encoders \\
+Speed & 0.5--1.5 m/s & Configurable via trit-word \\
+Battery & LiPo 3S (11.1V), 5000 mAh & $\sim$2 hours runtime \\
+Weight & $<$ 3 kg (including processor and sensors) & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\subsection{Configuration A Build: Pure Ternary Robot}
+
+\subsubsection{Processor}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Component} & \textbf{Part} & \textbf{Function} & \textbf{Qty} \\
+\midrule
+FPGA (Phase Fabric) & Xilinx Artix-7 (XC7A200T) & Trit fabric simulation & 1 \\
+                    &                             & 200K logic cells, 740 DSP & \\
+Oscillator Array & Si5351A PLL clock gen & Phase reference generation & 4 \\
+DAC (Phase Output) & AD5686R quad 16-bit DAC & Phase-to-analog for motors & 2 \\
+ADC (Krimelack Input) & AD7689 8-ch 16-bit ADC & Sensor-to-phase conversion & 2 \\
+Power Regulator & TPS65281 multi-rail & 1.0V core, 1.8V I/O, 3.3V sensor & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Sensor Array (Krimelacks)}
+
+\begin{center}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Sensor} & \textbf{Part} & \textbf{Interface} & \textbf{Range} & \textbf{Qty} \\
+\midrule
+Stereo Vision & OV7675 dual camera module & Parallel/SPI & 640$\times$480, 30fps & 1 pair \\
+Depth/ToF & VL53L5CX (8$\times$8 zone) & I$^2$C & 2--400cm & 2 (front+rear) \\
+IMU & ICM-42688-P 6-axis & SPI & $\pm$16g, $\pm$2000 dps & 1 \\
+IR Proximity & VCNL4040 & I$^2$C & 0--20cm & 4 (corners) \\
+Wheel Encoder & AS5048A magnetic & SPI & 14-bit absolute & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Actuators}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Component} & \textbf{Part} & \textbf{Specification} & \textbf{Qty} \\
+\midrule
+Drive Motor & Pololu 37D 12V gear motor & 200 RPM, encoder & 2 \\
+Motor Driver & DRV8874 H-Bridge & 6A peak, PWM input & 2 \\
+Servo (camera pan) & SG90 micro servo & 180$^\circ$, 1.5kg-cm & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Programming the Pure Ternary Fabric}
+
+The pure ternary ArcLoom is not ``programmed'' in the conventional sense.
+It is \textbf{configured} by defining:
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Ring Topology:} The number and arrangement of trit rings
+        in the FPGA. For the reference robot: 64 trit rings organized in
+        an 8$\times$8 lattice (matching the kernel's 8-dimensional state
+        vector, replicated across 8 spatial zones).
+  \item \textbf{Coupling Matrix ($J_{ij}$):} Loaded into the FPGA as a
+        lookup table of fixed-point coupling coefficients. Derived from
+        the L0--L4 kernel structure per the mapping in Section~5.3.
+  \item \textbf{Krimelack Binding:} Each sensor ADC channel is bound to
+        a specific input ring. The transduction coefficient $\kappa$ is
+        set per sensor type.
+  \item \textbf{Parity Chain Assignment:} Every group of 5 adjacent rings
+        is assigned a parity constant $K$.
+  \item \textbf{Output Binding:} Specific output rings are coupled to
+        motor driver DAC channels.
+\end{enumerate}
+
+\textbf{There is no instruction memory, no program counter, no opcodes.}
+The FPGA implements the phase-coupling physics as a dataflow fabric. Input
+signals propagate through the coupling network and produce output states
+through energy minimization.
+
+The ``behavior'' of the robot is entirely determined by the coupling
+matrix. Different coupling matrices produce different behaviors (follow,
+explore, course-follow) without changing the hardware.
+
+% ============================================================
+\subsection{Configuration B Build: Hybrid Robot}
+
+\subsubsection{Processor}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Component} & \textbf{Part} & \textbf{Function} & \textbf{Qty} \\
+\midrule
+BCP (Binary Supervisor) & STM32H743 MCU & Supervision, H1-C, fallback & 1 \\
+                        & 480 MHz Cortex-M7 & Binary kernel backup & \\
+AIF (Invariant Fabric) & Xilinx Artix-7 (XC7A100T) & Phase fabric (smaller) & 1 \\
+                       & 100K logic cells & \\
+Clock Generator & Si5351A & Structural timebase & 1 \\
+ADC & ADS8688 8-ch 16-bit & Sensor input & 1 \\
+DAC & DAC8568 8-ch 16-bit & Motor/servo output & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Sensor Array}
+
+Same sensor complement as Configuration A (Section 10.2.2). The BCP
+handles sensor initialization, calibration, and I$^2$C/SPI bus management.
+
+\subsubsection{Programming the Hybrid Processor}
+
+The hybrid ArcLoom is programmed in two layers:
+
+\textbf{Layer 1: AIF Configuration (same as pure)}
+\begin{itemize}[nosep]
+  \item Ring topology, coupling matrix, krimelack binding, parity chains,
+        output binding --- all loaded into the FPGA as fixed-point coefficients.
+\end{itemize}
+
+\textbf{Layer 2: BCP Firmware (C/Rust)}
+\begin{itemize}[nosep]
+  \item \texttt{main\_loop()}: Read AIF state $\to$ doorway detection $\to$
+        H1-C correction $\to$ write outputs
+  \item \texttt{l0\_l4\_kernel()}: Binary backup implementation of the full
+        DSF-AI kernel (used only during binary fallback)
+  \item \texttt{sensor\_init()}: I$^2$C/SPI bus setup, calibration sequences
+  \item \texttt{safety\_monitor()}: Watchdog, battery voltage, motor current limits
+  \item \texttt{telemetry()}: UART/BLE output for debugging and monitoring
+\end{itemize}
+
+The BCP firmware is deterministic: no dynamic memory allocation, no
+floating-point (fixed-point only), no interrupts during critical sections,
+no RTOS (bare-metal superloop).
+
+% ============================================================
+\section{Comparison of Configurations}
+
+\begin{center}
+\begin{tabular}{@{}p{3.5cm}p{5.5cm}p{5.5cm}@{}}
+\toprule
+\textbf{Feature} & \textbf{Config A: Pure Ternary} & \textbf{Config B: Hybrid AHPP} \\
+\midrule
+Logic basis & Topological invariants only & Binary-supervised phases \\
+Error correction & Geometric (parity chains + Schmitt) & H1-C + binary fallback \\
+Clock & Asynchronous (structural) & BCP clock + structural fabric \\
+Power (quiescent) & Near-zero (static leakage only) & BCP idle + fabric leakage \\
+Power (active) & Proportional to transitions & BCP active + fabric transitions \\
+Determinism guarantee & Topological (geometric) & BCP-certified (computational) \\
+Certification path & Novel (no precedent) & Standard (MCU-based safety case) \\
+Manufacturing tolerance & Parity chains required & BCP compensates drift \\
+Debugging & Field observation only & Register inspection + telemetry \\
+Recommended use & Research, sentience exploration & Commercial, medical, automotive \\
+Development timeline & 12--18 months & 6--9 months \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\section{Recommended Build Sequence}
+
+\begin{enumerate}[label=\textbf{Phase \arabic*:}]
+  \item \textbf{FPGA Simulation (Months 1--3):} Implement the phase fabric
+        in Verilog/VHDL on the Artix-7 using fixed-point arithmetic. Validate
+        trit stability, parity chains, and Schmitt trigger behavior in
+        simulation. No physical sensors.
+  \item \textbf{Hybrid Robot Build (Months 3--6):} Integrate STM32H7 BCP
+        with FPGA fabric. Connect sensors and motors. Validate H1-C policy
+        with real noise. Demonstrate person-following and obstacle avoidance.
+  \item \textbf{Pure Ternary Validation (Months 6--12):} Disable the BCP.
+        Run the fabric standalone with parity chain error correction only.
+        Characterize noise tolerance, metastability rate, and power consumption.
+        Compare outputs to hybrid (binary fallback) baseline.
+  \item \textbf{Analog Fabric (Months 12--18):} Replace FPGA simulation with
+        physical oscillator arrays (PLL networks). This is the transition
+        from ``simulated topology'' to ``real topology.'' Validate that
+        physical phase dynamics match FPGA simulation.
+\end{enumerate}
+
+% ============================================================
+\section{Invariants and Constraints}
+
+\begin{enumerate}
+  \item The winding number is the \textbf{only} valid representation of a
+        trit state. Voltage levels, register values, or other binary
+        representations are implementation artifacts, not architectural
+        primitives.
+  \item The coupling matrix $J_{ij}$ is \textbf{derived}, not fitted. Any
+        implementation that tunes $J_{ij}$ based on output performance is
+        non-compliant.
+  \item Parity chain constants $K$ are set at fabrication/configuration
+        time and are \textbf{never modified} during operation.
+  \item The nonlinear coupling constant $\alpha$ (Schmitt trigger) is a
+        frozen rational constant.
+  \item In hybrid mode, the BCP \textbf{never modifies} the coupling matrix.
+        It can only stall, heal amplitude, and substitute binary-computed
+        output. It cannot alter the fabric's topology.
+  \item SL-1 (Structural Lock) is a hardware output, not a software flag.
+        Once asserted, it remains asserted until the next structural frame
+        or exogenous disruption.
+  \item The krimelack transduction coefficient $\kappa$ is a frozen constant
+        per sensor type. It is not adapted at runtime.
+\end{enumerate}
+
+% ============================================================
+\section{Version History}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Version} & \textbf{Date} & \textbf{Description} \\
+\midrule
+1.0 & 2026-02 & Initial ArcLoom concept (LoomCore/RNA3D). \\
+2.0 & 2026-03 & Hybrid architecture with H1-C hardening. \\
+3.0 & 2026-04 & Pure ternary model added (w3.1 collaboration). \\
+4.0 & 2026-04-10 & Comprehensive ISO-grade specification. Added: coupling matrix \\
+    &            & derivation, topological Schmitt trigger, parity chains, krimelack \\
+    &            & I/O boundary, metastability resolution, reference robot platform \\
+    &            & with BOM for both pure and hybrid configurations. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{2em}
+\hrule
+\vspace{0.5em}
+{\color{al-gray}\small This document is confidential and for internal use only.
+It constitutes the ISO-grade deterministic specification for the ArcLoom
+Processor Architecture in both Pure Ternary and Hybrid configurations.
+All mathematical operations are deterministic. All constants are frozen
+rationals or derived from natural mathematical constants ($e$, $\Gamma$,
+$\pi$). No parameters are fitted, estimated, or heuristically determined.}
+
+\end{document}

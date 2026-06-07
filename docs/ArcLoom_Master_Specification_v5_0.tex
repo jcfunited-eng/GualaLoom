@@ -1,0 +1,1415 @@
+% ============================================================
+%  ArcLoom Master Specification v5.0
+%  Unified Architecture: Coherence-Field Lattice, TAL Physics,
+%  BSIL Interop, WeaveSpec Programming, Physical Implementation
+%  ISO-Grade Deterministic Specification
+%  Overleaf-compatible LaTeX
+% ============================================================
+\documentclass[11pt, a4paper]{report}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{booktabs, array, longtable, tabularx, multirow}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{setspace}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  urlcolor=blue!60!black,
+}
+
+\definecolor{al-gold}{RGB}{180, 140, 60}
+\definecolor{al-dark}{RGB}{30, 30, 30}
+\definecolor{al-green}{RGB}{40, 120, 60}
+\definecolor{al-red}{RGB}{160, 40, 40}
+\definecolor{al-gray}{RGB}{100, 100, 100}
+\definecolor{al-blue}{RGB}{40, 80, 160}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{al-gray}{\small ArcLoom Master Specification v5.0}}
+\lhead{\textcolor{al-gray}{\small Confidential --- Internal Use Only}}
+\cfoot{\thepage}
+
+\titleformat{\chapter}[display]{\bfseries\Huge}{Chapter \thechapter}{0.5em}{\Large}
+\titleformat{\section}{\large\bfseries\color{al-dark}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{al-dark}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\itshape\color{al-dark}}{\thesubsubsection}{0.6em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\onehalfspacing
+
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{axiom}{Axiom}[chapter]
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{corollary}{Corollary}[chapter]
+\newtheorem{requirement}{Requirement}[chapter]
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+% ============================================================
+\begin{document}
+
+% ── Title Page ─────────────────────────────────────────────
+\begin{titlepage}
+\centering
+{\Huge \textbf{ArcLoom}}\\[0.5cm]
+{\LARGE Master Specification v5.0}\\[0.3cm]
+{\Large Unified Architecture for Deterministic Structural Perception}\\[1cm]
+
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|Y|}
+\hline
+Document ID & ARC-MASTER-SPEC-5.0 \\\hline
+Version & 5.0 --- Master Canon \\\hline
+Status & Controlled specification \\\hline
+Effective Date & 2026-04-10 \\\hline
+Classification & Confidential --- Internal Use Only \\\hline
+Author & Joseph Forrester \\\hline
+Source Documents & ArcLoom Spec v0.3, v0.4, v1.0--v1.3; BSIL v0.1;
+                   WeaveSpec v0.1; MathLoom v1.4; ArcLoom v4.0 \\\hline
+Purpose & Consolidate all prior ArcLoom specifications into a single
+          authoritative master document. Defines the complete architecture
+          from coherence-field theory through physical implementation to
+          reference platform design. \\\hline
+Supersedes & All prior ArcLoom specifications. This document is the
+             single source of truth. \\\hline
+\end{tabularx}
+
+\vfill
+{\large \textbf{Non-Replacement Statement}}\\[0.2cm]
+\parbox{0.93\textwidth}{ArcLoom is a structural perception processor.
+It is not a general-purpose binary computer replacement. It excels at
+detecting structural state transitions in continuous signals with bounded
+latency, near-zero quiescent power, and deterministic safety guarantees.
+For general-purpose computation (arithmetic, networking, storage), ArcLoom
+coexists with conventional binary systems via the BSIL interoperability
+layer.}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+
+% ============================================================
+% PART I: FOUNDATIONS
+% ============================================================
+
+\chapter{Introduction}
+
+\section{What ArcLoom Is}
+
+ArcLoom is a deterministic, non-von Neumann processor architecture for
+\textbf{structural perception}. It does not execute instructions. It does
+not interpret opcodes. It does not operate on a clock cycle.
+
+Instead, ArcLoom:
+\begin{enumerate}[nosep]
+  \item Receives continuous sensor signals through \textbf{krimelack
+        transduction rings}
+  \item Injects structural evidence into a \textbf{coherence-field lattice}
+        ($\psi$-lattice)
+  \item Applies \textbf{Law-Fields} (constraint programs) and
+        \textbf{Goals} (boundary terms) that shape the field's settling
+        behavior
+  \item Settles to equilibrium through \textbf{energy minimization} in a
+        tri-stable attractor medium
+  \item \textbf{Commits} history into folded structural memory
+        (Krimelacks) when entropy collapses
+  \item Emits bounded outputs through a minimal universal adapter
+\end{enumerate}
+
+The processor's ``computation'' is the physics of the field settling.
+When the field reaches a structural lock, the output is not a calculation
+--- it is a \textbf{geometric requirement} of the field.
+
+\section{What ArcLoom Is Not}
+
+\begin{itemize}[nosep]
+  \item ArcLoom is \textbf{not} a general-purpose CPU replacement. It
+        cannot run Excel, browse the web, or play video games.
+  \item ArcLoom is \textbf{not} a neural network accelerator. It does not
+        perform matrix multiplication or gradient descent.
+  \item ArcLoom is \textbf{not} a quantum computer. It operates at room
+        temperature on classical physics.
+  \item ArcLoom \textbf{does not} use probability, statistics, or machine
+        learning at any level.
+\end{itemize}
+
+For tasks requiring general-purpose computation, ArcLoom coexists with
+binary systems through the \textbf{Binary Story Ingestion Layer (BSIL)}.
+
+\section{Architecture Summary}
+
+ArcLoom has five architectural layers:
+
+\begin{center}
+\begin{tabular}{@{}rll@{}}
+\toprule
+\textbf{\#} & \textbf{Layer} & \textbf{Function} \\
+\midrule
+1 & Coupler Array (Krimelacks) & Sensor transduction + output actuation \\
+2 & Kernel Fabric (UF L0--L4) & Structural perception: gates, DSF, safety \\
+3 & Loom Fabric ($\psi$-lattice + TAL) & Coherence-field evolution + attractor settling \\
+4 & Memory Fabric (Krimelacks Memory) & Folded structural memory: motifs, strands, recall \\
+5 & Governance \& Safety & SafeMode, hardening, bounded outputs \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two additional specification layers define software and interoperability:
+\begin{itemize}[nosep]
+  \item \textbf{WeaveSpec:} Declarative programming surface (constraint
+        bundles, not instructions)
+  \item \textbf{BSIL:} Binary Story Ingestion Layer (coexistence with
+        binary systems)
+\end{itemize}
+
+\section{Design Constraints (Diamond Hard)}
+
+\begin{enumerate}[label=DC-\arabic*.]
+  \item \textbf{Zero heuristics.} All thresholds derived from geometry
+        or frozen rational constants.
+  \item \textbf{Zero randomness.} No stochastic elements anywhere.
+  \item \textbf{Zero ML.} No trained models, no gradient descent, no
+        statistical inference.
+  \item \textbf{Deterministic.} Identical inputs + parameters $\Rightarrow$
+        identical outputs.
+  \item \textbf{Domain agnostic.} The fabric computes structural state
+        from any temporal signal.
+  \item \textbf{Bounded.} All outputs, energies, and state variables have
+        finite bounds.
+  \item \textbf{Safe.} SafeMode is a mandatory architectural state, not
+        an optional feature.
+\end{enumerate}
+
+% ============================================================
+\chapter{Glossary of Terms}
+
+\begin{longtable}{@{}p{4cm}p{10.5cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+AIF & ArcLoom Invariant Fabric. The ternary computing substrate. \\
+Arc & Mode overlap: the projection $A_i(k) = \langle \Phi_i, \psi(k) \rangle$.
+     Arc weights $p_i = |A_i|^2 / \sum |A_j|^2$. \\
+BSIL & Binary Story Ingestion Layer. Treats binary programs as story
+       generators; captures observable behavior as structural episodes. \\
+BCP & Binary Control Coprocessor. Conventional MCU supervisor in hybrid
+      configuration. \\
+Commit & The act of collapsing continuous lattice state into a discrete
+         Fact Strand when entropy drops below threshold. \\
+Coupling Matrix ($J_{ij}$) & Phase-coupling strengths between oscillator
+                             rings. Derived from DSF-AI kernel structure. \\
+DSF & Deterministic Structural Field. The 8-dimensional output vector of
+      the UF L0--L4 kernel: $(D_k, M_k, R_{rev,k}, U^*_k, C_k, P_k, B_k, S_{UF})$. \\
+Doorway Event & Local collapse of phase amplitude below $\epsilon$,
+                indicating topological vulnerability (Negative Space). \\
+Entropic Flip & The moment when lattice entropy $H_k$ drops and
+                determinism index $Det_k$ rises above commit threshold. \\
+Fact Strand & A committed structural episode stored in Krimelacks memory. \\
+H1-C & Hardening Level 1 with Correction. Deterministic error recovery
+       in hybrid mode. \\
+Horizon Projection & Free evolution of $\psi$ with $J=0$ to project
+                     future structural states. Structural imagination. \\
+Krimelack & Dual function: (1) sensory transduction ring (I/O boundary),
+            (2) folded structural memory (motif storage and recall). \\
+Law-Field & Hermitian constraint operator applied to the $\psi$-lattice.
+            ``Programs are constraint fields.'' \\
+MapInject & Canonical mapping from UF evidence to $\psi$-lattice injection. \\
+Mode Bank ($\Phi_i$) & Library of committed structural templates. Modes
+                       grow from committed histories via centroid synthesis. \\
+Motif & A structural pattern extracted from Fact Strands and stored in
+        Krimelacks memory with adjacency weights. \\
+Negative Space & Quiescent region where $\sigma < \sigma_{min}$,
+                 $\|\Delta F\| < \delta_{min}$, $\kappa < \kappa_{min}$.
+                 An active potential well, not a passive absence. \\
+Parity Chain & Group of trits whose winding numbers must sum to a
+               topological constant $K$. Geometric error correction. \\
+SafeMode & Mandatory safety state: $J=0$, $H_{goal}=0$, commit frozen,
+           memory frozen, outputs hold. \\
+SL-1 & Structural Lock Level 1. L6-TCL output certifying geometric
+       inevitability. \\
+TAL & Ternary Attractor Loom. Physical compute primitive using
+      tri-stable attractor cells. \\
+Topological Schmitt Trigger & Nonlinear coupling term that forces
+                              metastability resolution. \\
+Trit & Ternary digit: $t \in \{-1, 0, +1\}$. \\
+TSAC & Tri-Stable Attractor Cell. Physical element with three stable
+       energy basins. \\
+Weave & Declarative program bundle: couplers, laws, goals, memory
+        policy, commit policy. Mounted, not executed. \\
+Winding Number ($w$) & Integer topological invariant of a phase field
+                       around a ring. Encodes trit state. \\
+$\psi$-lattice & Coherence-field lattice. $\psi_n = \sqrt{\rho_n} e^{i\phi_n}$
+                 evolving under Hermitian Hamiltonian. \\
+\bottomrule
+\end{longtable}
+
+% ============================================================
+\chapter{Mathematical Foundations}
+
+\section{Notation}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+$\psi \in \mathbb{C}^N$ & Coherence-field lattice state \\
+$\psi_n = \sqrt{\rho_n} e^{i\phi_n}$ & Amplitude-phase decomposition at node $n$ \\
+$H$ & Hermitian Hamiltonian operator \\
+$J(k)$ & Injection field at structural time $k$ \\
+$\Phi_i$ & Mode template $i$ in the mode bank \\
+$A_i(k) = \langle \Phi_i, \psi(k) \rangle$ & Arc: mode overlap \\
+$p_i(k) = |A_i|^2 / \sum |A_j|^2$ & Arc weight (normalized) \\
+$H_k = -\sum_i p_i \log p_i$ & Structural entropy \\
+$Det_k = 1 - H_k/H_0$ & Determinism index \\
+$w$ & Winding number (trit state) \\
+$J_{ij}$ & Coupling matrix element \\
+$\mathcal{L}_k$ & Law-Field set active at gate $k$ \\
+$\mathcal{G}_k$ & Goal/boundary set active at gate $k$ \\
+$E_{sys}$ & Total system energy \\
+$V(x)$ & Tri-well potential function \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Balanced Ternary Arithmetic}
+
+The fundamental digit: $t \in \{-1, 0, +1\}$.
+
+An $n$-trit word: $\text{val}(T) = \sum_{i=0}^{n-1} t_i \cdot 3^i$.
+
+Properties: $\log_2 3 \approx 1.585$ bits/trit; symmetric signed
+representation; negation by sign flip $\overline{t_i} = -t_i$; native
+zero state represents quiescence.
+
+\section{Winding Number}
+
+\begin{definition}[Winding Number]
+Continuous: $w = \frac{1}{2\pi} \oint \frac{d\phi}{d\theta}\, d\theta \in \mathbb{Z}$.
+
+Discrete ($N$ samples): $w = \frac{1}{2\pi} \sum_{i=0}^{N-1} \text{wrap}(\phi_{i+1} - \phi_i)$,
+$\phi_N \equiv \phi_0$.
+\end{definition}
+
+\section{Coherence-Field Evolution}
+
+\begin{axiom}[$\psi$-Lattice Evolution]
+The coherence field evolves under:
+\begin{equation}
+  \boxed{i\hbar \frac{d\psi}{d\tau} =
+    \underbrace{[H_{base} + H_{mem} + H_{law}(\mathcal{L}_k) + H_{goal}(\mathcal{G}_k) + H_{safety}]}_{H_{total}(k)}
+    \psi + J(k)}
+\end{equation}
+\end{axiom}
+
+\textbf{Constraints:}
+\begin{itemize}[nosep]
+  \item $H_{total}(k)$ \textbf{must} be Hermitian (preserves norm)
+  \item All interaction terms \textbf{must} be symmetric
+  \item Integration method: Crank--Nicolson (norm-preserving, stable)
+  \item Norm invariant: $| \|\psi\|^2(k) - \|\psi\|^2(k-1) | \leq \epsilon_{norm}$
+\end{itemize}
+
+\section{Tri-Stable Attractor Cell (TSAC)}
+
+\begin{definition}[TSAC Energy]
+A TSAC has three stable basins at $x \in \{-1, 0, +1\}$:
+\begin{equation}
+  V(x) = a x^6 - b x^4 + c x^2
+\end{equation}
+with $a, b, c$ chosen to create three distinct minima. Constants are
+frozen rationals.
+\end{definition}
+
+\begin{definition}[TAL Energy Functional]
+For a coupled array of TSACs:
+\begin{equation}
+  E(\mathbf{x}; \mathbf{b}, W) = \sum_i V(x_i) - \sum_{i<j} W_{ij} x_i x_j - \sum_i b_i x_i
+\end{equation}
+with $W$ symmetric. The system settles by damped gradient flow toward
+energy minimum.
+\end{definition}
+
+\section{Nonlinear Coupling (Topological Schmitt Trigger)}
+
+\begin{equation}
+  E_{sys} = -\sum_{i,j} J_{ij} \left[ \cos(\Delta\phi_{ij})
+            + \alpha \cos^3(\Delta\phi_{ij}) \right]
+\end{equation}
+
+$\alpha$ is a frozen rational constant. The cubic term deepens wells at
+valid states and raises barriers at saddle points, forcing metastability
+resolution within:
+\begin{equation}
+  t_{resolve} < \frac{1}{J \cdot \alpha \cdot \omega_0}
+\end{equation}
+
+\section{Capture Threshold and Structural Lock}
+
+(From L6-TCL Specification.)
+
+\begin{equation}
+  \tau = 1 - \frac{\Gamma\!\left(\frac{n_{start}}{2}+1\right)}
+                  {\Gamma\!\left(\frac{n_{eff}}{2}+1\right)}
+  \cdot \pi^{(n_{eff}-n_{start})/2}
+\end{equation}
+
+Structural Lock fires when $n_{eff} < n_{start}/e$. Derived from
+natural constants ($e$, $\Gamma$). Not a design parameter.
+
+% ============================================================
+\chapter{The $\psi$-Lattice Core}
+
+\section{Description}
+
+The $\psi$-lattice is the central evolving substrate of ArcLoom. It is a
+coherence field --- a complex-valued vector $\psi \in \mathbb{C}^N$ where
+each component $\psi_n = \sqrt{\rho_n} e^{i\phi_n}$ carries both amplitude
+(structural weight) and phase (structural relationship).
+
+The lattice evolves deterministically under a Hermitian Hamiltonian. It
+does not ``compute'' in the von Neumann sense. It \textit{settles} ---
+finding the energy minimum of the combined constraint field formed by
+base coupling, memory influence, active laws, active goals, and safety
+boundaries.
+
+\section{Injection Mapping (MapInject)}
+
+UF L0--L4 kernel outputs are mapped into injection fields that perturb
+the $\psi$-lattice:
+
+\textbf{Evidence packing:}
+\begin{equation}
+  e_k = \text{concat}\!\left( \text{norm}(TVR_k),\; ISF_k,\; URF_k,\; DSF_k,\; N(G_k) \right)
+\end{equation}
+
+\textbf{Injection amplitude:}
+\begin{equation}
+  a_k = \text{clamp}\!\left( a_0 \cdot w_k \cdot URF_k \cdot (1-U^*_k) \cdot (1-N(G_k)),\; [0, a_{max}] \right)
+\end{equation}
+
+\textbf{Injection field:}
+\begin{equation}
+  J(k) = a_k \cdot \text{normalize}(P_{in} \cdot e_k)
+\end{equation}
+
+where $P_{in}$ is a deterministic orthonormal projection matrix constructed
+from a configuration seed (OD-4, locked: Option B).
+
+Constraints: $\|J(k)\| \leq J_{max}$; SafeMode $\Rightarrow J(k) = 0$;
+Negative Space $\Rightarrow a_k \leq a_{NS,max}$.
+
+\section{Mode Overlaps, Entropy, and Commit}
+
+\textbf{Arc computation:}
+$A_i(k) = \langle \Phi_i, \psi(k) \rangle$, \quad
+$p_i(k) = |A_i|^2 / \sum_j |A_j|^2$.
+
+\textbf{Entropy and determinism:}
+$H_k = -\sum_i p_i \log p_i$, \quad
+$Det_k = 1 - H_k / H_0$.
+
+\textbf{Commit condition (Entropic Flip):}
+\begin{equation}
+  \text{commit}(k) = 1 \iff Det_k \geq Det_{commit} \;\text{AND}\; \max_i p_i(k) \geq p_{commit}
+\end{equation}
+
+When commit fires, the current $\psi$ state is captured as a Fact Strand
+and folded into Krimelacks memory. The dominant mode $\Phi_{i^*}$ receives
+reinforcement.
+
+\section{Horizon Projection (Structural Imagination)}
+
+Free-evolve $\psi$ with zero injection to project future states:
+
+\begin{equation}
+  \hat{\psi}(k+h) = \text{FreeEvolve}\!\left( \hat{\psi}(k+h-1),\; H_{total}(\mathcal{L}_k, \mathcal{G}_k),\; J=0 \right)
+\end{equation}
+
+for $h = 1 \ldots H$. Compute projected arcs $\hat{p}_i(k+h)$ and
+projected $\widehat{DSF}(k+h)$.
+
+This is \textbf{structural imagination}: the system explores what the
+field would do if left undisturbed. It enables anticipatory behavior
+without prediction or probability.
+
+Constraint: projection weight in output $\leq w_{proj,max}$ (bounded
+influence).
+
+% ============================================================
+\chapter{Law-Fields: The Programming Model}
+
+\section{Core Concept}
+
+ArcLoom does not have instructions. It has \textbf{Law-Fields}: selectable
+constraint sets applied as Hermitian operators that shape how the
+$\psi$-lattice settles. ``Programs are constraint fields.''
+
+\begin{equation}
+  H_{law}(\mathcal{L}_k) = \sum_{j \in \mathcal{L}_k} \gamma_j L_j
+\end{equation}
+
+Every $L_j$ \textbf{must} be Hermitian ($L_j = L_j^\dagger$). Any potential
+term must be bounded below.
+
+\section{Canonical Law Families}
+
+\begin{enumerate}[label=(\Alph*)]
+  \item \textbf{Symmetry Law:} $L_{sym} = (I - T)^\dagger(I - T)$ for a
+        unitary transform $T$. Penalizes asymmetry.
+  \item \textbf{Consistency Law:} $L_{cons} = \sum_{(n,m)} a_{nm}(|n\rangle\langle n| - |m\rangle\langle m|)^2$
+        weighted by motif adjacency. Penalizes inconsistency with memory.
+  \item \textbf{Compactness Law:} $U_{comp}(\rho) = \lambda_{comp} \sum_n f(\rho_n)$
+        with $f$ convex. Penalizes diffuse states.
+\end{enumerate}
+
+\section{Law Selection Policy}
+
+When multiple law sets apply, selection uses \textbf{minimum action
+increment} ($\Delta S_{total}$). This is intrinsic and deterministic ---
+the law set that requires the least total structural change is preferred.
+
+\section{Goal and Boundary Terms}
+
+\begin{equation}
+  H_{goal}(\mathcal{G}_k) = \sum_{g \in \mathcal{G}_k} \eta_g G_g
+\end{equation}
+
+Canonical goal: readout operator $O_{out}$ maps $\psi$ to output space.
+$E_{goal} = \|O_{out}\psi - y_{target}\|^2$.
+
+SafeMode $\Rightarrow H_{goal} = 0$. Bound: $\|H_{goal}\| \leq H_{goal,max}$.
+
+% ============================================================
+\chapter{Krimelacks: Sensory Transduction \& Structural Memory}
+
+\section{Dual Role}
+
+Krimelacks serve two architectural functions:
+\begin{enumerate}[nosep]
+  \item \textbf{Sensory transduction rings} --- the I/O boundary between
+        environment and fabric
+  \item \textbf{Folded structural memory} --- where committed Fact Strands
+        are stored, organized, and recalled
+\end{enumerate}
+
+\section{Sensory Transduction}
+
+A krimelack is an oscillator ring whose natural frequency is modulated by
+an external physical signal:
+\begin{equation}
+  \omega_{krim}(t) = \omega_0 + \kappa \cdot s(t)
+\end{equation}
+
+Phase accumulation produces winding-number transitions at structural
+thresholds:
+\begin{equation}
+  \Delta w = \left\lfloor \frac{1}{2\pi} \int_0^T [\omega_{krim}(t) - \omega_0]\, dt + \frac{1}{2} \right\rfloor
+\end{equation}
+
+No analog-to-digital conversion required. The environment and the
+processor share a continuous physical coupling.
+
+\subsection{Sensor Types}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Sensor} & \textbf{Signal} & \textbf{Transduction} & \textbf{Type} \\
+\midrule
+Vision & Pixel intensity & Photoresistor $\to \omega$ & Optical \\
+Depth & Distance & Capacitive $\to \omega$ & Range \\
+Motion & Acceleration & Piezo $\to \omega$ & Inertial \\
+Proximity & Object distance & Reflective $\to \omega$ & Proximity \\
+Temperature & Thermal & Thermistor $\to \omega$ & Thermal \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Folded Structural Memory}
+
+Krimelacks memory stores committed Fact Strands as motifs with adjacency
+weights and spatial locality.
+
+\textbf{State:} $V$ motifs, $W_{adj}$ adjacency weights, $pos$ locality map.
+
+\textbf{Reinforcement:}
+$W_{adj}(u,v) \leftarrow W_{adj}(u,v) + \eta_{mem} \cdot \text{score}(u,v,\text{strand})$
+
+\textbf{Decay (Forgetting):}
+$W_{adj}(u,v) \leftarrow (1 - \lambda_{mem}) \cdot W_{adj}(u,v)$
+
+Decay is the Negative Space operator applied to memory. Structure is not
+deleted --- it is compressed into quiescence. Decayed motifs can re-ignite
+if the right structural trigger appears. This is how a smell recalls
+childhood.
+
+\textbf{Merge:}
+If $W_{adj}(u,v) \geq \tau_{merge}$, merge motifs deterministically.
+
+\textbf{Locality Folding:}
+\begin{equation}
+  \text{Cost}(pos) = \sum_{u,v} W_{adj}(u,v) \cdot \text{dist}(pos(u), pos(v))
+\end{equation}
+Update $pos$ to reduce Cost within tolerance $\epsilon_{fold}$. Structurally
+related motifs remain physically near each other for efficient recall.
+
+% ============================================================
+\chapter{Physical Geometry: The Triple-Node Resonant Ring}
+
+\section{Trit Register}
+
+A single trit consists of three nonlinear oscillators (Nodes $A$, $B$, $C$)
+in equilateral arrangement, coupled via phase-shifting delay lines.
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+$w$ & State & Phase Relationship & Meaning \\
+\midrule
+$0$  & Quiescent & $\phi_A = \phi_B = \phi_C$ & No flow \\
+$+1$ & CW Flow   & $\phi_B = \phi_A + 2\pi/3$, $\phi_C = \phi_B + 2\pi/3$ & Clockwise \\
+$-1$ & CCW Flow  & $\phi_C = \phi_A + 2\pi/3$, $\phi_B = \phi_C + 2\pi/3$ & Counter-clockwise \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Energy barrier between adjacent states:
+$\Delta E = J \cdot (1 + 3\alpha/4) \cdot 1.5$.
+For $J = 1$, $\alpha = 37/64$: $\Delta E \approx 2.37$.
+
+\section{Coupling Matrix ($J_{ij}$): The Instruction Set}
+
+The coupling matrix encodes the computational topology. It is derived
+from the DSF-AI kernel structure:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Kernel Output} & \textbf{Target} & \textbf{$J_{ij}$ Derivation} \\
+\midrule
+$D_k$ & Direction pair & $J = D_k \cdot J_{base}$ \\
+$S_{UF}$ & Convergence pair & $J = S_{UF} \cdot J_{base}$ \\
+$M_k$ & Momentum pair & $J = |M_k| \cdot J_{base}$ \\
+$C_k$ & Binding pair & $J = C_k/(1+C_k) \cdot J_{base}$ \\
+$P_k$ & Compression pair & $J = P_k/(1+P_k) \cdot J_{base}$ \\
+$B_k$ & Conviction pair & $J = |B_k| \cdot J_{base}$ \\
+$U^*_k$ & Freedom pair & $J = -(U^*_k) \cdot J_{base}$ \\
+$R_{rev,k}$ & Path-kill pair & $J = R_{rev,k} \cdot J_{max}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+$J_{base}$ and $J_{max}$ are frozen rational constants.
+
+\section{Geometric Error Correction: Parity Chains}
+
+Groups of $P = 5$ trits with topological parity constant $K$:
+$\sum_{i=1}^{P} w_i = K$.
+
+Restoring force: $F_{restore,i} = -\lambda_{parity}(\sum_j w_j - K)$.
+
+Single-trit error correction without binary logic.
+
+% ============================================================
+\chapter{Configuration A: Pure Ternary}
+
+All computation, error correction, and I/O through topological phase
+dynamics. No binary logic, no clock, no instruction set.
+
+\textbf{Logic:} Resonance Junctions --- coupled rings settle to energy
+minimum producing deterministic output.
+
+\textbf{Error correction:} Parity chains + topological Schmitt trigger.
+
+\textbf{Power:} $P_{avg} = N_{rings} \cdot \rho_{transition} \cdot E_{transition}$.
+Near-zero during quiescence.
+
+\textbf{Metastability:} Resolved within $t_{resolve} < 1/(J \cdot \alpha \cdot \omega_0)$.
+
+\textbf{Output:} $v_{motor} = w_{out} \cdot v_{max}$ ($w \in \{-1, 0, +1\}$:
+reverse, stop, forward).
+
+% ============================================================
+\chapter{Configuration B: Hybrid (AHPP)}
+
+ArcLoom Invariant Fabric (AIF) supervised by Binary Control Coprocessor (BCP).
+
+\textbf{BCP functions:} timing, H1-C error correction, binary fallback,
+memory management, safety monitoring.
+
+\textbf{Doorway detection:} $\delta_j^{ext} = 1$ if $\min(a_i) < \epsilon_{gate}$.
+
+\textbf{H1-C policy:} STALL $\to$ amplitude heal $\to$ relaxation ($R$ cycles)
+$\to$ verify winding $\to$ recovered / corrected / binary fallback.
+
+\textbf{Binary fallback:} BCP maintains complete L0--L4 kernel in binary.
+Substitutes binary output if AIF produces uncorrectable result.
+
+% ============================================================
+\chapter{WeaveSpec: The Programming Surface}
+
+\section{Description}
+
+A \textbf{Weave} is the ArcLoom equivalent of an application. It is a
+declarative JSON bundle specifying:
+\begin{itemize}[nosep]
+  \item Couplers (input/output bindings to krimelacks)
+  \item Laws (which Law-Fields to activate)
+  \item Goals (boundary terms and targets)
+  \item Memory policy (reinforcement/decay rates)
+  \item Commit policy (thresholds)
+  \item Governance (safety bounds)
+\end{itemize}
+
+\textbf{Weaves are mounted, not executed.} Mounting a Weave configures
+the coupling matrix, activates law sets, and binds I/O. The physics does
+the rest.
+
+\section{Lifecycle}
+
+\begin{center}
+AUTHORED $\to$ VALIDATED $\to$ MOUNTED $\to$ RUNNING $\to$ COMMITTING $\to$ UNMOUNTED
+\end{center}
+
+\section{Determinism Guarantee}
+
+No hidden randomness. Seeds are explicit. Tie-breaks are deterministic
+(lowest index). Fixed numeric precision.
+
+% ============================================================
+\chapter{BSIL: Binary Story Ingestion Layer}
+
+\section{Description}
+
+BSIL enables ArcLoom to coexist with binary systems without contaminating
+the ternary/topological core. It treats legacy programs as \textbf{story
+generators} --- observing their behavior rather than interpreting their
+instructions.
+
+\section{Capture Mechanism}
+
+BSIL observes:
+\begin{itemize}[nosep]
+  \item User inputs (keyboard, mouse, touch)
+  \item API calls and responses
+  \item File system operations
+  \item Render output (screen state)
+\end{itemize}
+
+These observables are captured as time-indexed structural episodes and
+injected into the $\psi$-lattice through MapInject. ArcLoom does not
+\textit{run} the binary program --- it \textit{learns the shape} of the
+workflow as committed motifs.
+
+\section{Compatibility Modes}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Mode} & \textbf{Function} & \textbf{Binary Required} \\
+\midrule
+Shadow & Observe only & Yes (binary runs) \\
+Assist & Observe + suggest & Yes (binary runs, ArcLoom advises) \\
+Replacement & Motif-driven weave & No (ArcLoom replays from memory) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Replacement mode is the long-term goal: ArcLoom has observed enough
+workflows that it can reproduce the structural behavior without the
+binary system running.
+
+% ============================================================
+\chapter{L6-TCL Integration: The Dimensional Grinder}
+
+The ArcLoom fabric physically instantiates the L6 Topological Constraint
+Layer. As constraints from the kernel restrict the coupling matrix, the
+fabric's effective dimensionality reduces:
+
+\begin{equation}
+  n_{eff} = n_{start} - \sum_{i=1}^{k} \text{rank}(C_i)
+\end{equation}
+
+When $n_{eff} < n_{start}/e$, the fabric enters the capture basin.
+SL-1 manifests as a global phase lock (pure) or hardware interrupt (hybrid).
+
+% ============================================================
+\chapter{Governance, Safety, and Hardening}
+
+\section{SafeMode}
+
+When SafeMode is active:
+\begin{itemize}[nosep]
+  \item $J(k) = 0$ (no injection)
+  \item $H_{goal} = 0$ (no goal pressure)
+  \item $\text{commit}(k) = 0$ (no memory writes)
+  \item Memory updates frozen
+  \item Outputs hold to $Y_{hold}$ (neutral)
+\end{itemize}
+
+\section{Invariants}
+
+\begin{enumerate}[nosep]
+  \item $\|\psi\|^2$ conserved within $\epsilon_{norm}$
+  \item All values finite (no NaN/INF)
+  \item Commit rate $\leq$ commit\_max per window
+  \item Output $\|y_k\| \leq Y_{max}$
+  \item Stale outputs ($k - k_{emit} > TTL_g$) $\Rightarrow Y_{hold}$
+\end{enumerate}
+
+\section{Determinism Rules}
+
+\begin{enumerate}[nosep]
+  \item No hidden randomness
+  \item Stable tie-breaks (lowest index)
+  \item Fixed numeric precision and ordering
+  \item Class A: IEEE-754 float64 (reference)
+  \item Class B: fixed-point (hardware, quantization bounded)
+\end{enumerate}
+
+% ============================================================
+\chapter{Familiarity Feedback: Clockless Habituation}
+
+\section{Motivation}
+
+A purely combinational SPPU with fixed coupling weights and a fixed dead
+zone produces identical output for identical input. This is deterministic
+and correct, but creates a failure mode: the system cannot escape repeated
+situations (e.g.\ a robot trapped in a corner repeating the same action).
+
+Traditional solutions (timers, counters, randomness) require a clock and
+violate the clockless principle of the SPPU.
+
+\section{The Biological Principle}
+
+Nothing in nature has a clock. Biological systems escape repetition through
+mechanisms that share one principle: \textbf{the act of responding to a
+specific input depletes the system's ability to respond to that same input
+again.}
+
+\begin{itemize}[nosep]
+  \item \textbf{Synaptic depletion:} Repeated firing exhausts neurotransmitter
+        supply at the synapse. Signal weakens because the resource was consumed,
+        not because time passed.
+  \item \textbf{Receptor saturation:} Olfactory receptors fill with the same
+        molecule and stop responding. Novel molecules use different receptors
+        at full sensitivity.
+  \item \textbf{Neural adaptation:} Photoreceptors change sensitivity based on
+        sustained stimulation. The substrate itself alters its response.
+  \item \textbf{Refractory period:} After firing, ion channels require physical
+        recovery. The neuron cannot fire regardless of input strength.
+\end{itemize}
+
+The common thread: the medium itself remembers what it has been doing, and
+doing the same thing exhausts the response. Not time. Not a counter.
+Experiential depletion.
+
+\section{Mechanism: Krimelack Recall as Dead-Zone Feedback}
+
+Krimelack recall is combinational --- the loom state is compared against all
+stored motifs in parallel and a match score appears on the output wire in
+one propagation delay.
+
+\textbf{The match score feeds back into the SPPU dead zone:}
+
+\begin{equation}
+  \Delta_{\text{eff}} = \Delta_{\text{base}} + \text{match\_score}
+\end{equation}
+
+Each \texttt{arcloom\_local\_field} instance receives the krimelack match score
+as an additional input. The tri-state comparator uses $\Delta_{\text{eff}}$
+instead of the fixed $\Delta_{\text{base}}$.
+
+This creates a combinational feedback loop:
+
+\begin{enumerate}[nosep]
+  \item SPPU settles $\rightarrow$ 48-bit loom state
+  \item Loom state $\rightarrow$ krimelack recall $\rightarrow$ match score
+  \item Match score $\rightarrow$ raises dead zone in SPPU
+  \item Raised dead zone $\rightarrow$ marginally committed trits drop to null
+  \item Different loom state $\rightarrow$ different match score
+  \item Loop finds equilibrium: the settlement \textbf{maximally unlike}
+        anything in krimelack, consistent with coupling pressures
+\end{enumerate}
+
+No clock. No timer. No register in the feedback path. Purely combinational.
+
+\section{Behavioral Consequences}
+
+\begin{description}[nosep]
+  \item[Novel input] (no matching motif): match score $\approx 0$, dead zone
+    stays at base, full sensitivity, normal response.
+  \item[First repetition] (one matching motif): match score moderate, dead zone
+    rises to $\sim$30--35. Trits with coupling pressure in $[20, 35]$ drop to
+    null. Different decision emerges.
+  \item[Multiple similar experiences] (several similar motifs): match score high,
+    dead zone rises to 40+. Only very strongly coupled trits commit. System
+    forced into a maximally novel response.
+  \item[New situation] (after leaving the repeated state): different loom state
+    $\rightarrow$ low match score $\rightarrow$ dead zone returns to base
+    $\rightarrow$ full sensitivity restored.
+\end{description}
+
+\section{Loop Stability}
+
+The combinational loop either finds a stable fixed point (the most novel
+response consistent with coupling pressures) or oscillates between two
+states (visible hesitation --- correct behavior for genuine indecision).
+
+If oscillation is unstable, feedback gain is reduced:
+
+\begin{equation}
+  \Delta_{\text{eff}} = \Delta_{\text{base}} + (\text{match\_score} \gg k)
+\end{equation}
+
+where $k = 1, 2, 3$ reduces feedback strength by factors of 2, 4, 8.
+Optimal $k$ is determined experimentally.
+
+\section{TSAC ASIC: Native Substrate Habituation}
+
+On ferroelectric TSACs, habituation is a free physical property. Sustained
+polarization causes \textbf{dielectric fatigue} --- the potential barrier
+rises with sustained identical state:
+
+\begin{itemize}[nosep]
+  \item Trit at $+1$, coupling pressure 25, base barrier 20 $\rightarrow$ commits
+  \item Sustained $+1$ $\rightarrow$ barrier rises: 20 $\rightarrow$ 22 $\rightarrow$ 25 $\rightarrow$ 28
+  \item Barrier exceeds pressure (28 $>$ 25) $\rightarrow$ trit falls to null
+  \item Null (rest) $\rightarrow$ barrier recovers $\rightarrow$ fresh sensitivity
+\end{itemize}
+
+The RC time constant of the ferroelectric material IS the habituation rate.
+No circuit. No logic. Physics.
+
+On ASIC, two habituation layers operate simultaneously:
+\begin{itemize}[nosep]
+  \item \textbf{Substrate} (TSAC fatigue): fast, local, per-trit depletion
+  \item \textbf{Cognitive} (krimelack feedback): slower, global, pattern-level familiarity
+\end{itemize}
+
+\section{Cognitive Implications}
+
+Familiarity feedback is not an engineering patch. It is a fundamental
+property of any system that learns from experience:
+
+\begin{itemize}[nosep]
+  \item \textbf{Novelty seeking:} Familiar states are harder to commit to.
+    The system naturally gravitates toward unfamiliar states. Curiosity as
+    a physical property, not a reward signal.
+  \item \textbf{Attention:} Novel stimuli receive full coupling sensitivity.
+    Repeated stimuli receive diminished sensitivity. Attention emerges from
+    dead-zone dynamics.
+  \item \textbf{Boredom:} Sustained identical input raises the dead zone until
+    no trits can commit. The system goes silent. Change the input and full
+    sensitivity returns.
+  \item \textbf{Creativity:} When familiar responses are suppressed, the only
+    available decisions are ones the system has never produced before.
+    Structured novelty constrained by coupling weights.
+\end{itemize}
+
+\section{Implementation Summary}
+
+\begin{longtable}{@{}lll@{}}
+\toprule
+\textbf{File} & \textbf{Change} & \textbf{Type} \\
+\midrule
+\endhead
+\texttt{arcloom\_local\_field} & Add \texttt{dead\_zone\_adj} input (8-bit) & Combinational \\
+\texttt{arcloom\_sppu.v} & Add \texttt{familiarity} input, pass to all fields & Combinational \\
+\texttt{arcloom\_top} & Wire \texttt{match\_score} $\rightarrow$ \texttt{familiarity} & Wire \\
+\texttt{arcloom\_axi\_wrapper.v} & Expose \texttt{match\_score} on read register & Read-only \\
+\bottomrule
+\end{longtable}
+
+No clock added. No register in feedback path. All changes preserve the
+SPPU's purely combinational nature.
+
+% ============================================================
+\chapter{Reference Platform: Autonomous Wheeled Robot}
+
+\section{Purpose}
+
+Validates ArcLoom's structural perception on real sensory data through
+real krimelack transduction, processed by real fabric, producing real
+motor commands.
+
+\textbf{Modes:} Person-following, obstacle avoidance, course-following.
+
+\section{Platform Specifications}
+
+Chassis: 4WD, $\sim$30cm $\times$ 25cm, $<$3kg.
+Drive: Differential (2 powered + 2 caster).
+Battery: LiPo 3S 11.1V, 5000mAh ($\sim$2hr runtime).
+
+\section{Config A: Pure Ternary BOM}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Component} & \textbf{Part} & \textbf{Qty} \\
+\midrule
+FPGA & Xilinx Artix-7 XC7A200T & 1 \\
+PLL Array & Si5351A & 4 \\
+DAC & AD5686R quad 16-bit & 2 \\
+ADC & AD7689 8-ch 16-bit & 2 \\
+Stereo Camera & OV7675 dual & 1 pair \\
+Depth/ToF & VL53L5CX 8$\times$8 & 2 \\
+IMU & ICM-42688-P 6-axis & 1 \\
+IR Proximity & VCNL4040 & 4 \\
+Wheel Encoder & AS5048A magnetic & 2 \\
+Motor & Pololu 37D 12V 200RPM & 2 \\
+Motor Driver & DRV8874 H-Bridge & 2 \\
+Camera Servo & SG90 & 1 \\
+Power & TPS65281 multi-rail & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Fabric: 64 trit rings in 8$\times$8 lattice. Coupling matrix loaded as
+fixed-point coefficients. No instruction memory.
+
+\section{Config B: Hybrid BOM}
+
+Same sensors and actuators. Add STM32H743 MCU (BCP). FPGA can be smaller
+(XC7A100T). BCP handles sensor init, H1-C correction, binary fallback,
+safety monitoring, telemetry (UART/BLE).
+
+\section{Build Sequence}
+
+\begin{enumerate}[label=\textbf{Phase \arabic*} (Months \arabic*--\arabic*):, start=1]
+  \item[Phase 1 (Months 1--3):] FPGA simulation. Validate trit stability, parity chains, Schmitt trigger, and MathLoom global settle (exhaustive 4-trit + scaling to 32-trit).
+  \item[Phase 2 (Months 3--6):] Hybrid robot. Connect sensors and motors. Validate H1-C. Demo person-following.
+  \item[Phase 3 (Months 6--12):] Pure ternary. Disable BCP. Characterize noise tolerance and power.
+  \item[Phase 4 (Months 12--18):] Analog fabric. Replace FPGA with physical oscillator arrays.
+\end{enumerate}
+
+% ============================================================
+\chapter{Time Management}
+
+Three clocks plus horizon:
+\begin{itemize}[nosep]
+  \item $t$: input time (monotonic)
+  \item $k$: structural time (gate index)
+  \item $\tau$: lattice time (integration steps within gate)
+  \item $h$: horizon step index
+\end{itemize}
+
+Lattice steps per gate:
+$N_{int}(k) = \text{clamp}(N_{min} + \text{round}(N_{range} \cdot Sched(k)),\; [N_{min}, N_{max}])$
+
+where $Sched(k) = (1 - U^*_k) \cdot w_k \cdot (1 - N(G_k))$.
+
+SafeMode $\Rightarrow N_{int}(k) = N_{min}$.
+
+% ============================================================
+\chapter{Comparison of Configurations}
+
+\begin{center}
+\begin{tabular}{@{}p{3.5cm}p{5cm}p{5cm}@{}}
+\toprule
+\textbf{Feature} & \textbf{Pure Ternary} & \textbf{Hybrid AHPP} \\
+\midrule
+Logic & Topological invariants & Binary-supervised phases \\
+Error correction & Geometric & H1-C + binary fallback \\
+Clock & Asynchronous & BCP clock + fabric \\
+Power (quiet) & Near-zero & BCP idle + leakage \\
+Determinism & Topological & BCP-certified \\
+Certification & Novel & Standard (MCU safety case) \\
+Debugging & Field observation & Register + telemetry \\
+Use case & Research, cognition & Commercial, medical, auto \\
+Timeline & 12--18 months & 6--9 months \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\chapter{Invariants and Constraints (Normative)}
+
+\begin{enumerate}
+  \item Winding number is the \textbf{only} valid trit representation.
+  \item $J_{ij}$ is \textbf{derived}, not fitted.
+  \item Parity constants $K$ are set at configuration, never modified.
+  \item $\alpha$ (Schmitt) is a frozen rational constant.
+  \item BCP \textbf{never modifies} the coupling matrix.
+  \item SL-1 is a hardware output, not a software flag.
+  \item Krimelack $\kappa$ is frozen per sensor type.
+  \item $H_{total}$ \textbf{must} be Hermitian.
+  \item All interactions $W$ \textbf{must} be symmetric.
+  \item Law operators $L_j$ \textbf{must} be Hermitian.
+  \item Goal operators $G_g$ \textbf{must} be bounded.
+  \item $P_{in}$ (MapInject) is deterministic from configuration seed.
+\end{enumerate}
+
+% ============================================================
+% APPENDICES
+% ============================================================
+
+\appendix
+
+\chapter{MathLoom: Balanced Ternary Arithmetic via Global Settling}
+
+\textit{This appendix defines the Math Loom (ML) subsystem for exact
+arithmetic on the TAL substrate. Originally conceived as a theoretical
+thought experiment, analysis of the global settling property of coupled
+TAL lattices suggests MathLoom may achieve practical arithmetic speeds
+by exploiting physics parallelism for carry propagation. Validation is
+scheduled for Phase~1 FPGA simulation alongside trit stability testing.}
+
+\section{Concept}
+
+Rather than using rigid binary logic gates, MathLoom represents numbers
+as balanced ternary digit strings and implements arithmetic through
+\textbf{constraint relaxation} in the TAL medium. Operands are injected
+as biases into a coupled lattice. The lattice settles to the energy
+minimum that satisfies all digit constraints simultaneously.
+
+The key insight: the TAL lattice settles \textit{globally}, not locally.
+Carry propagation is not a sequential chain --- it is a physical coupling
+that resolves through the medium at the speed of oscillator interaction,
+potentially producing correct results in a single settle cycle regardless
+of word width.
+
+\section{Digit Constraint}
+
+For each digit position $i$:
+\begin{equation}
+  a_i + b_i + c_i = s_i + 3 \cdot c_{i+1}
+\end{equation}
+where $a_i, b_i$ are input digits, $s_i$ is the sum digit, and $c_{i+1}$
+is the carry to the next position. All values are balanced ternary:
+$a_i, b_i, s_i \in \{-1, 0, +1\}$, $c_i \in \{-1, 0, +1\}$.
+
+\section{The Carry Problem and Three Solutions}
+
+In binary ALUs, carry-lookahead logic computes all carries in parallel
+using combinatorial AND/OR gates. In a naive MathLoom implementation,
+each digit position must settle sequentially because carry $c_{i+1}$
+depends on the settled state of position $i$. For an $n$-trit word,
+this gives worst-case latency of $n \times t_{settle}$.
+
+Three approaches resolve this:
+
+\subsection{Approach 1: Ternary Carry-Lookahead Tree}
+
+The balanced ternary carry function is associative:
+\begin{equation}
+  c_{i+1} = \left\lfloor \frac{a_i + b_i + c_i + 1}{3} \right\rfloor - 1
+\end{equation}
+
+This composes across digit groups. A carry-lookahead tree computes group
+carries in parallel using $\lceil \log_3 n \rceil$ levels of TAL cells.
+
+\textbf{Latency:} $\lceil \log_3 n \rceil \times t_{settle}$.
+For 32 trits: $\sim$3 levels $\times$ 3~ns $=$ 9~ns.
+
+\textbf{Assessment:} Approximately 30$\times$ slower than binary ALU.
+Viable for structural computation where arithmetic is infrequent.
+
+\subsection{Approach 2: Redundant Ternary Representation}
+
+Allow intermediate digits to temporarily hold values in the extended set
+$\{-2, -1, 0, +1, +2\}$. This eliminates carry propagation entirely:
+each digit absorbs its carry locally.
+
+\begin{equation}
+  s_i' = a_i + b_i \in \{-2, \ldots, +2\}
+\end{equation}
+
+A subsequent normalization pass converts redundant digits back to
+$\{-1, 0, +1\}$. Normalization is fully parallel --- every digit
+normalizes independently:
+\begin{equation}
+  s_i = s_i' - 3 \cdot \text{round}(s_i'/3), \qquad
+  c_{i+1} = \text{round}(s_i'/3)
+\end{equation}
+
+\textbf{Latency:} Two parallel settle cycles (sum + normalize).
+For any word width: $\sim$2 $\times$ $t_{settle}$ $=$ 6~ns.
+
+\textbf{Assessment:} Approximately 20$\times$ slower than binary ALU.
+Independent of word width. Requires TAL cells with 5 stable basins
+instead of 3 (extended TSAC).
+
+\subsection{Approach 3: Global Lattice Settling (Primary Candidate)}
+
+\begin{axiom}[Global Settle Hypothesis]
+When all digit constraints are encoded as coupling terms in a single TAL
+lattice, and both operands are injected simultaneously as bias fields,
+the global energy minimization produces the correct arithmetic result in
+a single settle cycle --- regardless of word width.
+\end{axiom}
+
+\textbf{Physical basis:} The TAL lattice does not ``know'' about digits
+or carries. It minimizes total energy:
+\begin{equation}
+  E_{ML}(\mathbf{s}, \mathbf{c}; \mathbf{a}, \mathbf{b}) =
+    \sum_{i=0}^{n-1} \left[ V(s_i) + V(c_i) \right]
+    + \lambda_{digit} \sum_{i=0}^{n-1} (a_i + b_i + c_i - s_i - 3c_{i+1})^2
+    + \lambda_{parity} \sum_{chains} \left(\sum_j w_j - K\right)^2
+\end{equation}
+
+where:
+\begin{itemize}[nosep]
+  \item $V(\cdot)$ is the tri-well potential (TSAC basins)
+  \item $\lambda_{digit}$ is the digit-constraint coupling strength
+        (frozen rational)
+  \item $\lambda_{parity}$ is the parity-chain coupling (geometric
+        error correction)
+  \item $a_i, b_i$ are injected as fixed biases (not free variables)
+\end{itemize}
+
+The carry ``propagates'' through the coupling matrix at the speed of the
+physical medium (oscillator coupling velocity), not through sequential
+cell settling. The entire lattice converges simultaneously because all
+constraints are applied in parallel through the energy functional.
+
+\textbf{Latency:} $\sim$1 $\times$ $t_{settle}$ for any word width.
+For 32 trits: $\sim$3~ns.
+
+\textbf{Assessment:} If validated, this is approximately 10$\times$ slower
+than binary ALU --- but \textbf{independent of word width}. A 256-trit
+addition takes the same time as a 4-trit addition. Binary carry-lookahead
+scales as $O(\log n)$; global settling scales as $O(1)$.
+
+For very wide words (cryptographic, scientific), MathLoom could
+potentially \textbf{match or exceed} binary ALU performance because the
+binary carry tree grows logarithmically while MathLoom remains constant.
+
+\textbf{Critical validation requirement:} Phase~1 FPGA simulation must
+demonstrate that global settling produces correct 32-trit addition in a
+single settle cycle. If it does not converge (oscillates or settles to
+incorrect state), fall back to Approach~1 or 2.
+
+\section{Multiplication (Profile M1)}
+
+Multiplication of two $n$-trit numbers $A \times B$ can be decomposed
+into:
+\begin{enumerate}[nosep]
+  \item \textbf{Partial product generation:} $n$ partial products, each
+        a single-trit $\times$ $n$-trit multiplication (trit-by-word).
+        Since trits are $\{-1, 0, +1\}$, this is trivial: negate, zero,
+        or pass-through.
+  \item \textbf{Partial product accumulation:} $n$ additions via MathLoom.
+        If global settling works, all partial products can be injected
+        into a single extended lattice and accumulated in one settle cycle.
+\end{enumerate}
+
+\textbf{Latency estimate (global settle):} $\sim$1--2 $\times$ $t_{settle}$
+for any word width. This is speculative and requires Phase~1 validation.
+
+\section{Division: Folding Division (Profile M2)}
+
+The original spec proposed division via lattice constraint settling.
+The implemented method is \textbf{folding division} --- a novel approach
+discovered during development.
+
+\subsection{Concept}
+
+Standard division asks ``how many times does $B$ fit into $A$?'' ---
+an iterative counting procedure. Folding division asks: \textbf{at which
+fold does the field exhaust itself?}
+
+\begin{enumerate}[nosep]
+  \item Field starts with energy $|A|$ (numerator magnitude)
+  \item Each fold removes $|B|$ units (denominator magnitude)
+  \item When remaining field $< |B|$, it falls into the dead zone
+  \item Number of folds = quotient $q$
+  \item Residual energy = remainder $r$
+\end{enumerate}
+
+Formally: $A = q \cdot B + r, \quad |r| < |B|$.
+
+\subsection{Connection to SPPU Physics}
+
+This is the same mechanism as the SPPU dead zone. In the SPPU, input
+field energy (weighted sum) either exceeds the dead-zone barrier (commits)
+or doesn't (stays null). In folding division, the numerator field either
+exceeds the denominator (sustains another fold) or doesn't (falls into
+the dead zone). The SPPU IS a divider --- input energy divided by coupling
+structure. \texttt{arcloom\_mathloom\_div} makes this explicit as
+standalone arithmetic.
+
+\subsection{Fractional Division}
+
+To compute $A/B$ with $N$ fractional digits: left-shift $A$ by $N$
+positions (multiply by $3^N$ --- append $N$ null trits, zero cost). Fold.
+The quotient's lower $N$ digits are the fractional part.
+Truncation-as-rounding guarantees these are the optimal $N$-digit
+approximation. No correction pass.
+
+$1/3$ is exact in balanced ternary: $(+1) \cdot 3^{-1}$. Impossible in
+binary (infinite repeating fraction).
+
+\subsection{Implementation}
+
+Implemented in \texttt{arcloom\_mathloom\_div.v} as a 2-state FSM
+(IDLE $\rightarrow$ FOLDING). Each fold is one clock cycle. Uses
+\texttt{arcloom\_bt\_compare} for magnitude check and
+\texttt{arcloom\_bt\_adder} for subtraction. Worst case for 4-trit
+operands ($\pm 40$): 40 cycles.
+
+\subsection{Comparison}
+
+Comparison is a special case of subtraction: compute $A - B$ via
+\texttt{arcloom\_bt\_sub}, scan from MSB for the first non-null trit.
+That trit's sign determines greater/less/equal. Purely combinational.
+
+\subsection{Verification}
+
+\begin{itemize}[nosep]
+  \item Folding division: 41,430 simulation tests, zero errors
+  \item Folding division on silicon: 18/18 tests, zero errors
+  \item Comparison on silicon: 6,561/6,561 exhaustive, zero errors
+\end{itemize}
+
+\section{Safety}
+
+If the lattice fails to settle within $T_{settle,max}$ or repair cycles
+exceed $R_{max}$, the output is \textbf{Neutral} (Valid=0) --- not a
+wrong answer. The system fails gracefully rather than silently producing
+incorrect arithmetic.
+
+\section{MathLoom Validation Results}
+
+Phase~1 validation is \textbf{complete}. All operations verified on
+Xilinx Zynq-7020 FPGA silicon (PYNQ-Z2), April 2026:
+
+\begin{longtable}{@{}llrl@{}}
+\toprule
+\textbf{Operation} & \textbf{Module} & \textbf{Tests} & \textbf{Errors} \\
+\midrule
+\endhead
+Addition       & \texttt{arcloom\_bt\_adder}   & 6,561  & 0 \\
+Multiplication & \texttt{arcloom\_trit\_mul}    & 6,561  & 0 \\
+Comparison     & \texttt{arcloom\_bt\_compare}  & 6,561  & 0 \\
+Division (sim) & \texttt{arcloom\_mathloom\_div} & 41,430 & 0 \\
+Division (silicon) & \texttt{arcloom\_mathloom\_div} & 18 & 0 \\
+\midrule
+\textbf{Total} & & \textbf{61,131} & \textbf{0} \\
+\bottomrule
+\end{longtable}
+
+\textbf{Computational completeness:} Addition + multiplication + folding
+division = any numerical function via iteration. Fractions, square roots,
+and trigonometric functions verified in simulation through folding and
+Newton iteration.
+
+\textbf{Implementation:} Addition, multiplication, and comparison are
+purely combinational ($\sim$10--15\,ns for 4-trit operands on Zynq-7020).
+Division is the sole clocked MathLoom module (2-state FSM, one fold per
+clock cycle). MathLoom exists at I/O boundaries only --- not used inside
+the SPPU settling path.
+
+\section{Significance}
+
+MathLoom is validated on silicon with zero errors across 61,131 tests.
+It represents a fundamentally different approach to arithmetic:
+\begin{itemize}[nosep]
+  \item \textbf{Constraint satisfaction:} Each digit position satisfies
+        $a_i + b_i + c_i = s_i + 3 c_{i+1}$. The hardware stores the
+        constraint, not an algorithm. The answer is the unique solution.
+  \item \textbf{No instruction set required:} Arithmetic is a consequence
+        of constraint propagation through LUTs, not instruction execution.
+  \item \textbf{Truncation equals rounding:} Balanced ternary truncation
+        rounds to nearest, not toward zero. No bias accumulation.
+  \item \textbf{Folding division:} Novel method connecting division to
+        the SPPU's dead-zone settling. Same physics --- force vs barrier,
+        iterated until exhaustion.
+  \item \textbf{Boundary role:} MathLoom exists at I/O boundaries (BSIL
+        conversion, actuator output, external communication). The SPPU
+        settling path uses weighted accumulation and dead-zone thresholding,
+        not MathLoom arithmetic.
+\end{itemize}
+
+MathLoom is promoted from theoretical appendix to \textbf{proven core
+capability} as of April 2026.
+
+% ============================================================
+\chapter{Risk Register}
+
+\begin{longtable}{@{}p{1cm}p{3.5cm}p{5cm}p{4cm}@{}}
+\toprule
+\textbf{ID} & \textbf{Risk} & \textbf{Impact} & \textbf{Mitigation} \\
+\midrule
+\endhead
+R1 & 0-basin instability & Neutral state ($w=0$) not stable under noise;
+      ternary collapses to binary & Domain pinning geometry;
+      Schmitt trigger; validate with 27-cell tile \\
+R2 & Settle time too slow & TAL relaxation exceeds real-time requirements &
+     Quantify in Phase 1 FPGA sim; bound $N_{int}$ \\
+R3 & Manufacturing variance & Tri-well margins too tight for
+     production & Parity chains; BCP compensation (hybrid) \\
+R4 & Collective oscillation & Large coupled arrays exhibit emergent
+     dynamics & Staged scaling; 27-cell $\to$ 64-cell $\to$ 256-cell \\
+R5 & BSIL capture completeness & Insufficient observables to reproduce
+     binary workflow & Validate with known workflows; define minimum
+     observable set \\
+R6 & Ecosystem adoption & No tooling, no developers, no community &
+     Hybrid mode provides familiar MCU interface; WeaveSpec is JSON \\
+R7 & MathLoom global settle failure & Carry does not propagate through
+     coupling; arithmetic requires sequential settling &
+     Fall back to Approach 1 (carry tree) or 2 (redundant representation);
+     validate in Phase 1 with width-independence test \\
+\bottomrule
+\end{longtable}
+
+% ============================================================
+\chapter{Version History}
+
+\begin{longtable}{@{}lll@{}}
+\toprule
+\textbf{Version} & \textbf{Date} & \textbf{Description} \\
+\midrule
+\endhead
+v0.3 & 2026-01-06 & Original $\psi$-lattice architecture, Law-Fields, Krimelacks memory \\
+v0.4 & 2026-01-06 & Locked OD-1 through OD-6, MapInject, commit mechanics \\
+BSIL v0.1 & 2026-01-06 & Binary Story Ingestion Layer \\
+WeaveSpec v0.1 & 2026-01-06 & Declarative programming surface \\
+v1.0 & 2026-01-06 & Consolidated spec with WVB, TDM, conformance indicators \\
+v1.1 & 2026-01-07 & Binary-free pivot, five BF compliance rules \\
+v1.2 & 2026-01-07 & Ternary differential signaling, performance metrics, ``worth it'' analysis \\
+v1.3 & 2026-01-07 & TAL core (tri-stable attractor cells), 27-cell test tile \\
+v1.4 & 2026-01-07 & MathLoom addendum (balanced ternary arithmetic) \\
+v4.0 & 2026-04-10 & Physical implementation: triple-node rings, Schmitt trigger, parity chains,
+                     krimelack I/O, robot BOM \\
+\textbf{v5.0} & \textbf{2026-04-10} & \textbf{Master Canon.} Consolidates all prior specs. Supersedes all. \\
+v5.0.1 & 2026-04-10 & MathLoom upgraded: global settle hypothesis, carry-lookahead \\
+       &            & tree, redundant ternary, multiplication sketch, validation protocol. \\
+       &            & MathLoom promoted from theoretical appendix to Phase~1 validation target. \\
+v5.1 & 2026-05-03 & Familiarity Feedback: clockless habituation via krimelack \\
+     &            & dead-zone coupling. Biological principle, FPGA implementation, \\
+     &            & TSAC substrate fatigue, loop stability, cognitive implications. \\
+     &            & MathLoom updated: folding division (41,430 tests), validation \\
+     &            & results (61,131 total, zero errors), promoted from appendix \\
+     &            & to proven core capability. \\
+\bottomrule
+\end{longtable}
+
+\vspace{2em}
+\hrule
+\vspace{0.5em}
+{\color{al-gray}\small This document is confidential and for internal use only.
+It constitutes the master specification for the ArcLoom Processor
+Architecture. All prior ArcLoom specifications are superseded by this
+document. The $\psi$-lattice architecture, Law-Field programming model,
+Krimelacks memory, BSIL interoperability, and WeaveSpec programming
+surface are the canonical layers. The physical implementation (TAL cells,
+triple-node rings, parity chains) is the reference hardware design. All
+mathematics are deterministic. All constants are frozen rationals or
+derived from natural mathematical constants. No parameters are fitted,
+estimated, or heuristically determined.}
+
+\end{document}

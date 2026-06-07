@@ -1,0 +1,496 @@
+ArcLoom — Ternary Attractor Loom Specification v1.3
+===================================================
+Date: 2026-01-07
+Full replacement spec pivoting to TAL core.
+
+Design approvals assumed:
+
+Approved: Pivot to a Ternary Attractor Loom (TAL) core (collective relaxation) with:
+• Option 1 medium: ferroic domain‑landscape tri‑stable cells (“tri‑well basins”).
+• Ternary as the architectural primitive (balanced trits: −1, 0, +1).
+• UF L0–L4 kernel as the deterministic governance and DSF definition.
+• Negative‑space windows used for deterministic calibration/maintenance.
+• No binary ISA/CPU/fetch-decode-execute inside the ArcLoom boundary.
+
+Change log (v1.3 vs v1.2)
+=========================
+
+v1.3 changes:
+• Replaces the core model: ArcLoom is now defined around a Ternary Attractor Loom (TAL) medium that relaxes into structural states.
+• Defines the tri‑stable attractor cell (TSAC) and TAL energy landscape as the primary primitive.
+• Recasts “processing” as: bias → settle → readout → DSF → commit/recall, rather than symbol streaming.
+• Keeps UF L0–L4 equations and hardening/SafeMode as normative governance (determinism + boundedness).
+• Retains ternary differential signaling as an optional interconnect/readout layer (non-essential to the TAL core).
+
+Normative references
+====================
+NF‑1: UF Spec v1.4.0.
+Informative: IRF paper; UFCP/Not‑Math concept.
+
+Contents
+========
+
+0. Scope
+1. Conformance
+2. Terms, symbols, and abbreviations
+3. System overview
+4. Ternary Attractor Loom Core (TALC)
+5. Field coupling, time integrity, and negative-space maintenance
+6. Episode gating and settling protocol
+7. DSF generation and deterministic governance (UF L0–L4)
+8. Krimelacks folded motif memory
+9. Output control and domain adapters
+10. Hardening, SafeMode, and recovery
+11. Performance (lever factor) and benchmark metrics
+12. Validation and test vehicles
+13. Fabrication recommendations and implementation profiles
+14. Intended uses and explicit non-goals
+15. Glossary
+Annex A: Mathematical reference model
+Annex B: Minimal 27‑cell tile specification
+Annex C: Risk register and mitigations
+Annex D: Patent-oriented claim anchors (informative)
+Annex E: Recommended next steps
+
+0. Scope
+========
+ArcLoom v1.3: tri-stable attractor medium + UF governance; binary-free; bias→settle→readout→DSF→memory→output.
+
+1. Conformance
+==============
+
+1.1 Conformance classes (normative)
+• Class R (Reference‑Deterministic): A software reference model produces identical traces for identical inputs and configuration.
+• Class D (Device‑Deterministic): A physical device produces identical gate boundaries and DSF within declared tolerances under bounded noise/drift.
+
+1.2 Binary‑Free boundary (normative)
+BF‑1: ArcLoom SHALL contain no binary instruction execution engine (no ISA, no PC, no fetch/decode/execute).
+BF‑2: ArcLoom SHALL NOT require internal state to be representable as bits.
+BF‑3: Any discrete internal state used for decisions SHALL be ternary or multi‑level (≥3 stable states).
+BF‑4: Any binary interoperability SHALL be implemented outside the ArcLoom boundary (external gateway).
+
+1.3 Deterministic tie‑breaks (normative)
+Whenever multiple states are admissible (e.g., competing attractors), ArcLoom SHALL apply deterministic tie‑break rules. If no tie‑break is safe, ArcLoom SHALL output the neutral decision (D=0) and/or enter SafeMode.
+
+2. Terms, symbols, abbreviations
+================================
+
+2.1 Symbols
+t : physical time
+k : gate/episode index
+F(t) ∈ ℝ^d : time-indexed input field (UF kernel)
+SEV(t) : State Embedding Vector (UF kernel)
+N(t) ∈ {0,1} : negative-space operator (UF kernel)
+x ∈ ℝ^n : TAL state vector (cell states)
+E(x; b, W) : TAL energy functional
+b(t) ∈ ℝ^n : TAL bias field derived from inputs
+W ∈ ℝ^{n×n} : symmetric coupling matrix
+x*(k) : settled TAL state for gate k
+DSF_k : Decision Surface Vector (UF L4)
+T = {−1, 0, +1} : balanced trit alphabet
+
+2.2 Abbreviations
+TAL : Ternary Attractor Loom
+TALC : Ternary Attractor Loom Core
+TSAC : Tri‑Stable Attractor Cell
+KM : Krimelacks Memory
+UF : Unified Framework kernel (L0–L4)
+HTC/HA/HRR : Hardening Triggers / Actions / Recovery Rules (UF)
+
+3. System overview
+==================
+
+3.1 Functional blocks (normative)
+A) Coupler Array (CA): transforms physical transduction into a bounded field interface
+B) Time Integrity & Negative‑Space Manager (TINM): ensures monotone time; schedules maintenance on negative-space windows
+C) Episode Gate Engine (EGE): determines gate boundaries / episodes (UF L1)
+D) Ternary Attractor Loom Core (TALC): tri-stable medium that relaxes into structural attractors
+E) Readout & Ternary Quantizer (RTQ): deterministically maps settled state into ternary structural signatures
+F) UF Governance Kernel (UFGK): enforces invariants; produces DSF; hardening/SafeMode
+G) Krimelacks Memory (KM): stores motifs/strands; manages folded adjacency & cue recall
+H) Output Control & Domain Adapters (OCDA): bounded outputs to the external world
+
+3.2 Primary data products (normative)
+• Gate stream: {G_k}
+• Settled attractor states: {x*(k)}
+• DSF stream: {DSF_k} (UF L4)
+• Motif store: {m_i} and folded adjacency map
+
+4. TAL core
+===========
+
+4.1 Tri‑Stable Attractor Cell (TSAC) (normative)
+A TSAC SHALL provide three stable basins. The logical states are:
+t ∈ {−1,0,+1}.
+
+4.2 TAL energy functional (normative reference)
+ArcLoom SHALL define a reference energy:
+E(x; b, W) = Σ_i V(x_i) − Σ_{i<j} W_{ij} x_i x_j − Σ_i b_i x_i,
+with W symmetric: W_{ij} = W_{ji}.
+
+4.3 Tri‑well local potential (normative)
+V(x) SHALL have three minima at (approximately) x ∈ {−1, 0, +1}.
+An example admissible form:
+V(x) = a x^6 − b x^4 + c x^2
+with parameters chosen to create three wells.
+
+4.4 Deterministic relaxation (normative)
+The TALC evolution SHALL be defined by a deterministic rule. A reference rule is damped gradient flow:
+dx/dt = −∇_x E(x; b, W) − γ dx/dt
+or, in discrete time:
+x_{n+1} = Clip( x_n − η ∇_x E(x_n; b, W) ),
+with deterministic Clip and step scheduling.
+
+4.5 Settle completion (normative)
+A gate k is “settled” when:
+||x_{n+1} − x_n|| ≤ ε_settle for N_settle steps,
+and the energy gap to the nearest competing basin exceeds:
+ΔE_gap ≥ E_gap_min.
+If not satisfied, output SHALL be held (neutral DSF) or SafeMode invoked per governance rules.
+
+4.6 Deterministic tie‑break (normative)
+If multiple minima are admissible within tolerance, ArcLoom SHALL:
+(1) prefer the minimum with larger ΔE_gap,
+(2) else prefer the minimum with lower uncertainty U*,
+(3) else output neutral decision D=0 and suppress commit.
+
+5. Field coupling & time integrity
+==================================
+
+5.1 UF L0 input health verification (normative)
+ArcLoom SHALL reject input if any UF L0 condition fails:
+• timestamp monotonicity fails
+• ||∆F(t)|| > ∆max
+• σ(t) ∉ [0, σmax)
+• F(t) ∉ D ⊂ ℝ^d
+
+5.2 Negative‑space operator (normative)
+ArcLoom SHALL compute:
+N(t)=1 iff σ(t)<σ_min ∧ ||∆F(t)||<δ_min ∧ κ(t)<κ_min.
+
+5.3 Negative‑space maintenance windows (normative)
+When N(t)=1 for a declared maintenance window length Wm, ArcLoom SHALL:
+• re‑estimate baseline thresholds (receiver thresholds, bias offsets),
+• update drift/aging coefficients (deterministically),
+• validate TSAC tri‑well separation via a non‑destructive probe,
+• and log calibration actions.
+
+5.4 Time integrity (normative)
+ArcLoom SHALL maintain a monotone internal time index. External time references MAY be used only if bounded and sanity‑checked.
+
+6. Episode gating and settling
+==============================
+
+6.1 Gate boundary operator (normative; UF L1)
+D(t)=α1||∆F(t)||+α2σ(t)+α3κ(t)
+D(t) ≥ τ_D ⇒ boundary
+Gate G_k = [t_a, t_b] satisfies:
+∀t∈(t_a,t_b): D(t) < τ_D.
+
+6.2 Bias schedule (normative)
+Within gate k, ArcLoom SHALL apply a deterministic bias schedule b(t) derived from SEV(t) and configuration Θ.
+The schedule SHALL be bounded: ||b(t)|| ≤ b_max.
+
+6.3 Settle budget (normative)
+Each gate SHALL have a settle-time budget T_settle_max.
+If settle does not complete within budget, ArcLoom SHALL:
+• output neutral DSF,
+• suppress commit,
+• and MAY invoke hardening actions.
+
+7. UF governance
+================
+
+7.1 UF interpretive metrics and resonance (normative)
+ArcLoom SHALL implement UF L2–L3:
+• interpretive weight w_k, contrast vector CV_k, score S_k, regime Reg_k, uncertainty U_k,
+• resonance R(k) and contextual gating g_k.
+
+7.2 Decision Surface Vector (normative; UF L4)
+Let ∆R(k)=R(k)−R(k−1). Direction:
+D_k = +1 if ∆R(k) > ε_D
+D_k =  0 if |∆R(k)| ≤ ε_D
+D_k = −1 if ∆R(k) < −ε_D
+
+DSF_k = (D_k, M_k, Rv_k, U*_k, C_k, P_k, B_k) per UF L4.
+
+7.3 Invariants (normative)
+ArcLoom SHALL enforce UF invariants, including:
+0 ≤ R(k) ≤ 1
+0 ≤ U_k ≤ 1
+C_k ≤ C_max
+B_min ≤ B_k ≤ B_max
+SafeMode triggers iff S(UF) < S_min.
+
+7.4 Hardening (normative)
+ArcLoom SHALL implement UF hardening triggers (HTCs), actions (HAs), and recovery rules (HRRs).
+A non-compliant implementation is one that violates an HTC without firing a corresponding HA and/or SafeMode as required.
+
+8. Krimelacks memory
+====================
+
+8.1 Commit eligibility (normative)
+ArcLoom SHALL commit only if:
+• SafeMode=0,
+• contextual gating g_k=1,
+• uncertainty U*_k ≤ U_commit_max,
+• settle gap ΔE_gap ≥ E_gap_min,
+• commit rate ≤ max_commits_per_time.
+
+8.2 Motif representation (normative)
+A motif m_i SHALL be representable as one or more of:
+• an attractor template x̂_i,
+• a coupling patch Ŵ_i,
+• a bias signature b̂_i,
+with all representations bounded.
+
+8.3 Folded adjacency (normative)
+ArcLoom SHALL maintain an adjacency map A(i,j) where:
+A(i,j) increases deterministically with co-activation and decays deterministically with disuse.
+This map SHOULD be implemented with physical locality (tile placement) where feasible.
+
+8.4 Recall (normative)
+Given a cue q, recall SHALL return the motif maximizing deterministic similarity:
+m* = argmax_m Similarity(q,m),
+with deterministic Similarity and tie-break rules.
+
+9. Output control
+=================
+
+9.1 Output envelope (normative)
+Each output channel SHALL declare:
+• magnitude bounds
+• rate bounds
+• SafeHold state
+• SafeMode state
+
+9.2 SafeHold/SafeMode (normative)
+If hardening fires or SafeMode=1, ArcLoom SHALL place outputs into SafeHold deterministically.
+
+9.3 Ternary-native outputs (normative)
+If discrete outputs are used, the native symbol set SHALL be ternary (−1,0,+1) or multi-level ≥3.
+
+10. Hardening and SafeMode
+==========================
+
+10.1 SafeMode trigger (normative; UF)
+SafeMode=1 ⇔ S(UF) < S_min.
+
+10.2 SafeMode behavior (normative; UF)
+In SafeMode:
+• decision dynamics freeze,
+• DSF is neutralized to a hold vector,
+• schema/motif formation suspended,
+• resonance gating forced to 0,
+• outputs SafeHold.
+
+10.3 Recovery (normative; UF)
+Exit SafeMode only when ALL recovery rules HRR-1..HRR-5 are satisfied (stability, mosaic, breathing, schema, SES if present).
+
+11. Performance metrics
+=======================
+
+11.1 Settle Time (ST) (normative)
+ST_k = t_settle_end(k) − t_gate_open(k)
+Report median, p95, p99.
+
+11.2 Reality‑to‑Action Latency (R2A) (normative)
+R2A = t_output_change − t_input_change
+Report median, p95, p99.
+
+11.3 Jitter (normative)
+Jitter = p99(R2A) − p50(R2A), and Var(R2A).
+
+11.4 Data‑Tax Proxy (DTP) (normative)
+Let BW_in be raw field bandwidth presented to ArcLoom.
+Let BW_struct be bandwidth of (DSF + motif events + output events).
+DTP = BW_struct / BW_in.
+Target: DTP ≪ 1 for domains with large negative-space spans.
+
+11.5 Lever Factor (LF) (normative)
+LF = 1 / DTP, interpreted as “how much raw stream is collapsed into stable structural decisions.”
+(An LF≈10 corresponds to a 10× reduction in structural bandwidth relative to raw input.)
+
+11.6 Stability Events (normative)
+Count: hardening actions, SafeMode entries, recovery times.
+
+12. Validation
+==============
+
+12.1 TAL tile validation (normative)
+A minimum tile test vehicle SHALL demonstrate:
+• three stable basins per cell within declared margins,
+• deterministic settle completion criteria (ε_settle, N_settle),
+• stable “0” basin (not a fragile midpoint),
+• drift/aging compensation via negative-space maintenance windows.
+
+12.2 UF kernel validation (normative)
+ArcLoom SHALL pass UF validation domains including:
+• noise robustness
+• adversarial structured inputs
+• parameter perturbation tests
+• memory/schema stress tests
+• multi-lattice conflict tests
+• breathing synchronization tests
+• global stability shock tests
+(See UF Spec v1.4.0 validation suite.)
+
+12.3 Integrated benchmarks (normative)
+ArcLoom SHALL provide benchmark packages producing:
+• ST distribution
+• R2A distribution
+• jitter
+• DTP and LF
+• SafeMode frequency and recovery time
+
+13. Fabrication
+===============
+
+13.1 Option 1 medium (approved) (normative)
+ArcLoom v1.3 TALC SHALL be implemented using a ferroic domain-landscape medium capable of tri-stable basins (−1,0,+1) at operating conditions.
+
+13.2 Implementation profiles (options + explicit recommendation)
+Profile A (RECOMMENDED for first fabrication):
+• Silicon wafer baseline (standard CMOS-adjacent process)
+• Ferroic thin-film stack integrated above/beside standard interconnect
+• Conventional metal interconnect acceptable for prototype (binary-free is architectural, not “no copper”)
+
+Profile B (advanced thermal profile):
+• High thermal conductivity substrate (e.g., SiC or synthetic diamond)
+• Higher-current/thermal interconnect upgrades (e.g., graphene-based) where manufacturable
+
+Recommendation: Profile A for first test vehicle, because it minimizes unknowns while validating the TAL primitive and UF governance.
+
+13.3 Required deliverables (normative)
+Manufacturer package SHALL include:
+• TSAC margin characterization (state separation vs temperature/aging)
+• settle-time characterization (ST distributions)
+• negative-space maintenance procedures and logs
+• UF validation report (noise/adversarial/drift/shock)
+• SafeMode behavior verification (trigger iff S(UF)<S_min)
+• conformance report for BF boundary rules
+
+14. Intended uses
+=================
+
+14.1 Intended uses (normative)
+ArcLoom is intended for domains where reality-handling is dominated by continuous fields:
+• robotics and autonomous control
+• sensor fusion and instrumentation
+• communication monitoring and early warning
+• real-time media interaction (structural collapse into decisions)
+
+14.2 Explicit non-goals (normative)
+• ArcLoom does NOT promise superiority on classic CPU workloads (e.g., arbitrary exact integer arithmetic at scale, OS kernels, classic database joins).
+• ArcLoom does NOT embed a CPU to execute binary programs within its boundary.
+• Any legacy software interoperability SHALL occur via an external gateway, not inside ArcLoom.
+
+14.3 Boundary to external ecosystems (normative)
+ArcLoom SHALL export only DSF, motif events, and bounded outputs as defined. External systems MAY translate these into other representations.
+
+Annex A — Mathematical reference model
+======================================
+
+A.1 Purpose
+This annex provides a deterministic reference model for the TALC + UF governance coupling. Physical devices SHALL approximate this model within declared tolerances (Class D).
+
+A.2 TALC reference energy
+E(x; b, W) = Σ_i V(x_i) − Σ_{i<j} W_{ij} x_i x_j − Σ_i b_i x_i
+with W symmetric.
+
+A.3 Tri-well constraints
+V(x) MUST admit three minima near {−1,0,+1}. Implementations SHALL publish parameters and verified minima positions.
+
+A.4 Deterministic update rule (discrete reference)
+Given x_n:
+x_{n+1} = Clip( x_n − η ∇E(x_n) )
+where Clip clamps each x_i into [−1, +1] deterministically.
+Convergence criteria: ||x_{n+1}−x_n|| ≤ ε_settle for N_settle steps.
+
+A.5 Ternary quantization
+q(x_i) = −1 if x_i ≤ −θ
+q(x_i) =  0 if |x_i| < θ
+q(x_i) = +1 if x_i ≥ +θ
+with deterministic tie-breaks at boundaries.
+
+A.6 Mapping settled state to UF quantities (example admissible mapping)
+A conforming implementation SHALL declare mapping functions:
+• F(t) → b(t)
+• x*(k) → gate descriptors (Tk,Vk,Rk) and mosaic projections Pℓ(Gk)
+• x*(k) → interpretive metrics (w_k, CV_k, U_k)
+The mapping MUST be bounded and deterministic.
+
+Annex B — Minimal 27-cell tile
+==============================
+
+B.1 Purpose
+Define a minimal test vehicle that can be built and evaluated without building a full system.
+
+B.2 Tile composition
+• 27 TSACs arranged in a 3×3×3 (or equivalent 2D 9×3) topology.
+• Symmetric nearest-neighbor couplings W_ij (publish matrix).
+• Readout provides q(x_i) ∈ {−1,0,+1} for each cell.
+
+B.3 Tile tests (must pass)
+• Tri-state margin test across temperature range: state separation ≥ margin_min.
+• Repeatability: identical bias patterns yield identical q(x*) within tolerance.
+• Stable 0-basin: midpoint remains a basin under zero-bias and small perturbations.
+• Maintenance window: apply negative-space mode; show threshold recentering without losing state.
+
+B.4 Pass/Fail
+PASS if all tests pass with no uncontrolled attractor flips and deterministic tie-break behavior.
+
+Annex C — Risk register & mitigations
+=====================================
+
+C.1 Tri-state stability risk
+Risk: “0” state becomes fragile midpoint.
+Mitigation: domain pinning geometry; symmetric coupling; maintenance windows; neutral DSF on ambiguity.
+
+C.2 Drift/aging risk
+Risk: thresholds move; attractor basins shift.
+Mitigation: negative-space maintenance windows; publish drift coefficients; enforce SafeMode on instability.
+
+C.3 Manufacturing variance risk
+Risk: cell-to-cell variability breaks determinism.
+Mitigation: per-tile calibration; deterministic bad-cell mapping; bounded parameter perturbation tests.
+
+C.4 Runaway dynamics risk
+Risk: uncontrolled oscillation or schema runaway.
+Mitigation: UF invariants + hardening triggers/actions + SafeMode (mandatory).
+
+C.5 Ecosystem risk
+Risk: mismatch with legacy software expectations.
+Mitigation: external gateway boundary; DSF-centric interfaces; domain-adapter libraries.
+
+Annex D — Patent claim anchors
+==============================
+
+D.1 Potential claim anchors (non-legal)
+• A binary-free processing platform whose primitive is bias→settle→readout→DSF under deterministic governance.
+• A tri-stable attractor cell and coupled attractor loom implementing collective relaxation for structural decisions.
+• Negative-space maintenance windows used to compensate drift/aging while preserving determinism.
+• Folded motif memory represented as attractor templates and coupling patches with locality-preserving adjacency.
+• Mandatory hardening + SafeMode triggered by a stability functional and invariants.
+
+Annex E — Recommended next steps
+================================
+
+E.1 Recommended next step (explicit)
+Build (or commission) the Annex B 27-cell TSAC tile. Do not build a “full chip” first.
+
+E.2 What to ask a lab/foundry (plain language)
+Ask for:
+• a tiny array of tri-stable cells with three reproducible states,
+• a way to apply small bias patterns,
+• and a way to read which of the three states each cell settled into,
+across room temperature and over time.
+
+E.3 Success criterion (explicit)
+A tile is a success if it:
+• holds all three states with clear margins,
+• settles reproducibly under the same bias,
+• and uses the 0-basin as a stable “hold/absence” state.
+
+E.4 If the tile fails (explicit)
+If the 0-basin is not stable, ArcLoom SHALL NOT proceed with ternary-attractor embodiment until the cell physics is revised.

@@ -1,0 +1,563 @@
+% ============================================================
+%  ArcLoom SPPU — Competitive Landscape Analysis
+%  Version 1.0 — May 2026
+%  Confidential — Internal Use Only (DARPA/Patent Preparation)
+% ============================================================
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multicol}
+
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue}
+
+\definecolor{tfe-gold}{RGB}{180, 140, 60}
+\definecolor{tfe-dark}{RGB}{30, 30, 30}
+\definecolor{tfe-gray}{RGB}{100, 100, 100}
+\definecolor{gap-red}{RGB}{180, 40, 40}
+\definecolor{proven-green}{RGB}{40, 130, 40}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{tfe-gray}{\small ArcLoom Competitive Landscape v1.0}}
+\lhead{\textcolor{tfe-gray}{\small Confidential --- DARPA/Patent Preparation}}
+\rfoot{\textcolor{tfe-gray}{\small Page \thepage}}
+
+\titleformat{\section}{\large\bfseries\color{tfe-dark}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{tfe-dark}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\itshape\color{tfe-dark}}{}{0em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\nopriorart}{\textcolor{gap-red}{\textbf{No prior art}}}
+\newcommand{\proven}{\textcolor{proven-green}{\textbf{PROVEN}}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{ArcLoom SPPU}}\\[6pt]
+  {\large Competitive Landscape Analysis}\\[4pt]
+  {\large Ternary Computing, Clockless Perception, and Related Work}\\[8pt]
+  {\color{tfe-gray}\small Version 1.0 \quad|\quad May 2026 \quad|\quad Confidential}\\[4pt]
+  {\color{tfe-gray}\small Joseph Forrester \quad|\quad DSF-AI Architecture}
+\end{center}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+% ============================================================
+\section{Purpose}
+
+This document surveys all known ternary computing systems, clockless
+perception hardware, structural memory architectures, and related work.
+Its purpose is to establish that ArcLoom occupies a unique position in
+the landscape and to prepare clear distinctions for DARPA pitch,
+Efabless submission, and patent prosecution.
+
+All ArcLoom claims reference validated demonstrations documented in
+the ASIC Architecture Specification v1.2.
+
+% ============================================================
+\section{Ternary Computing Hardware}
+
+\subsection{Huawei Ternary Logic Gate (2025)}
+
+\textbf{What:} Patent CN119652311A for ternary logic gates using
+threshold voltage layering on CNTFET. Claims 40\% fewer transistors,
+60\% less power.
+
+\textbf{Ternary type:} Standard (0, 1, 2) --- NOT balanced.
+
+\textbf{Hardware status:} Patent filing. Unclear if silicon exists.
+
+\textbf{Computing model:} Sequential instruction execution with
+3-state gates.
+
+\textbf{ArcLoom distinction:} Huawei improved the transistor. The
+computing model is unchanged --- fetch/decode/execute with a clock.
+Standard ternary (0,1,2) lacks the symmetric negation property of
+balanced ternary ($-1$, 0, $+1$). The SPPU's combinational settling
+through signed coupling is architecturally impossible in Huawei's
+number system. (See ASIC Spec v1.2, \S10.2.1.)
+
+\subsection{5500FP Ternary RISC Processor (2026)}
+
+\textbf{What:} 24-trit balanced ternary RISC processor on Efinix
+Trion T120F484 FPGA. 120-instruction ISA. Open hardware.
+
+\textbf{Ternary type:} Balanced ($-1$, 0, $+1$).
+
+\textbf{Hardware status:} Running on FPGA. No custom silicon.
+
+\textbf{Computing model:} Von Neumann RISC --- fetch, decode, execute,
+store.
+
+\textbf{ArcLoom distinction:} The 5500FP treats trits as numbers in
+registers. ArcLoom treats them as coupled physical states in a field.
+The null trit in 5500FP is arithmetic zero. In SPPU, it is structural
+uncertainty --- the system's admission that coupling pressure is
+insufficient to commit this dimension. The 5500FP validates that
+balanced ternary works on FPGA; ArcLoom builds a different
+computational model on top of it. (See ASIC Spec v1.2, \S10.2.2.)
+
+\subsection{Microsoft BitNet b1.58 (2024--2026)}
+
+\textbf{What:} LLM with ternary weight quantization $\{-1, 0, +1\}$.
+2B parameter model. Open-source inference engine.
+
+\textbf{Ternary type:} Ternary VALUES on binary HARDWARE.
+Not ternary computing.
+
+\textbf{Hardware status:} Runs on standard x86 CPUs. No custom hardware.
+
+\textbf{ArcLoom distinction:} BitNet uses ternary as a compression
+trick --- reducing model weight storage from 16-bit floats to 1.58-bit
+trits. The processor is entirely binary. The computation is still
+matrix multiplication (simplified to add/subtract). ArcLoom uses
+balanced ternary as the native computational substrate. The coupling
+fabric IS the computation. No matrix multiplication. No training.
+No inference.
+
+\subsection{TCN-CUTIE / CUTIE (ETH Zurich, 2022)}
+
+\textbf{What:} Fabricated ASIC (GlobalFoundries 22nm) for ternary
+neural network acceleration. 1,036 TOp/s/W efficiency.
+
+\textbf{Ternary type:} Ternary weights, binary logic. The chip is a
+binary accelerator optimized for ternary-quantized weight matrices.
+
+\textbf{Hardware status:} Real silicon. Production-grade.
+
+\textbf{ArcLoom distinction:} TCN-CUTIE is a binary chip that
+processes ternary data. ArcLoom is a ternary chip that perceives
+through coupling. TCN-CUTIE requires trained neural network weights.
+ArcLoom derives weights from sensor physics with zero training.
+
+\subsection{TerEffic (2025)}
+
+\textbf{What:} FPGA architecture for ternary LLM inference.
+16,300 tokens/second.
+
+\textbf{ArcLoom distinction:} Ternary data on binary hardware with
+a trained model. ArcLoom is native ternary logic, no training.
+
+\subsection{Tiny Tapeout Balanced Ternary Calculator (USN Group)}
+
+\textbf{What:} 2-trit balanced ternary calculator (add/subtract/multiply)
+taped out on Skywater 130nm through Tiny Tapeout 03. Follow-up REBEL-2
+ALU on TT05.
+
+\textbf{Ternary type:} Balanced ($-1$, 0, $+1$). Binary-Encoded
+Ternary on CMOS.
+
+\textbf{Hardware status:} Real silicon (Tiny Tapeout shuttle).
+
+\textbf{ArcLoom distinction:} REBEL-2 does add/sub/mul. MathLoom
+does all of those PLUS folding division (41,430 tests, zero errors)
+with native free rounding via truncation. Nobody else has verified
+balanced ternary division on hardware. More fundamentally, REBEL-2
+is a standalone ALU. MathLoom exists only at I/O boundaries of the
+SPPU --- the perception path has no ALU at all.
+
+\subsection{Carbon Nanotube Ternary Logic (Science Advances, Jan 2025)}
+
+\textbf{What:} CNT source-gating transistors with native 3-state
+switching. Ternary inverters, NMIN/NMAX gates, ternary SRAM, ternary
+neural network.
+
+\textbf{Hardware status:} Lab-scale fabricated devices. Not a system.
+
+\textbf{ArcLoom distinction:} Individual ternary gates, not an
+architecture. Their ternary neural network is trained. ArcLoom is a
+complete perception system from sensor to motor, training-free.
+
+\subsection{USN Ternary Research Group (Univ.\ of South-Eastern Norway)}
+
+\textbf{What:} Academic research group building EDA tools for ternary
+VLSI. Mixed Radix Circuit Synthesizer (MRCS). Founded 2019.
+
+\textbf{Hardware status:} EDA tools and simulation. No fabricated chips.
+
+\textbf{ArcLoom distinction:} USN builds the tools to design ternary
+chips. ArcLoom IS a ternary chip (on FPGA, ASIC spec'd). Complementary,
+not competing. Potential collaboration for ArcLoom-256 tape-out.
+
+\subsection{Historical: Setun (Moscow State University, 1958)}
+
+\textbf{What:} First and only mass-produced balanced ternary computer.
+$\sim$50 units built. Discontinued for political reasons, not technical ones.
+
+\textbf{ArcLoom distinction:} Setun was a general-purpose computer that
+happened to use balanced ternary. It validated the number system. It did
+not explore coupling, perception, or the null trit as structural
+uncertainty.
+
+\subsection{TCAM (Cisco, Broadcom --- Production)}
+
+\textbf{What:} Ternary Content-Addressable Memory in network routers.
+Three states: 0, 1, X (don't care). Massively deployed.
+
+\textbf{ArcLoom distinction:} TCAM's third state is a wildcard mask
+for pattern matching, not a computational state. TCAM does lookup, not
+logic. The ``ternary'' in TCAM has nothing in common with balanced
+ternary computing.
+
+\subsection{Three Generations of Ternary}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Generation} & \textbf{Architecture} & \textbf{Innovation} & \textbf{Limitation} \\
+\midrule
+Huawei (2025) & Standard ternary gates & Better transistor & Same computing model \\
+5500FP (2026) & Balanced ternary RISC & Better number system & Same computing model \\
+ArcLoom (2026) & BT coupling fabric & Different computing model & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Huawei improved the \textit{transistor}. The 5500FP improved the
+\textit{number system}. ArcLoom changed what \textit{computation means}.
+
+% ============================================================
+\section{Clockless / Asynchronous Perception Hardware}
+
+\subsection{Intel Loihi 2}
+
+\textbf{What:} 128 asynchronous neuron cores on Intel 4 process.
+Spiking neural network processor. Sensor fusion demonstrated
+(radar, vision, lidar).
+
+\textbf{ArcLoom distinction:} Loihi runs trained spiking neural
+networks on async hardware. The hardware is clockless; the computation
+is ML. SPPU is combinational --- no spikes, no neurons, no training,
+no iteration. The answer settles through wire propagation in $\sim$5~ns.
+
+\subsection{BrainChip Akida (AKD1500)}
+
+\textbf{What:} Event-driven digital processor. 800 GOPS at $<$300mW.
+Gesture recognition demonstrated with Prophesee event camera.
+
+\textbf{ArcLoom distinction:} Akida runs Temporal Event-based Neural
+Networks (TENNs). Event-driven hardware, ML algorithms. SPPU has no
+neural network of any kind.
+
+\subsection{SpiNNaker2 (TU Dresden)}
+
+\textbf{What:} 153 ARM cores with async event routing. 22nm FDSOI.
+Deployed at Sandia National Labs.
+
+\textbf{ArcLoom distinction:} SpiNNaker2 is a massively parallel ARM
+cluster for spiking neural network simulation. It has 153 clocked ARM
+cores connected by async routing. SPPU has zero clocked cores and zero
+neural networks.
+
+\subsection{Prophesee GenX320 (Event Camera)}
+
+\textbf{What:} 320$\times$320 event camera where each pixel fires
+independently and asynchronously. 10,000 FPS equivalent. $>$140dB
+dynamic range.
+
+\textbf{ArcLoom distinction:} Prophesee is an async \textit{sensor},
+not an async \textit{processor}. Interesting as a future BSIL input
+source --- event-driven pixels feeding directly into the SPPU's
+combinational fabric. Complementary technology.
+
+\subsection{Gap Analysis}
+
+Every existing clockless/async processor runs trained neural networks.
+The async fabric is the delivery mechanism; the computation is still ML.
+
+\textbf{Nobody has:} purely combinational perception where the answer
+settles through coupling constraints with no spikes, no neurons, no
+weights learned from data, and no iteration. The SPPU is unique in
+this category.
+
+% ============================================================
+\section{Content-Addressable Structural Memory (Krimelack)}
+
+\subsection{Existing CAM Technology}
+
+All deployed CAMs (TCAM in routers, memristor CAMs, ferroelectric CAMs)
+do bit-level or weight-level matching. They store addresses, keys, or
+feature vectors. None store \textbf{structural motifs} --- coupled
+multi-field patterns that represent a settled loom state.
+
+\subsection{Memristor Habituation (Nature Communications, 2025)}
+
+\textbf{What:} Third-order memristor (HfO$_2$+TiO$_x$) with physical
+habituation. Robot arm ignores 71\% of familiar stimuli while responding
+to threats. Non-volatile habituation survives power loss.
+
+\textbf{ArcLoom distinction:} This is the closest existing work to
+Krimelack's habituation mechanism. The difference: memristor habituation
+is \textit{analog}, \textit{per-synapse}, and embedded in a trained SNN.
+Krimelack habituation is \textit{digital}, \textit{pattern-level}
+(full loom state), and operates through \textit{combinational dead-zone
+feedback}. The memristor habituates individual connections. Krimelack
+habituates entire structural experiences.
+
+\subsection{Gap Analysis}
+
+No existing hardware combines:
+\begin{enumerate}[nosep]
+  \item Content-addressable structural motif storage
+  \item Cue-based recall from partial signatures
+  \item Pattern-level habituation via dead-zone feedback
+  \item Autonomous commit gating based on dimensional exhaustion
+        (L6 structural lock)
+\end{enumerate}
+
+Each piece exists in isolation somewhere. The combination is unique
+to Krimelack.
+
+% ============================================================
+\section{Balanced Ternary Arithmetic (MathLoom)}
+
+\subsection{REBEL-2 (USN Group, Tiny Tapeout 05)}
+
+\textbf{What:} Balanced ternary ALU with MIN, MAX, ADD, SUB, MUL,
+CMP, SHFT. Submitted for ASIC fabrication on Skywater 130nm.
+
+\textbf{MathLoom distinction:} REBEL-2 does not implement division.
+MathLoom's folding division --- verified with 41,430 tests (integer,
+complex, matrix, polynomial) at zero errors --- has no equivalent in
+any balanced ternary hardware. The native free rounding property
+(truncation = rounding in balanced ternary) is exploited as a design
+feature in MathLoom but is not used in REBEL-2's operations.
+
+\subsection{Georgia Tech Discrete ALU (Louis Duret-Robert)}
+
+\textbf{What:} 2-trit balanced ternary ALU from discrete CD4007 CMOS
+chips.
+
+\textbf{MathLoom distinction:} Proof of concept on discrete components.
+Not integrated. No division. No verification suite.
+
+\subsection{MathLoom Unique Claims}
+
+\begin{enumerate}[nosep]
+  \item Folding division with native free rounding --- \nopriorart
+  \item Exact $1/3$ representation exploited as design feature --- \nopriorart
+  \item Computational completeness proven (complex, matrix, polynomial, trig)
+  \item 41,430 verification tests + 18 silicon tests at zero errors
+  \item Positioned as I/O boundary arithmetic, not central ALU
+\end{enumerate}
+
+% ============================================================
+\section{Structural Perception Without ML}
+
+\subsection{Hyperdimensional Computing (UC San Diego, UC Berkeley, ETH Zurich)}
+
+\textbf{What:} Encodes sensor data into high-dimensional binary vectors.
+Does similarity matching via dot products. HyperSense (2024) does
+real-time raw sensor processing on FPGA. GraspHD (2024) does robotic
+grasping.
+
+\textbf{ArcLoom distinction:} HDC encodes deterministically but
+classifies with a trained model. The encoding is training-free; the
+decision is not. SPPU is training-free end-to-end --- from sensor to
+motor. HDC operates in high-dimensional binary space. SPPU operates
+in low-dimensional balanced ternary space where the null state is a
+first-class computational primitive.
+
+\subsection{Ternary Spike-Based SNN (Neural Networks, 2025)}
+
+\textbf{What:} Threshold-adaptive encoding converts analog to ternary
+spikes. QT-SNN processes with quantized ternary weights. Speech and
+EEG recognition.
+
+\textbf{ArcLoom distinction:} Trained spiking neural network with
+ternary encoding. Not structural perception. Not combinational.
+Not training-free.
+
+\subsection{Gap Analysis}
+
+The following concepts return \textbf{zero results} in the literature:
+\begin{itemize}[nosep]
+  \item ``Coupling weights'' as a perception mechanism
+  \item ``Dimensional exhaustion'' as a detection principle
+  \item ``Geometric inevitability'' in hardware
+  \item Perception that settles via coupling constraints without
+        iteration or training
+  \item $3^i$ positional weights as structural decoders in a
+        perception fabric
+\end{itemize}
+
+ArcLoom's computational model --- combinational settling through
+signed ternary coupling with dead-zone thresholding --- has
+\nopriorart.
+
+% ============================================================
+\section{Dead Zone / Null State Computing}
+
+\subsection{Three-Valued Logic}
+
+Kleene and \L ukasiewicz three-valued logics are well-established in
+formal logic. Hardware implementations exist (TDDFET gates, memristive
+circuits, Huawei patent). In all cases, the third state represents
+``unknown'' or ``high-impedance'' --- a failure to resolve.
+
+\subsection{ArcLoom Distinction}
+
+In the SPPU, the null trit is not ``unknown.'' It is ``the coupling
+field has insufficient energy to collapse this dimension.'' This is
+an \textit{active} computational state with specific consequences:
+
+\begin{itemize}[nosep]
+  \item It contributes zero to downstream coupling (multiplicative silence)
+  \item It can be created by habituation (Krimelack dead-zone feedback)
+  \item It can be created by insufficient input (sensor ambiguity)
+  \item It is counted by L6 to detect dimensional exhaustion
+  \item It can flip to committed ($+1$ or $-1$) when coupling pressure
+        increases
+\end{itemize}
+
+No prior ternary architecture treats the null state as structural
+uncertainty with these computational properties.
+
+% ============================================================
+\section{Summary: What ArcLoom Has That Nobody Else Has}
+
+\begin{center}
+\begin{longtable}{@{}p{4.5cm}p{4cm}p{5cm}@{}}
+\toprule
+\textbf{Capability} & \textbf{Nearest Prior Art} & \textbf{Gap} \\
+\midrule
+\endhead
+Combinational ternary perception & Loihi 2 (async SNN) & No ML, no spikes, no clock \\
+$3^i$ positional coupling weights & None & \nopriorart \\
+Null trit as structural uncertainty & Three-valued logic & Not used as active computation \\
+Krimelack structural motif memory & Memristor habituation & Not CAM, not pattern-level, not combinational \\
+Folding division with native rounding & REBEL-2 (add/sub/mul only) & No division anywhere \\
+L6 dimensional exhaustion & None & \nopriorart \\
+Clockless habituation via dead-zone feedback & None & \nopriorart \\
+Sensor-to-motor ternary chain & None & \nopriorart \\
+Training-free embodied cognition & HDC (trains classifier) & End-to-end training-free \\
+Autonomous obstacle navigation on ternary HW & None & \nopriorart \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+% ============================================================
+\section{Potential Allies / Collaborators}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Entity} & \textbf{What They Have} & \textbf{How They Help ArcLoom} \\
+\midrule
+USN Ternary Research Group & EDA tools (MRCS) & Synthesis and verification for tape-out \\
+Prophesee & Event cameras (GenX320) & Async sensor input for SPPU \\
+Efabless & Shuttle runs (SKY130, GF180) & ArcLoom-256 fabrication \\
+Caltech/Yale async groups & ACT async design tools & Async BSIL timing verification \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ============================================================
+\section{Anticipated Objections and Responses}
+
+\textbf{``Isn't this just another ternary computer?''}
+
+No. The 5500FP is a ternary computer --- fetch, decode, execute.
+ArcLoom has no instruction set. The answer settles through wire
+propagation. Different computational model entirely.
+
+\textbf{``How is this different from BitNet?''}
+
+BitNet uses ternary values on binary hardware. ArcLoom uses ternary
+logic as the native substrate. BitNet is a compression trick for
+trained LLMs. ArcLoom is a perception architecture that requires
+zero training.
+
+\textbf{``Huawei already made a ternary chip.''}
+
+Huawei patented ternary gates using standard ternary (0,1,2). ArcLoom
+uses balanced ternary ($-1$,0,$+1$) which has the symmetric negation
+property required for signed coupling. Huawei's chip (if it exists)
+runs sequential instructions. ArcLoom settles combinationally.
+Different number system, different architecture.
+
+\textbf{``Neural accelerators already do low-power perception.''}
+
+Neural accelerators require trained models, clocks, and sequential
+matrix multiplication. SPPU requires no training, no clock, and no
+multiplication in the decision path. Power is $10^{9}\times$ lower
+than ARM Cortex-M0 for equivalent perception.
+
+\textbf{``How do you know it works?''}
+
+19,683 arithmetic operations verified on FPGA silicon. 41,430 division
+tests at zero errors. Live sensor-to-motor chain demonstrated.
+351-sample autonomous obstacle navigation with camera. Camera-sensor
+ambiguity correctly perceived. See ASIC Spec v1.2, \S12
+(Validation Status).
+
+\textbf{``What about Loihi / Akida / SpiNNaker?''}
+
+All three run trained spiking neural networks on async hardware. The
+hardware is clockless; the computation is ML. SPPU is purely
+combinational --- no spikes, no neurons, no weights learned from data.
+
+% ============================================================
+\section{DSF-AI as ML Model Auditor (New Capability, May 2026)}
+
+During this competitive analysis, a new DSF-AI capability was
+discovered: the UF-Core kernel (L0--L4) can be run directly on the
+trained weight tensors of ML models. The kernel reads trained weights
+as structural signals and extracts coupling profiles per tensor,
+per layer, and per element.
+
+\subsection{Demonstration: CathodeX MACE Ensemble Audit}
+
+The DSF-AI kernel was run on the trained weights of the CathodeX
+MACE-MP-0 ensemble (5 members, 5.5M parameters each) --- a materials
+science ML model for cathode screening. Findings:
+
+\begin{enumerate}[nosep]
+  \item \textbf{Ensemble members are structurally identical.}
+        All 5 members produce identical DSF profiles to 6 decimal
+        places. The ensemble's epistemic uncertainty estimate
+        (inter-model variance) may measure noise, not genuine
+        disagreement.
+  \item \textbf{Lithium has the weakest learned representation}
+        of all cathode-relevant elements (coupling = 0.889,
+        uncertainty = 0.434). The element most critical to cathode
+        screening is the one the model knows least about.
+  \item \textbf{Parameter budget allocated to wrong elements.}
+        Top 5 by weight magnitude: S, As, Ta, Sb, Nb --- not
+        cathode metals.
+\end{enumerate}
+
+\textbf{Implication:} DSF-AI can audit any ML model by reading its
+weight structure. No other tool provides this capability. This is a
+natural extension of the kernel's domain-agnostic structural field
+extraction --- trained weights are just another signal.
+
+See \textit{DSF-AI MACE Audit Report} (May 2026) for full details.
+
+\vspace{2em}
+\hrule
+\vspace{0.5em}
+{\color{tfe-gray}\small This document is confidential and for internal
+use only. The competitive landscape analysis is based on publicly
+available information as of May 2026. All ArcLoom claims reference
+validated demonstrations documented in the ASIC Architecture
+Specification v1.2. The ArcLoom SPPU architecture is the intellectual
+property of Joseph Forrester / DSF-AI. The coupling weight derivation
+methodology, UF pipeline internals, and coherence field physics are
+trade secrets and are not disclosed in this document.}
+
+\end{document}

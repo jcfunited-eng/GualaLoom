@@ -1,0 +1,339 @@
+ArcLoom Interop Spec v0.1 — Binary Story Ingestion Layer (BSIL)
+---------------------------------------------------------------
+Date: 2026-01-06
+Status: locked v0.1.
+Intent: compatibility by observation, not by importing binary as native primitive.
+
+0. Locked Design Decisions
+--------------------------
+
+BSIL-1 (Interop strategy): Binary-as-Story Teacher Layer (approved). 
+BSIL-2 (Determinism): identical instrumentation + identical binary execution trace ⇒ identical BSIL ingestion record (within defined timestamp jitter policy).
+BSIL-3 (Kernel interface): BSIL emits a time-indexed field F_bin(t) and optional relevance r(t) that feed UF L0; BSIL itself does not bypass UF.
+BSIL-4 (Safety): UF hardening/SafeMode are mandatory boundaries for all ingested program stories.
+BSIL-5 (Privacy): capture is explicit by user consent; recordings are stored as motifs/strands in Krimelacks memory with export controls.
+
+
+Outline
+-------
+1. Introduction
+2. What BSIL Is and Is Not
+3. Process Flow Overview
+4. Capture Sources and Observability
+5. Binary Story Normalization and Negative Space
+6. UF Integration (L0–L4) and DSF Emission
+7. ArcLoom Core Integration (MapInject, ψ Evolution, Commit)
+8. Program Strands, Program Motifs, and Krimelacks Memory
+9. Compatibility Modes (Shadow / Assist / Replacement)
+10. Output Coupling Back to Binary Interfaces
+11. Governance: Hardening, SafeMode, Recovery
+12. Schemas
+13. Validation Protocols (BSIL-specific)
+14. Glossary
+15. Recommended Next Steps
+
+1. Introduction
+---------------
+BSIL enables adoption by letting ArcLoom learn and reproduce legacy software behavior as structural history. A legacy program is treated as a <b>story generator</b>: a stream of user inputs, system calls, resource flows, and rendered outputs. BSIL captures that story deterministically and feeds it into UF L0–L4, which yields gates and DSF for ArcLoom ingestion.
+
+2. What BSIL is and is not
+--------------------------
+BSIL is not an emulator, compiler, or instruction translator. It does not parse binaries into opcodes. Instead, it captures observable behaviors and treats them as structured episodes.
+
+2.1 Normative scope
+-------------------
+
+BSIL SHALL:
+• capture user input events, API/system call summaries (where available), and render outputs (frames/audio/text) as time-indexed observables.
+• compute “negative space” in program behavior (periods of inactivity/stability) as informative structure.
+• feed the resulting field into UF (L0→L4) unchanged in mathematical meaning.
+• use UF SafeMode as the boundary for when captured stories are considered unsafe/unstable.
+
+BSIL SHALL NOT:
+• disassemble binaries as a required step.
+• represent a program as a bit-level instruction stream in ArcLoom memory.
+• bypass UF hardening constraints.
+
+
+3. Process Flow Overview
+------------------------
+BSIL is a deterministic capture-and-ingest pipeline that produces UF-compatible fields and a story archive.
+
+3.1 Pipeline diagram
+--------------------
+
+(0) Consent + Capture Config
+    user consent + target program + capture profile
+
+(1) Observability Capture
+    UI events | system/API events | file/network events | perf/resource counters | renderer outputs
+
+(2) Normalization
+    map heterogenous events → canonical feature vectors
+    enforce deterministic ordering + timestamp jitter policy
+
+(3) Program Negative Space
+    detect stable spans (no UI change, low event rate, steady resources)
+
+(4) UF Integration (L0–L4)
+    F_bin(t) → SEV(t) → NSF → gates G_k → ISF_k → URF_k → DSF_k (bounded)
+    apply UF validation/hardening; SafeMode as needed
+
+(5) ArcLoom Intake
+    gate evidence e_k + DSF_k → MapInject → ψ evolution → arcs p_i(k) → commit events
+
+(6) Krimelacks Memory
+    committed “program strands” folded into motifs + landmarks
+
+(7) Compat Modes
+    Shadow: observe only
+    Assist: suggest/augment
+    Replacement: weave renders outputs to mimic workflow
+
+
+4. Capture Sources and Observability
+------------------------------------
+Defines the capture sources that produce a stable behavioral trace without requiring opcode awareness.
+
+4 Capture channels and BOR
+--------------------------
+
+4.2 Canonical observability record (BOR)
+
+BOR(t) = {
+  t: timestamp,
+  ui_in: [event tokens],
+  ui_out: [frame delta summary],
+  sys: [API/system summary tokens],
+  res: [resource vector],
+  net: [flow summary],
+  fs:  [file/artifact summary],
+  meta: {program_id, session_id, capture_profile_id}
+}
+
+Ordering is deterministic:
+• primary key: timestamp t
+• secondary: channel ordering fixed: ui_in < ui_out < sys < res < net < fs
+
+
+5. Normalization and Negative Space
+-----------------------------------
+Maps heterogenous BOR(t) to a stable numeric field F_bin(t) suitable for UF L0 and computes program negative space.
+
+5 Field mapping & negative space
+--------------------------------
+
+5.1 Canonical feature field (normative)
+
+F_bin(t) = concat(
+  Enc(ui_in), Enc(ui_out), Enc(sys), Enc(res), Enc(net), Enc(fs)
+)
+
+Enc(·) MUST be deterministic:
+• stable dictionary IDs
+• bounded numeric ranges
+• fixed dimensionality per capture profile
+
+5.2 Program negative space (normative)
+
+Define event-rate λ(t) over window W_e and output-change δ_frame(t):
+
+λ(t) = (#events in [t−W_e,t]) / W_e
+δ_frame(t) = ||FrameSummary(t) − FrameSummary(t−Δt)||
+
+N_bin(t) = 1 if λ(t) < λ_min AND δ_frame(t) < δ_min AND ||Δres(t)|| < ρ_min else 0
+
+N_bin(t) is incorporated as an additional dimension in F_bin(t) and as r(t) dampening.
+
+
+6 UF integration
+----------------
+BSIL feeds F_bin(t) through UF L0–L4 to obtain gates and DSF, enforcing UF invariants and SafeMode.
+
+6 UF dependency
+---------------
+
+BSIL SHALL use UF’s core operators for:
+• health verification (timestamp monotonicity, ∥ΔF∥, σ bounds, domain bounds),
+• negative space operator N(t),
+• gate boundary operator D(t) and gate definition,
+• resonance R(k), contextual gating g_k,
+• DSF_k = (D_k, M_k, R_k, U*_k, C_k, P_k, B_k) as the sole kernel output to L5 adapters.
+
+BSIL SHALL treat SafeMode as authoritative:
+SafeMode=1 ⇒ no ArcLoom injection/commit based on this trace segment.
+
+
+7 ArcLoom core integration
+--------------------------
+After UF produces gate evidence and DSF, BSIL hands the story to ArcLoom for injection into ψ and commit into motifs/strands.
+
+7 Core block
+------------
+
+7.1 Evidence pack for program stories (normative)
+
+e_k = concat( TVR_k, ISF_k, URF_k, DSF_k, N_bin(G_k), capture_profile_id )
+
+7.2 Commit semantics (normative)
+
+A “program commit” means:
+• ArcLoom becomes near-certain that the current gate sequence matches a known program-episode motif.
+This is measured as a dominance + entropy drop over arc weights (IRF-style determinism index framing).
+
+
+8 Memory
+--------
+Defines how program behaviors become structural artifacts (strands/motifs) and how folding/landmarks enable cue-driven recall.
+
+8 Memory artifacts
+------------------
+
+8.1 ProgramStrand (normative)
+
+ProgramStrand = {
+  strand_id,
+  episode_class_id (motif),
+  gate_chain: [k0..k1],
+  DSF_trace: [DSF_k],
+  summary: {top arcs, determinism peak, negative-space spans},
+  artifacts: {file deltas, rendered outputs (optional references)}
+}
+
+8.2 Landmarks (recommended and locked for BSIL memory)
+
+A Landmark is a stable motif used to anchor recall and reduce “search.”
+Landmarks are NOT addresses; they are high-salience motifs with high reuse.
+
+
+9 Compatibility modes
+---------------------
+Defines how a user experiences compatibility without asking them to change tolerance overnight.
+
+9 Mode definitions
+------------------
+
+Shadow Mode (default):
+• run legacy program normally
+• BSIL captures story and builds motifs
+• no intervention
+
+Assist Mode:
+• BSIL still captures
+• ArcLoom suggests next action or prefetches artifacts (bounded, reversible)
+• SafeMode ⇒ no suggestions
+
+Replacement Mode:
+• ArcLoom mounts a weave that reproduces a learned workflow by story motifs
+• BSIL may still run the legacy program in parallel for verification (optional)
+• mismatches ⇒ fall back to Assist or Shadow
+
+
+10 Output coupling
+------------------
+When interacting with binary UIs, outputs must be rendered into familiar surfaces (screens, files, network messages) while staying bounded and reversible.
+
+10 Safety constraints
+---------------------
+
+10.1 Reversibility (normative)
+
+Any Assist/Replacement action SHALL be:
+• logged as an event in BOR(t)
+• reversible where possible (undo record)
+• bounded in rate and magnitude
+
+10.2 SafeHold (normative)
+
+UF SafeMode or ArcLoom SafeHold ⇒ no outward actions; only observation continues.
+
+
+11 Governance
+-------------
+Governance and safety for BSIL are inherited from UF hardening and extended with capture/consent rules.
+
+11 Governance rules
+-------------------
+
+BSIL SHALL implement UF hardening triggers and actions as authoritative boundaries:
+• HTCs (mosaic divergence, uncertainty violation, breathing range, schema growth, stability collapse, DSF instability, drift violation, resonance blowup, etc.)
+• HAs (gate suppression, DSF neutralization, uncertainty spike, breathing contraction, schema freeze, merge, mosaic compression)
+• SafeMode definition and recovery rules.
+
+Additionally BSIL SHALL:
+• stop capture if consent is withdrawn
+• mark the story segment as non-exportable if policy requires
+
+
+12 Schemas
+----------
+Defines the records required to make BSIL deterministic, auditable, and testable.
+
+12 Schema block
+---------------
+
+12.1 BOR(t)  (see Section 4)
+
+12.2 ROR(t) — Render Output Record
+{ t, frame_summary, audio_summary, text_summary, ui_state_summary }
+
+12.3 F_bin checkpoint
+{ t0, t1, dim_d, scaling_id, checksum }
+
+12.4 UF output per gate
+{ k, gate:[t_a,t_b], TVR_k, ISF_k, URF_k, DSF_k, SafeMode, faults, N_gate }
+
+12.5 Program commit event
+{ k, commit=1, motif_id, p_max, Det_k, strand_id }
+
+
+13 Validation protocols
+-----------------------
+Adds BSIL-specific validation on top of UF validation: determinism of capture/normalization, privacy bounds, and replay equivalence.
+
+13 BSIL validation set
+----------------------
+
+BSIL Test B-1 — Deterministic Replay
+Goal: identical program session run twice under identical capture profile ⇒ identical BOR ordering, identical F_bin(t) (within numeric tolerance), identical UF gates/DSF.
+
+BSIL Test B-2 — Channel Drop Robustness
+Goal: drop one capture channel (e.g., perf counters) ⇒ UF remains stable; SafeMode triggers if needed; story quality degrades gracefully.
+
+BSIL Test B-3 — Negative Space Stability
+Goal: periods of inactivity produce stable N_bin(t) and do not cause spurious gate boundaries.
+
+BSIL Test B-4 — Consent Boundary
+Goal: withdrawing consent stops capture and marks story segment; exports are blocked for marked segments.
+
+BSIL Test B-5 — Assist/Replacement Reversibility
+Goal: every outward action is logged, bounded, and undoable where possible; SafeMode disables outward actions.
+
+
+14 Glossary
+-----------
+Defines BSIL-specific terms.
+
+15 Next steps
+-------------
+Practical next steps to turn BSIL into a testable compatibility bridge without requiring you to be a developer.
+
+15 Next steps block
+-------------------
+
+Recommended next step (explicit):
+Start with ONE workflow in Shadow Mode and perform BSIL Test B-1 (Deterministic Replay).
+If B-1 passes, enable Assist Mode for that same workflow.
+
+What you need to provide (non-developer-friendly):
+• Name the program/workflow (e.g., “write a document”, “edit a photo”, “robot calibration sequence”).
+• What “success” looks like (e.g., “suggest the next step”, “recover after error”, “predict stall”).
+
+
+References
+----------
+
+• UF Spec v1.4.0 skeleton: deterministic L0–L4, DSF, invariants, validation & hardening.
+• IRF: epochal eigenmodes Φ_i, amplitudes A_i(t), entropy/determinism index D_n and “entropic flip” framing.
+• UFCP / Not‑Math: ψ=√ρ e^{iϕ}; Hermitian action; symmetric couplings; overlap‑squared rule; falsifiability conditions.
+

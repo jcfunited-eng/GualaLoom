@@ -102,6 +102,7 @@ header{padding:8px 14px;border-bottom:1px solid var(--border);background:var(--b
     <button class="upload-btn" onclick="uploadSound()">&#x1f50a; sound</button>
     <button class="upload-btn" onclick="uploadVideo()">&#x1f3a5; video</button>
     <button class="upload-btn" onclick="openBundleModal()">&#x1f381; experience</button>
+    <button class="upload-btn" onclick="triggerSleep()">&#x1f4a4; sleep</button>
     <button class="upload-btn" id="snap-btn" style="display:none" onclick="takeSnapshot()">&#x1f4f8; snapshot</button>
     <video id="cam-preview" autoplay playsinline muted></video>
   </div>
@@ -171,17 +172,37 @@ document.getElementById('session-line').textContent='session: '+sid;
 let lastTick=0,audioUnlocked=false,muted=false,micGranted=false,camStream=null,sttActive=false,recognition=null;
 let last503msg=0; // debounce 503 messages
 
-// --- 503 handling ---
-function handle503(context){
+// --- 503/500 handling ---
+function handleNotReady(context){
   const now=Date.now();
   if(now-last503msg<60000)return; // at most once per minute
   last503msg=now;
   addMsg('she is still loading \u2014 give her a moment','system');
 }
 
-// --- Permission Strip ---
+// --- Sleep / Dream (5b) ---
+async function triggerSleep(){
+  addMsg('(asking her to dream...)','system');
+  try{
+    const r=await fetch(`${API}/v7/quiet`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,n_ticks:50})});
+    if(r.status===503||r.status===500){handleNotReady('sleep');return}
+    const d=await r.json();
+    addMsg('(she is dreaming \u2014 '+d.replayed+' replayed memories, '+d.commits+' commits)','system');
+    pollV7State();
+  }catch(e){addMsg('sleep error: '+e.message,'system')}
+}
+
+// --- Permission Strip (5a: toggle off support) ---
 async function requestMic(){
   const btn=document.getElementById('mic-perm');
+  if(micGranted){
+    // Turn OFF
+    if(sttActive&&recognition){recognition.stop();sttActive=false}
+    micGranted=false;
+    btn.textContent='Enable Microphone';btn.className='perm-btn';
+    document.getElementById('mic-btn').style.display='none';
+    return;
+  }
   try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());
     btn.textContent='\u2705 Microphone ON';btn.className='perm-btn granted';micGranted=true;
     document.getElementById('mic-btn').style.display='inline-block';
@@ -189,6 +210,14 @@ async function requestMic(){
 }
 async function requestCam(){
   const btn=document.getElementById('cam-perm');
+  if(camStream){
+    // Turn OFF
+    camStream.getTracks().forEach(t=>t.stop());camStream=null;
+    const vid=document.getElementById('cam-preview');vid.srcObject=null;vid.style.display='none';
+    document.getElementById('snap-btn').style.display='none';
+    btn.textContent='Enable Camera';btn.className='perm-btn';
+    return;
+  }
   try{camStream=await navigator.mediaDevices.getUserMedia({video:true});
     const vid=document.getElementById('cam-preview');vid.srcObject=camStream;vid.style.display='inline-block';
     btn.textContent='\u2705 Camera ON';btn.className='perm-btn granted';
@@ -435,7 +464,7 @@ function addResponseBlock(result){
 async function sendFeedback(correct,up,dn){
   try{
     const r=await fetch(`${API}/v7/feedback`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,correct})});
-    if(r.status===503){handle503('feedback');return}
+    if(r.status===503||r.status===500){handleNotReady('feedback');return}
     if(correct){up.classList.add('active');dn.classList.remove('active')}else{dn.classList.add('active');up.classList.remove('active')}
   }catch(e){}
 }
@@ -454,7 +483,7 @@ async function sendMsg(){
       const v6p=fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,source:'joe'})}).catch(()=>null);
       const [r,r6]= await Promise.all([v7p,v6p]);
       // Render v7 first (primary)
-      if(r.status===503){handle503('converse')}
+      if(r.status===503||r.status===500){handleNotReady('converse')}
       else{
         const d=await r.json();
         if(d.session_id){sid=d.session_id;localStorage.setItem('guala_session_id',sid);document.getElementById('session-line').textContent='session: '+sid}
@@ -488,9 +517,9 @@ async function pollStatus(){
 async function pollV7State(){
   try{
     const r=await fetch(`${API}/v7/state?session_id=${sid}`);
-    if(r.status===503){
+    if(r.status===503||r.status===500){
       statsLine.textContent='she is still loading...';
-      handle503('state');return;
+      handleNotReady('state');return;
     }
     const s=await r.json();
     // Substrate
@@ -535,7 +564,7 @@ async function pollEvents(){
 async function backgroundReplay(){
   try{
     const r=await fetch(`${API}/v7/quiet`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,n_ticks:5})});
-    if(r.status===503)return; // silently skip during init
+    if(r.status===503||r.status===500)return; // silently skip during init
     const d=await r.json();if(d.commits>0)addMsg(`\ud83d\udcad (thinking... ${d.replayed} memories, ${d.commits} commits)`,'emission');pollV7State();
   }catch(e){}
 }

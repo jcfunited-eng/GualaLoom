@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Guala</title>
+<style>
+:root{--bg:#0d1117;--bg-alt:#161b22;--text:#e6edf3;--text-muted:#7d8590;--accent:#58a6ff;--border:#30363d;--input-bg:#0d1117;--msg-user:#1f2937;--msg-sub:#161b22;--ev-activity:#58a6ff;--ev-motif:#3fb950;--ev-emission:#f0883e;--nmda-fire:#3fb950;--nmda-block:#f85149}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SF Mono','Fira Code',monospace;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+#perm-strip{display:flex;gap:6px;padding:6px 14px;background:#0b0e14;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.perm-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;font-family:inherit;font-size:10px;cursor:pointer;white-space:nowrap}
+.perm-btn:hover{border-color:var(--accent);color:var(--text)}
+.perm-btn.granted{border-color:var(--ev-motif);color:var(--ev-motif)}
+.perm-btn.denied{border-color:var(--nmda-block);color:var(--nmda-block)}
+#speaker-badge{font-size:10px;color:var(--text-muted);cursor:pointer;margin-left:auto;display:flex;align-items:center;gap:6px}
+#mute-toggle{background:none;border:1px solid var(--border);color:var(--text-muted);padding:2px 8px;border-radius:4px;font-family:inherit;font-size:9px;cursor:pointer}
+header{padding:8px 14px;border-bottom:1px solid var(--border);background:var(--bg-alt);display:flex;justify-content:space-between;align-items:center}
+.header-left h1{font-size:15px;font-weight:600;color:var(--accent)}
+.header-left .subtitle{font-size:9px;color:var(--text-muted)}
+.header-right{display:flex;align-items:center;gap:6px}
+.hdr-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:3px 8px;border-radius:4px;font-family:inherit;font-size:9px;cursor:pointer}
+.hdr-btn:hover{border-color:var(--accent);color:var(--text)}
+#stats-line{padding:4px 14px;font-size:9px;color:var(--text-muted);background:var(--bg-alt);border-bottom:1px solid var(--border)}
+#main-area{flex:1;display:flex;overflow:hidden}
+#convo-col{flex:1;display:flex;flex-direction:column;min-width:0}
+#transcript{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.msg{max-width:85%;padding:6px 10px;border-radius:6px;font-size:11px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.msg.user{align-self:flex-end;background:var(--msg-user);border:1px solid var(--border)}
+.msg.substrate{align-self:flex-start;background:var(--msg-sub);border:1px solid var(--border);color:var(--accent)}
+.msg.emission{align-self:flex-start;background:transparent;border:1px solid #30363d44;color:var(--ev-emission);font-style:italic;font-size:10px}
+.msg.system{align-self:center;color:var(--text-muted);font-size:9px;font-style:italic}
+.response-block{align-self:flex-start;max-width:90%}
+.response-text{padding:6px 10px;border-radius:6px 6px 0 0;background:var(--msg-sub);border:1px solid var(--border);color:var(--accent);font-size:11px;line-height:1.45}
+.response-text .tok-anno{color:var(--text-muted);font-size:9px}
+.response-meta{display:flex;align-items:center;gap:6px;padding:3px 10px;background:var(--bg);border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;font-size:9px;color:var(--text-muted)}
+.fb-btn{cursor:pointer;font-size:13px;opacity:0.4}.fb-btn:hover{opacity:1}.fb-btn.active{opacity:1}
+#upload-bar{display:flex;gap:4px;padding:4px 14px;background:var(--bg-alt);border-top:1px solid var(--border);align-items:center;flex-wrap:wrap}
+.upload-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:3px 8px;border-radius:4px;font-family:inherit;font-size:10px;cursor:pointer}
+.upload-btn:hover{border-color:var(--accent);color:var(--text)}
+#cam-preview{display:none;width:80px;height:60px;border-radius:4px;border:1px solid var(--border);object-fit:cover}
+#input-row{padding:8px 14px;border-top:1px solid var(--border);background:var(--bg-alt);display:flex;gap:6px;align-items:center}
+#input-row input{flex:1;background:var(--input-bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-family:inherit;font-size:11px;outline:none}
+#input-row input:focus{border-color:var(--accent)}
+#input-row button{background:var(--accent);color:#0d1117;border:none;padding:6px 14px;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer}
+#mic-btn,#snap-btn{display:none;background:none;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;font-family:inherit;font-size:11px;cursor:pointer}
+#mic-btn:hover,#snap-btn:hover{border-color:var(--accent);color:var(--text)}
+#mic-btn.recording{border-color:var(--nmda-block);color:var(--nmda-block);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+#live-transcript{font-size:9px;color:var(--text-muted);padding:0 14px;min-height:14px;overflow:hidden}
+#state-panel{width:280px;border-left:1px solid var(--border);background:var(--bg-alt);overflow-y:auto;padding:8px;font-size:9px}
+.ps{margin-bottom:8px}
+.ps-title{font-size:9px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid var(--border)}
+.ps-row{display:flex;justify-content:space-between;padding:1px 0}
+.ps-row .l{color:var(--text-muted)}.ps-row .v{color:var(--text)}
+.nmda-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px}
+.nmda-dot.fired{background:var(--nmda-fire)}.nmda-dot.blocked{background:var(--nmda-block)}.nmda-dot.idle{background:var(--border)}
+.ev{padding:2px 6px;font-size:8px;color:var(--text-muted);border-bottom:1px solid #21262d}
+/* Bundle modal */
+#bundle-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:100;justify-content:center;align-items:center}
+#bundle-modal.visible{display:flex}
+#bundle-form{background:var(--bg-alt);border:1px solid var(--border);border-radius:8px;padding:16px;width:380px;max-height:80vh;overflow-y:auto}
+#bundle-form h3{font-size:12px;color:var(--accent);margin-bottom:10px}
+#bundle-form label{display:block;font-size:9px;color:var(--text-muted);margin:8px 0 3px}
+#bundle-form input[type="text"],#bundle-form input[type="file"]{width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-family:inherit;font-size:10px}
+#bundle-form select{width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);padding:4px;border-radius:4px;font-family:inherit;font-size:9px}
+.bundle-btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.bundle-btns button{padding:5px 14px;border-radius:4px;font-family:inherit;font-size:10px;cursor:pointer;border:1px solid var(--border)}
+.bundle-btns .cancel{background:none;color:var(--text-muted)}
+.bundle-btns .submit{background:var(--accent);color:#0d1117;border:none;font-weight:600}
+@media(max-width:700px){#state-panel{display:none}.msg{max-width:95%}}
+</style>
+</head>
+<body>
+<!-- Permission Strip -->
+<div id="perm-strip">
+  <button class="perm-btn" id="mic-perm" onclick="requestMic()">Enable Microphone</button>
+  <button class="perm-btn" id="cam-perm" onclick="requestCam()">Enable Camera</button>
+  <span id="speaker-badge" onclick="unlockAudio()">&#x1f507; Click anywhere to enable audio</span>
+  <button id="mute-toggle" onclick="toggleMute()">unmuted</button>
+</div>
+<header>
+  <div class="header-left">
+    <h1>Guala</h1>
+    <div class="subtitle" id="session-line">session: ---</div>
+  </div>
+  <div class="header-right">
+    <button class="hdr-btn" onclick="newSession()">new session</button>
+  </div>
+</header>
+<div id="stats-line">she is still loading...</div>
+<audio id="voice" style="display:none"></audio>
+<div id="main-area">
+<div id="convo-col">
+  <div id="transcript"></div>
+  <div id="live-transcript">&nbsp;</div>
+  <div id="upload-bar">
+    <button class="upload-btn" onclick="uploadBook()">&#x1f4d6; book</button>
+    <button class="upload-btn" onclick="uploadPDF()">&#x1f4d5; PDF</button>
+    <button class="upload-btn" onclick="uploadPicture()">&#x1f5bc; picture</button>
+    <button class="upload-btn" onclick="uploadSound()">&#x1f50a; sound</button>
+    <button class="upload-btn" onclick="uploadVideo()">&#x1f3a5; video</button>
+    <button class="upload-btn" onclick="openBundleModal()">&#x1f381; experience</button>
+    <button class="upload-btn" id="snap-btn" style="display:none" onclick="takeSnapshot()">&#x1f4f8; snapshot</button>
+    <video id="cam-preview" autoplay playsinline muted></video>
+  </div>
+  <div id="input-row">
+    <input id="msg" type="text" placeholder="say something..." autocomplete="off">
+    <button id="mic-btn" style="display:none" onclick="toggleSTT()">&#x1f3a4;</button>
+    <button onclick="sendMsg()">send</button>
+  </div>
+</div>
+<div id="state-panel">
+  <div class="ps"><div class="ps-title">Substrate</div><div id="sp-substrate">--</div></div>
+  <div class="ps"><div class="ps-title">Pool Activity</div><div id="sp-pools">--</div></div>
+  <div class="ps"><div class="ps-title">Intro / Aware</div><div id="sp-intro-aware">--</div></div>
+  <div class="ps"><div class="ps-title">NMDA Gates</div><div id="sp-nmda">--</div></div>
+  <div class="ps"><div class="ps-title">Events</div><div id="sp-events" style="max-height:200px;overflow-y:auto"></div></div>
+</div>
+</div>
+
+<!-- Experience Bundle Modal -->
+<div id="bundle-modal">
+<div id="bundle-form">
+  <h3>Give her an experience</h3>
+  <label>Caption</label>
+  <input type="text" id="bundle-caption" placeholder="what is this experience?">
+  <label>Picture</label>
+  <input type="file" id="bundle-image" accept="image/*">
+  <label>Sound</label>
+  <input type="file" id="bundle-sound" accept="audio/*">
+  <label>Touch (ctrl/cmd-click for multiple)</label>
+  <select id="bundle-touch" multiple size="3">
+    <option>warm</option><option>cool</option><option>cold</option><option>hot</option>
+    <option>soft</option><option>hard</option><option>smooth</option><option>rough</option>
+    <option>wet</option><option>dry</option><option>sharp</option><option>fuzzy</option>
+    <option>heavy</option><option>light</option><option>squishy</option><option>bumpy</option>
+  </select>
+  <label>Smell</label>
+  <select id="bundle-smell" multiple size="3">
+    <option>fresh</option><option>floral</option><option>sweet</option><option>earthy</option>
+    <option>smoky</option><option>salty</option><option>fruity</option><option>woody</option>
+    <option>clean</option><option>rain</option><option>grass</option><option>ocean</option>
+  </select>
+  <label>Taste</label>
+  <select id="bundle-taste" multiple size="3">
+    <option>sweet</option><option>sour</option><option>salty</option><option>bitter</option>
+    <option>savory</option><option>spicy</option><option>creamy</option><option>tangy</option>
+  </select>
+  <div class="bundle-btns">
+    <button class="cancel" onclick="closeBundleModal()">cancel</button>
+    <button class="submit" onclick="submitBundle()">give her this</button>
+  </div>
+</div>
+</div>
+
+<script>
+const API='https://3d6toi0gw0.execute-api.us-east-1.amazonaws.com';
+const transcript=document.getElementById('transcript');
+const msgInput=document.getElementById('msg');
+const voiceEl=document.getElementById('voice');
+const liveT=document.getElementById('live-transcript');
+const evDiv=document.getElementById('sp-events');
+const statsLine=document.getElementById('stats-line');
+
+let sid=localStorage.getItem('guala_session_id');
+if(!sid){sid='sid_'+Math.random().toString(36).slice(2,10);localStorage.setItem('guala_session_id',sid)}
+document.getElementById('session-line').textContent='session: '+sid;
+
+let lastTick=0,audioUnlocked=false,muted=false,micGranted=false,camStream=null,sttActive=false,recognition=null;
+let last503msg=0; // debounce 503 messages
+
+// --- 503 handling ---
+function handle503(context){
+  const now=Date.now();
+  if(now-last503msg<60000)return; // at most once per minute
+  last503msg=now;
+  addMsg('she is still loading \u2014 give her a moment','system');
+}
+
+// --- Permission Strip ---
+async function requestMic(){
+  const btn=document.getElementById('mic-perm');
+  try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());
+    btn.textContent='\u2705 Microphone ON';btn.className='perm-btn granted';micGranted=true;
+    document.getElementById('mic-btn').style.display='inline-block';
+  }catch(e){btn.textContent='\u274c Microphone denied \u2014 typing only';btn.className='perm-btn denied'}
+}
+async function requestCam(){
+  const btn=document.getElementById('cam-perm');
+  try{camStream=await navigator.mediaDevices.getUserMedia({video:true});
+    const vid=document.getElementById('cam-preview');vid.srcObject=camStream;vid.style.display='inline-block';
+    btn.textContent='\u2705 Camera ON';btn.className='perm-btn granted';
+    document.getElementById('snap-btn').style.display='inline-block';
+  }catch(e){btn.textContent='\u274c Camera denied';btn.className='perm-btn denied'}
+}
+function unlockAudio(){
+  if(audioUnlocked)return;audioUnlocked=true;
+  voiceEl.play().catch(()=>{});
+  document.getElementById('speaker-badge').innerHTML='\ud83d\udd0a Audio ready';
+}
+document.addEventListener('click',unlockAudio,{once:true});
+function toggleMute(){muted=!muted;document.getElementById('mute-toggle').textContent=muted?'muted':'unmuted'}
+
+// --- Speech-to-Text ---
+function toggleSTT(){
+  if(!micGranted)return;
+  const btn=document.getElementById('mic-btn');
+  if(sttActive&&recognition){recognition.stop();return}
+  if(!('webkitSpeechRecognition' in window)){addMsg('Speech recognition not supported in this browser','system');return}
+  recognition=new webkitSpeechRecognition();recognition.continuous=false;recognition.interimResults=true;recognition.lang='en-US';
+  recognition.onstart=()=>{sttActive=true;btn.classList.add('recording')};
+  recognition.onresult=ev=>{
+    let interim='',final='';
+    for(let i=ev.resultIndex;i<ev.results.length;i++){if(ev.results[i].isFinal)final+=ev.results[i][0].transcript;else interim+=ev.results[i][0].transcript}
+    liveT.textContent=interim||final;
+    if(final){msgInput.value=final;liveT.textContent='';sendMsg()}
+  };
+  recognition.onerror=()=>{sttActive=false;btn.classList.remove('recording');liveT.textContent=''};
+  recognition.onend=()=>{sttActive=false;btn.classList.remove('recording')};
+  recognition.start();
+}
+
+// --- Snapshot (B2) ---
+async function takeSnapshot(){
+  if(!camStream)return;
+  const vid=document.getElementById('cam-preview');
+  const c=document.createElement('canvas');c.width=vid.videoWidth;c.height=vid.videoHeight;
+  c.getContext('2d').drawImage(vid,0,0);
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));
+  const reader=new FileReader();
+  reader.onload=async function(){
+    let b64=reader.result;
+    b64=b64.replace(/^data:image\/jpeg;base64,/,'');
+    const ts=Date.now();
+    addMsg('(sending snapshot...)','system');
+    try{
+      const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({text:b64,command:'/addpicture:snapshot_'+ts+'.jpg'})});
+      const d=await r.json();
+      addMsg(d.response||JSON.stringify(d),'system');
+      if(d.pictures)renderPictures(d.pictures);
+      pollV7State();pollStatus();
+    }catch(e){addMsg('snapshot error: '+e.message,'system')}
+  };
+  reader.readAsDataURL(blob);
+}
+
+// --- Upload helpers ---
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+function fileToText(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=reject;
+    r.readAsText(file);
+  });
+}
+function pickFile(accept){
+  return new Promise(resolve=>{
+    const inp=document.createElement('input');inp.type='file';inp.accept=accept;
+    inp.onchange=()=>resolve(inp.files[0]||null);
+    inp.click();
+  });
+}
+
+// --- Upload: Book (B3) ---
+async function uploadBook(){
+  const file=await pickFile('.txt,.md,text/plain');if(!file)return;
+  addMsg('(uploading book: '+file.name+')','system');
+  try{
+    const text=await fileToText(file);
+    const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:text,command:'/addbook:'+file.name})});
+    const d=await r.json();
+    addMsg(d.response||JSON.stringify(d),'system');
+    if(d.pictures)renderPictures(d.pictures);
+    pollV7State();pollStatus();
+  }catch(e){addMsg('upload error: '+e.message,'system')}
+}
+
+// --- Upload: PDF (B3) ---
+async function uploadPDF(){
+  const file=await pickFile('.pdf,application/pdf');if(!file)return;
+  addMsg('(uploading PDF: '+file.name+')','system');
+  try{
+    const dataUrl=await fileToBase64(file);
+    const b64=dataUrl.replace(/^data:[^;]+;base64,/,'');
+    const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:b64,command:'/addpdf:'+file.name})});
+    const d=await r.json();
+    addMsg(d.response||JSON.stringify(d),'system');
+    if(d.pictures)renderPictures(d.pictures);
+    pollV7State();pollStatus();
+  }catch(e){addMsg('upload error: '+e.message,'system')}
+}
+
+// --- Upload: Picture (B3) ---
+async function uploadPicture(){
+  const file=await pickFile('image/*');if(!file)return;
+  addMsg('(uploading picture: '+file.name+')','system');
+  try{
+    const dataUrl=await fileToBase64(file);
+    const b64=dataUrl.replace(/^data:[^;]+;base64,/,'');
+    const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:b64,command:'/addpicture:'+file.name})});
+    const d=await r.json();
+    addMsg(d.response||JSON.stringify(d),'system');
+    if(d.pictures)renderPictures(d.pictures);
+    pollV7State();pollStatus();
+  }catch(e){addMsg('upload error: '+e.message,'system')}
+}
+
+// --- Upload: Sound (B3) ---
+async function uploadSound(){
+  const file=await pickFile('audio/*');if(!file)return;
+  if(file.size>6*1024*1024){addMsg('(sound too large \u2014 6MB max)','system');return}
+  addMsg('(uploading sound: '+file.name+')','system');
+  try{
+    const dataUrl=await fileToBase64(file);
+    const b64=dataUrl.replace(/^data:[^;]+;base64,/,'');
+    const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:b64,command:'/addsound:'+file.name})});
+    const d=await r.json();
+    addMsg(d.response||JSON.stringify(d),'system');
+    if(d.pictures)renderPictures(d.pictures);
+    pollV7State();pollStatus();
+  }catch(e){addMsg('upload error: '+e.message,'system')}
+}
+
+// --- Upload: Video (B3) ---
+function uploadVideo(){
+  addMsg('video upload: pipeline not yet wired','system');
+}
+
+// --- Bundle modal (B4) ---
+function openBundleModal(){document.getElementById('bundle-modal').classList.add('visible')}
+function closeBundleModal(){
+  document.getElementById('bundle-modal').classList.remove('visible');
+  document.getElementById('bundle-caption').value='';
+  document.getElementById('bundle-image').value='';
+  document.getElementById('bundle-sound').value='';
+  document.getElementById('bundle-touch').selectedIndex=-1;
+  document.getElementById('bundle-smell').selectedIndex=-1;
+  document.getElementById('bundle-taste').selectedIndex=-1;
+}
+async function submitBundle(){
+  const caption=document.getElementById('bundle-caption').value.trim();
+  const imgFile=document.getElementById('bundle-image').files[0];
+  const sndFile=document.getElementById('bundle-sound').files[0];
+  const touch=Array.from(document.getElementById('bundle-touch').selectedOptions).map(o=>o.value);
+  const smell=Array.from(document.getElementById('bundle-smell').selectedOptions).map(o=>o.value);
+  const taste=Array.from(document.getElementById('bundle-taste').selectedOptions).map(o=>o.value);
+  if(!caption&&!imgFile&&!sndFile&&!touch.length&&!smell.length&&!taste.length){
+    addMsg('(need at least one sense filled in)','system');return;
+  }
+  if(sndFile&&sndFile.size>6*1024*1024){addMsg('(sound too large \u2014 6MB max)','system');return}
+  const bundle={caption:caption||null,image_b64:null,sound_b64:null,touch,smell,taste};
+  if(imgFile){const du=await fileToBase64(imgFile);bundle.image_b64=du.replace(/^data:[^;]+;base64,/,'')}
+  if(sndFile){const du=await fileToBase64(sndFile);bundle.sound_b64=du.replace(/^data:[^;]+;base64,/,'')}
+  const name=caption||((imgFile&&imgFile.name)||(sndFile&&sndFile.name)||'experience');
+  const lanes=[];
+  if(caption)lanes.push('word');if(imgFile)lanes.push('sight');if(sndFile)lanes.push('sound');
+  if(touch.length)lanes.push('touch');if(smell.length)lanes.push('smell');if(taste.length)lanes.push('taste');
+  addMsg('(creating experience "'+name+'": '+lanes.join(', ')+')','system');
+  try{
+    const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:JSON.stringify(bundle),command:'/bundle:'+name})});
+    const d=await r.json();
+    addMsg(d.response||JSON.stringify(d),'system');
+    if(d.pictures)renderPictures(d.pictures);
+    closeBundleModal();pollV7State();pollStatus();
+  }catch(e){addMsg('bundle error: '+e.message,'system')}
+}
+
+// --- renderPictures (B5) ---
+function renderPictures(pics){
+  if(!pics||!pics.length)return;
+  for(const p of pics){
+    const div=document.createElement('div');div.className='msg substrate';
+    if(p.data){
+      div.innerHTML='<img src="data:image/jpeg;base64,'+p.data+'" style="max-width:240px;border-radius:6px"> <span style="font-size:9px;color:var(--text-muted)">'+(p.title||'')+'</span>';
+    }else if(p.item_id){
+      div.textContent='loading '+(p.title||p.item_id)+'...';
+      (async(el,pid)=>{
+        try{
+          const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({text:'',command:'/picture '+pid})});
+          const d=await r.json();
+          if(d.picture_data){
+            el.innerHTML='<img src="data:image/jpeg;base64,'+d.picture_data+'" style="max-width:240px;border-radius:6px"> <span style="font-size:9px;color:var(--text-muted)">'+(p.title||'')+'</span>';
+          }
+        }catch(e){}
+      })(div,p.item_id);
+    }
+    transcript.appendChild(div);
+  }
+  transcript.scrollTop=transcript.scrollHeight;
+}
+
+// --- Messages ---
+function addMsg(text,cls){const d=document.createElement('div');d.className='msg '+cls;d.textContent=text;transcript.appendChild(d);transcript.scrollTop=transcript.scrollHeight}
+
+function addResponseBlock(result){
+  const block=document.createElement('div');block.className='response-block';
+  const textDiv=document.createElement('div');textDiv.className='response-text';
+  const tokens=result.response_tokens||[];
+  textDiv.innerHTML=tokens.length?tokens.map(t=>`${t.token}<span class="tok-anno">(s=${t.mode_strength.toFixed(1)})</span>`).join(' '):'...';
+  block.appendChild(textDiv);
+  const meta=document.createElement('div');meta.className='response-meta';
+  const nFired=(result.nmda_events||[]).filter(e=>e.fired).length;
+  const emCount=(result.raw_emissions||[]).length;
+  const info=document.createElement('span');info.textContent=`${emCount} commits, ${nFired} gates`;meta.appendChild(info);
+  if(result.honest_silence_reason){const s=document.createElement('span');s.style.color='var(--text-muted)';s.textContent=`[${result.honest_silence_reason}]`;meta.appendChild(s)}
+  const spacer=document.createElement('span');spacer.style.flex='1';meta.appendChild(spacer);
+  const up=document.createElement('span');up.className='fb-btn';up.textContent='\ud83d\udc4d';
+  const dn=document.createElement('span');dn.className='fb-btn';dn.textContent='\ud83d\udc4e';
+  up.onclick=()=>sendFeedback(true,up,dn);dn.onclick=()=>sendFeedback(false,up,dn);
+  meta.appendChild(up);meta.appendChild(dn);block.appendChild(meta);
+  transcript.appendChild(block);transcript.scrollTop=transcript.scrollHeight;
+  // Voice playback
+  if(result.self_voice_audio_b64&&audioUnlocked&&!muted){
+    voiceEl.src='data:audio/wav;base64,'+result.self_voice_audio_b64;voiceEl.play().catch(()=>{});
+  }
+}
+
+async function sendFeedback(correct,up,dn){
+  try{
+    const r=await fetch(`${API}/v7/feedback`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,correct})});
+    if(r.status===503){handle503('feedback');return}
+    if(correct){up.classList.add('active');dn.classList.remove('active')}else{dn.classList.add('active');up.classList.remove('active')}
+  }catch(e){}
+}
+
+async function sendMsg(){
+  const text=msgInput.value.trim();if(!text)return;msgInput.value='';
+  const isCmd=text.startsWith('/');addMsg(text,isCmd?'system':'user');
+  try{
+    if(isCmd){
+      const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'',command:text})});
+      const d=await r.json();addMsg(d.response||JSON.stringify(d),'system');
+      if(d.pictures)renderPictures(d.pictures);
+    }else{
+      // v7 + v6 dual-dispatch in parallel (B7)
+      const v7p=fetch(`${API}/v7/converse`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,session_id:sid})});
+      const v6p=fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,source:'joe'})}).catch(()=>null);
+      const [r,r6]= await Promise.all([v7p,v6p]);
+      // Render v7 first (primary)
+      if(r.status===503){handle503('converse')}
+      else{
+        const d=await r.json();
+        if(d.session_id){sid=d.session_id;localStorage.setItem('guala_session_id',sid);document.getElementById('session-line').textContent='session: '+sid}
+        addResponseBlock(d);pollV7State();
+      }
+      // Then v6 (secondary)
+      if(r6&&r6.ok){try{const d6=await r6.json();if(d6.response)addMsg(d6.response,'emission');if(d6.pictures)renderPictures(d6.pictures)}catch(e6){}}
+    }
+  }catch(e){addMsg('(error: '+e.message+')','system')}
+  msgInput.focus();
+}
+msgInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg()});
+
+// --- Polling: v6 status (B7) ---
+async function pollStatus(){
+  try{
+    const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:'',command:'/status'})});
+    const d=await r.json();
+    const m=d.motifs||{};
+    const vocab=m.total_words||'?';
+    const n_motifs=m.n_motifs||'?';
+    const atlas=typeof m.atlas_strength==='number'?m.atlas_strength.toFixed(1):'?';
+    const n_sounds=m.n_sounds||'?';
+    const n_pictures=m.n_pictures||'?';
+    statsLine.textContent='vocab: '+vocab+' \u00b7 motifs: '+n_motifs+' \u00b7 atlas: '+atlas+' \u00b7 sounds: '+n_sounds+' \u00b7 pics: '+n_pictures;
+  }catch(e){}
+}
+
+// --- Polling: V7 State ---
+async function pollV7State(){
+  try{
+    const r=await fetch(`${API}/v7/state?session_id=${sid}`);
+    if(r.status===503){
+      statsLine.textContent='she is still loading...';
+      handle503('state');return;
+    }
+    const s=await r.json();
+    // Substrate
+    const sub=document.getElementById('sp-substrate');
+    sub.innerHTML=`<div class="ps-row"><span class="l">vocab</span><span class="v">${s.v6_vocab_count??'?'}</span></div>`+
+      `<div class="ps-row"><span class="l">atlas</span><span class="v">${s.atlas_count??'?'}</span></div>`;
+    // Pool activity (B1)
+    const pools=document.getElementById('sp-pools');let ph='';
+    const vc=s.vocab_counts||{};
+    for(const p of['pool_a','pool_b','pool_c']){
+      const cnt=vc[p];
+      ph+=`<div class="ps-row"><span class="l">${p}</span><span class="v">${cnt!=null&&cnt>0?cnt:'\u2014'}</span></div>`;
+    }
+    pools.innerHTML=ph||'--';
+    // Intro/Aware
+    const ia=document.getElementById('sp-intro-aware');
+    ia.innerHTML=`<div class="ps-row"><span class="l">intro</span><span class="v">${s.introspection||s.intro_state||'--'}</span></div>`+
+      `<div class="ps-row"><span class="l">aware</span><span class="v">${s.awareness||s.aware_state||'--'}</span></div>`;
+    // NMDA gates — intro + aware only (B1)
+    const nDiv=document.getElementById('sp-nmda');const gates={};
+    for(const ev of(s.nmda_events||[]))gates[ev.gate]=ev;
+    let nh='';for(const gn of['intro','aware']){const ev=gates[gn];const cls=ev?(ev.fired?'fired':'blocked'):'idle';
+      nh+=`<div><span class="nmda-dot ${cls}"></span>${gn}: ${ev?(ev.fired?'t'+ev.tick:ev.reason):'idle'}</div>`}
+    nDiv.innerHTML=nh;
+  }catch(e){}
+}
+
+// --- Polling: Events ---
+async function pollEvents(){
+  try{const r=await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:String(lastTick),command:'/events'})});
+    const d=await r.json();for(const ev of(d.events||[])){
+      if(ev.tick>lastTick)lastTick=ev.tick;
+      const el=document.createElement('div');el.className='ev';
+      let det='';if(ev.detail){if(ev.detail.content)det=' "'+ev.detail.content+'"';if(ev.detail.source)det+=' ['+ev.detail.source+']'}
+      el.innerHTML=`<span style="color:var(--ev-activity)">${ev.kind}</span> t${ev.tick}${det}`;
+      evDiv.insertBefore(el,evDiv.firstChild);while(evDiv.children.length>60)evDiv.removeChild(evDiv.lastChild);
+      if(ev.kind==='emission'&&ev.detail&&ev.detail.content)addMsg('\ud83d\udcad '+ev.detail.content,'emission');
+    }}catch(e){}
+}
+
+// --- Background Replay ---
+async function backgroundReplay(){
+  try{
+    const r=await fetch(`${API}/v7/quiet`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,n_ticks:5})});
+    if(r.status===503)return; // silently skip during init
+    const d=await r.json();if(d.commits>0)addMsg(`\ud83d\udcad (thinking... ${d.replayed} memories, ${d.commits} commits)`,'emission');pollV7State();
+  }catch(e){}
+}
+
+// --- Presence Heartbeat ---
+let lastActivity=Date.now();
+['mousemove','keydown','scroll','touchstart'].forEach(e=>document.addEventListener(e,()=>{lastActivity=Date.now()},{passive:true}));
+async function presenceHeartbeat(){
+  if(document.visibilityState!=='visible'||Date.now()-lastActivity>30000)return;
+  try{await fetch(`${API}/api/v1/gualaloom`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'joe',command:'/presence'})})}catch(e){}
+}
+
+// --- Session ---
+function newSession(){sid='sid_'+Math.random().toString(36).slice(2,10);localStorage.setItem('guala_session_id',sid);
+  document.getElementById('session-line').textContent='session: '+sid;addMsg('new session: '+sid,'system')}
+
+// --- Boot ---
+(()=>{
+  addMsg('v7 uncage ready.','system');msgInput.focus();
+  pollV7State();pollEvents();pollStatus();
+  setInterval(pollV7State,3000);setInterval(pollEvents,2000);setInterval(pollStatus,3000);
+  setInterval(backgroundReplay,10000);setInterval(presenceHeartbeat,20000);presenceHeartbeat();
+})();
+</script>
+</body>
+</html>

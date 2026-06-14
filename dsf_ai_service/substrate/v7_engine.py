@@ -34,16 +34,17 @@ VOICE_PROFILE = {"voice": "en+f3", "pitch": 90, "speed": 130}
 
 
 def seed_vocab_from_engine(engine):
-    """Read v6 engine word_modes and distribute round-robin across pools."""
+    """Read v6 engine vocab and distribute round-robin across pools."""
     if engine is None:
         raise ValueError("seed_vocab_from_engine requires a non-None engine")
-    word_modes = getattr(engine, "word_modes", {})
-    if not word_modes:
-        raise ValueError("engine has no word_modes; cannot seed substrate")
+    # engine.vocab is a set of words she has actually heard
+    vocab_set = getattr(engine, "vocab", None) or set()
+    if not vocab_set:
+        raise ValueError("engine has no vocab; cannot seed substrate")
     result = {p: [] for p in POOL_NAMES}
     all_words = []
-    for label in word_modes:
-        w = label.lower().strip()
+    for w in sorted(vocab_set):  # sorted for deterministic distribution
+        w = w.lower().strip()
         if w and w not in all_words:
             all_words.append(w)
     for i, w in enumerate(all_words):
@@ -520,7 +521,7 @@ class V7Session:
                                          getattr(self, "last_emissions", [])[-10:]],
             }
             if engine is not None:
-                state["v6_vocab_count"] = len(getattr(engine, "word_modes", {}))
+                state["v6_vocab_count"] = len(getattr(engine, "vocab", set()))
                 atlas = getattr(self.sys_, "atlas", None)
                 state["atlas_count"] = len(atlas.entries) if atlas else 0
             return state

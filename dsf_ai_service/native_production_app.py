@@ -2853,7 +2853,20 @@ def _physical_choice_evidence_from_transition(
         return None
     causal_motor_lineage = causal_motor.get("motor_lineage")
     recruitments = tuple(action.get("prepared_recruitments", ()))
-    if not recruitments:
+    bindings = tuple(action.get("body_effector_bindings", ()))
+    if not recruitments or not bindings:
+        return None
+    bindings_by_lineage = {
+        binding.get("motor_lineage"): binding
+        for binding in bindings
+        if isinstance(binding, dict)
+    }
+    causal_binding = bindings_by_lineage.get(causal_motor_lineage)
+    if (
+        len(bindings_by_lineage) != len(bindings)
+        or not isinstance(causal_binding, dict)
+        or causal_binding.get("axis") != "neck_yaw"
+    ):
         return None
 
     positive_carriers = 0
@@ -2864,16 +2877,23 @@ def _physical_choice_evidence_from_transition(
     for recruitment in recruitments:
         if not isinstance(recruitment, dict):
             return None
-        topology_index = int(recruitment["motor_topology_index"])
         carriers = int(recruitment["outward_elementary_carriers"])
-        if carriers <= 0:
+        binding = bindings_by_lineage.get(recruitment.get("motor_lineage"))
+        if (
+            carriers <= 0
+            or not isinstance(binding, dict)
+            or binding.get("axis") != "neck_yaw"
+            or binding.get("outward_elementary_carriers") != carriers
+        ):
             return None
-        if topology_index % 2 == 0:
+        if binding.get("direction") == "toward_maximum":
             positive_carriers += carriers
             positive_recruitments += 1
-        else:
+        elif binding.get("direction") == "toward_minimum":
             negative_carriers += carriers
             negative_recruitments += 1
+        else:
+            return None
         if recruitment.get("motor_lineage") == causal_motor_lineage:
             causal_motor_prepared = True
         if not all(
@@ -2891,9 +2911,15 @@ def _physical_choice_evidence_from_transition(
         return None
 
     settled_signed_intent = positive_carriers - negative_carriers
-    if (
+    neck_consequences = tuple(
+        consequence
+        for consequence in action.get("articulated_body_consequences", ())
+        if isinstance(consequence, dict) and consequence.get("axis") == "neck_yaw"
+    )
+    if len(neck_consequences) != 1 or (
         settled_signed_intent == 0
-        or settled_signed_intent != int(action.get("signed_yaw_millidegrees", 0))
+        or settled_signed_intent
+        != neck_consequences[0].get("signed_displacement")
     ):
         return None
     causal_intent = action.get("causal_intent_receipt_sha256")
@@ -7612,279 +7638,6 @@ def _resident_prepare_hop(
     }
 
 
-def _insert_native_action_consequences(
-    trajectory: list[tuple[Any, Any, int]],
-    resume_index: int,
-    hop: dict[str, Any],
-    parent_consequence_depth: int,
-) -> None:
-    """Insert exact native body feedback before the suspended later source."""
-
-    sources = tuple(hop["body_proprioceptive_sources"])
-    extents = tuple(hop["body_proprioceptive_source_extents"])
-    if len(sources) != len(extents):
-        raise RuntimeError("native action consequence lost cardinality")
-    consequence_depth = parent_consequence_depth + 1
-    if sources and consequence_depth > 74:
-        raise RuntimeError(
-            "native action consequence did not quiesce inside one body frontier"
-        )
-    for raw_source, extent in reversed(tuple(zip(sources, extents, strict=True))):
-        _source_tick, port_count, sample_count, occurrence_count, frame_count = extent
-        consequence = restore_native_joint_source_episode(
-            raw_source,
-            port_count,
-            sample_count,
-            occurrence_count,
-            frame_count,
-        )
-        trajectory.insert(
-            resume_index,
-            (
-                consequence,
-                [(1, 1_000)] * occurrence_count,
-                consequence_depth,
-            ),
-        )
-
-
-def _commit_vestibular_tick(
-    organism: Any,
-    predecessor_heading_millidegrees: int,
-    signed_body_motion_millidegrees: int,
-) -> dict[str, Any]:
-    """Commit one exact native 1 ms body-and-balance interval in memory."""
-
-    evidence: ResidentPrepareEvidence = organism.prepare_vestibular_tick(
-        predecessor_heading_millidegrees,
-        signed_body_motion_millidegrees,
-    )
-    observed = organism.commit(evidence.token)
-    return {
-        "cognitive_mosaic_count": observed.cognitive_mosaic_count,
-        "cognitive_trace_count": observed.cognitive_trace_count,
-        "complete_neuron_count": observed.complete_neuron_count,
-        "developmental_resting_neuron_count": (
-            observed.developmental_resting_neuron_count
-        ),
-        "complete_neuron_fractal_count": evidence.complete_neuron_fractal_count,
-        "emitted_neuron_fractals": tuple(
-            {
-                "predecessor_organism_tick": evidence.predecessor_organism_tick,
-                "organism_tick": evidence.organism_tick,
-                "neuron_lineage": lineage,
-                "sparse_retained_delta": entries,
-            }
-            for lineage, entries in evidence.emitted_neuron_fractals
-        ),
-        "current_cohort_evaluation_count": (
-            evidence.current_cohort_evaluation_count
-        ),
-        "dsf_delivery_count": evidence.dsf_delivery_count,
-        "formation_activation_count": observed.formation_activation_count,
-        "predecessor_organism_tick": evidence.predecessor_organism_tick,
-        "organism_tick": observed.organism_tick,
-        "partial_cue_reassembly_count": observed.partial_cue_reassembly_count,
-        "endogenous_partial_cue_reassembly_count": (
-            observed.endogenous_partial_cue_reassembly_count
-        ),
-        "internally_reassembled_formation_cues": (
-            evidence.internally_reassembled_formation_cues
-        ),
-        "physically_transitioned_neuron_count": (
-            evidence.physically_transitioned_neuron_count
-        ),
-        "metabolically_perturbed_body_receptor_count": (
-            evidence.metabolically_perturbed_body_receptor_count
-        ),
-        "rest_recovered_neuron_count": evidence.rest_recovered_neuron_count,
-        "rest_drained_dissipation_quanta": (
-            evidence.rest_drained_dissipation_quanta
-        ),
-        "unmet_dissipation_quanta": evidence.unmet_dissipation_quanta,
-        "energy_exhausted": observed.energy_exhausted,
-        "energy_exhausted_interval_count": int(observed.energy_exhausted),
-        "dissipation_capacity_energy_zeptojoules": (
-            observed.dissipation_capacity_energy_zeptojoules
-        ),
-        "externally_perturbed_body_receptor_count": (
-            evidence.externally_perturbed_body_receptor_count
-        ),
-        "motor_unit_recruitments": evidence.motor_unit_recruitments,
-        "body_effector_bindings": evidence.body_effector_bindings,
-        "articulated_body_consequences": (
-            evidence.articulated_body_consequences
-        ),
-        "body_proprioceptive_sources": evidence.body_proprioceptive_sources,
-        "body_proprioceptive_source_extents": (
-            evidence.body_proprioceptive_source_extents
-        ),
-        "articulatory_unit_recruitments": (
-            evidence.articulatory_unit_recruitments
-        ),
-        "changed_contact_channel_states": (
-            evidence.changed_contact_channel_states
-        ),
-        "physical_frontier_routes": evidence.physical_frontier_routes,
-        "preceding_distinct_physical_frontier_routes": (
-            evidence.preceding_distinct_physical_frontier_routes
-        ),
-        "reached_and_foregone_physical_frontier_routes": (
-            evidence.reached_and_foregone_physical_frontier_routes
-        ),
-        "working_causal_continuations": evidence.working_causal_continuations,
-        "settled_working_frontier": evidence.settled_working_frontier,
-        "physical_prediction_alternatives": (
-            evidence.physical_prediction_alternatives
-        ),
-        "body_consequence_transfers": evidence.body_consequence_transfers,
-        "affective_balance_trajectories": evidence.affective_balance_trajectories,
-        "localized_fluid_chemistry": evidence.localized_fluid_chemistry,
-        "localized_metabolic_strain_evaluated_body_receptor_lineages": (
-            evidence.localized_metabolic_strain_evaluated_body_receptor_lineages
-        ),
-        "localized_metabolic_strain": evidence.localized_metabolic_strain,
-        "organic_mosaic_relations": tuple(
-            {
-                "predecessor_organism_tick": evidence.predecessor_organism_tick,
-                "organism_tick": evidence.organism_tick,
-                "formation_receipts": receipts,
-                "shared_neuron_lineages": lineages,
-                "active_physical_bonds": bonds,
-                "structural_relation_sha256": structure_receipt,
-                "ordered_physical_paths": ordered_paths,
-                "ordered_path_relations": ordered_path_relations,
-            }
-            for receipts, lineages, bonds, structure_receipt, ordered_paths, ordered_path_relations in (
-                evidence.organic_mosaic_relations
-            )
-        ),
-        "recurrent_complete_neuron_fractal_count": (
-            evidence.recurrent_complete_neuron_fractal_count
-        ),
-        "state_sha256": observed.state_sha256,
-    }
-
-
-def _commit_vestibular_trajectory(
-    organism: Any,
-    predecessor_heading_millidegrees: int,
-    signed_body_motion_millidegrees: tuple[int, ...],
-) -> dict[str, Any]:
-    """Commit every ordered 1 ms vestibular interval and seal only the end."""
-
-    evidence: ResidentPrepareEvidence = organism.prepare_vestibular_trajectory(
-        predecessor_heading_millidegrees,
-        signed_body_motion_millidegrees,
-    )
-    observed = organism.commit(evidence.token)
-    return {
-        "cognitive_mosaic_count": observed.cognitive_mosaic_count,
-        "cognitive_trace_count": observed.cognitive_trace_count,
-        "complete_neuron_count": observed.complete_neuron_count,
-        "developmental_resting_neuron_count": (
-            observed.developmental_resting_neuron_count
-        ),
-        "complete_neuron_fractal_count": evidence.complete_neuron_fractal_count,
-        "emitted_neuron_fractals": tuple(
-            {
-                "predecessor_organism_tick": evidence.predecessor_organism_tick,
-                "organism_tick": evidence.organism_tick,
-                "neuron_lineage": lineage,
-                "sparse_retained_delta": entries,
-            }
-            for lineage, entries in evidence.emitted_neuron_fractals
-        ),
-        "current_cohort_evaluation_count": (
-            evidence.current_cohort_evaluation_count
-        ),
-        "dsf_delivery_count": evidence.dsf_delivery_count,
-        "formation_activation_count": observed.formation_activation_count,
-        "predecessor_organism_tick": evidence.predecessor_organism_tick,
-        "organism_tick": observed.organism_tick,
-        "partial_cue_reassembly_count": observed.partial_cue_reassembly_count,
-        "endogenous_partial_cue_reassembly_count": (
-            observed.endogenous_partial_cue_reassembly_count
-        ),
-        "internally_reassembled_formation_cues": (
-            evidence.internally_reassembled_formation_cues
-        ),
-        "physically_transitioned_neuron_count": (
-            evidence.physically_transitioned_neuron_count
-        ),
-        "metabolically_perturbed_body_receptor_count": (
-            evidence.metabolically_perturbed_body_receptor_count
-        ),
-        "rest_recovered_neuron_count": evidence.rest_recovered_neuron_count,
-        "rest_drained_dissipation_quanta": (
-            evidence.rest_drained_dissipation_quanta
-        ),
-        "unmet_dissipation_quanta": evidence.unmet_dissipation_quanta,
-        "energy_exhausted": observed.energy_exhausted,
-        "energy_exhausted_interval_count": int(observed.energy_exhausted),
-        "dissipation_capacity_energy_zeptojoules": (
-            observed.dissipation_capacity_energy_zeptojoules
-        ),
-        "externally_perturbed_body_receptor_count": (
-            evidence.externally_perturbed_body_receptor_count
-        ),
-        "causal_interval_evidence": _causal_interval_hops(evidence),
-        "motor_unit_recruitments": evidence.motor_unit_recruitments,
-        "body_effector_bindings": evidence.body_effector_bindings,
-        "articulated_body_consequences": (
-            evidence.articulated_body_consequences
-        ),
-        "body_proprioceptive_sources": evidence.body_proprioceptive_sources,
-        "body_proprioceptive_source_extents": (
-            evidence.body_proprioceptive_source_extents
-        ),
-        "articulatory_unit_recruitments": (
-            evidence.articulatory_unit_recruitments
-        ),
-        "changed_contact_channel_states": (
-            evidence.changed_contact_channel_states
-        ),
-        "physical_frontier_routes": evidence.physical_frontier_routes,
-        "preceding_distinct_physical_frontier_routes": (
-            evidence.preceding_distinct_physical_frontier_routes
-        ),
-        "reached_and_foregone_physical_frontier_routes": (
-            evidence.reached_and_foregone_physical_frontier_routes
-        ),
-        "working_causal_continuations": evidence.working_causal_continuations,
-        "settled_working_frontier": evidence.settled_working_frontier,
-        "physical_prediction_alternatives": (
-            evidence.physical_prediction_alternatives
-        ),
-        "body_consequence_transfers": evidence.body_consequence_transfers,
-        "affective_balance_trajectories": evidence.affective_balance_trajectories,
-        "localized_fluid_chemistry": evidence.localized_fluid_chemistry,
-        "localized_metabolic_strain_evaluated_body_receptor_lineages": (
-            evidence.localized_metabolic_strain_evaluated_body_receptor_lineages
-        ),
-        "localized_metabolic_strain": evidence.localized_metabolic_strain,
-        "organic_mosaic_relations": tuple(
-            {
-                "predecessor_organism_tick": evidence.predecessor_organism_tick,
-                "organism_tick": evidence.organism_tick,
-                "formation_receipts": receipts,
-                "shared_neuron_lineages": lineages,
-                "active_physical_bonds": bonds,
-                "structural_relation_sha256": structure_receipt,
-                "ordered_physical_paths": ordered_paths,
-                "ordered_path_relations": ordered_path_relations,
-            }
-            for receipts, lineages, bonds, structure_receipt, ordered_paths, ordered_path_relations in (
-                evidence.organic_mosaic_relations
-            )
-        ),
-        "recurrent_complete_neuron_fractal_count": (
-            evidence.recurrent_complete_neuron_fractal_count
-        ),
-        "state_sha256": observed.state_sha256,
-    }
-
-
 def _advance_bounded_frontier_evidence(
     current: tuple[tuple[Any, ...], ...],
     preceding_distinct: tuple[tuple[Any, ...], ...],
@@ -8926,9 +8679,9 @@ def _perform_admitted_intake(
     runtime (503) exactly as before, so no observation or readiness is ever
     computed from unpersisted state.
 
-    If a hop is refused mid-lesson, the already-committed hop prefix is
-    persisted before the refusal is re-raised, keeping the durable body and
-    the in-process organism identical.
+    If any hop or native action consequence is refused, the complete unsealed
+    transaction and every prepared world interval return to their authenticated
+    predecessors; no admitted prefix is published.
     """
 
     _begin_external_intake()
@@ -8943,6 +8696,138 @@ def _perform_admitted_intake(
         _end_external_intake()
 
 
+def _prepare_native_action_consequence(
+    phase: Any,
+) -> tuple[Any, Any, Any, list[tuple[int, int]], dict[str, Any], Any, dict[str, Any]]:
+    """Prepare the exact world interval caused by one paused native discharge."""
+
+    from dsf_ai_service.substrate.embodiment_world import (
+        ActionExecutionReceipt,
+        AdvancePhysicalTimeCommand,
+        ENVIRONMENT_PORT_ID,
+        PreparedActionExecution,
+        encode_command,
+    )
+
+    if phase.pause_interval_ordinal is None or not phase.motor_unit_recruitments:
+        raise RuntimeError("native action consequence requires one motor pause")
+    if not phase.articulated_body_consequences:
+        raise RuntimeError("native motor pause carried no physical body consequence")
+
+    predecessor_positions: dict[str, int] = {}
+    for consequence in phase.articulated_body_consequences:
+        axis = consequence[1]
+        predecessor_position = consequence[3]
+        prior = predecessor_positions.setdefault(axis, predecessor_position)
+        if prior != predecessor_position:
+            raise RuntimeError("native action carried conflicting axis predecessors")
+    predecessor_body_axes = tuple(
+        (
+            axis[0],
+            axis[1],
+            axis[2],
+            predecessor_positions.get(axis[1], axis[3]),
+            axis[4],
+            axis[5],
+            axis[6],
+        )
+        for axis in phase.articulated_body_axes
+    )
+
+    authority = _world()
+    before = authority.observation_snapshot()
+    intent = _receipt({
+        "articulated_body_consequences": phase.articulated_body_consequences,
+        "body_effector_bindings": phase.body_effector_bindings,
+        "duration_microseconds": WORLD_BODY_ACTION_MILLISECONDS * 1_000,
+        "motor_unit_recruitments": phase.motor_unit_recruitments,
+        "pause_interval_ordinal": phase.pause_interval_ordinal,
+        "schema": "guala.native_action_world_interval_intent.v1",
+        "unsealed_token_sha256": hashlib.sha256(phase.token).hexdigest(),
+        "world_revision": before.revision,
+        "world_state_before_sha256": before.state_sha256,
+    })
+    prepared = authority.prepare_port_command(
+        port_id=ENVIRONMENT_PORT_ID,
+        command_payload=encode_command(
+            AdvancePhysicalTimeCommand(
+                duration_microseconds=WORLD_BODY_ACTION_MILLISECONDS * 1_000
+            )
+        ),
+        causal_intent_receipt_sha256=intent,
+        expected_revision=before.revision,
+    )
+    if isinstance(prepared, ActionExecutionReceipt):
+        raise RuntimeError(
+            "native action world interval was refused: " + prepared.reason
+        )
+    if not isinstance(prepared, PreparedActionExecution):
+        raise RuntimeError("native action world interval lost prepared custody")
+
+    try:
+        execution = prepared.execution_receipt
+        episode, admissions, lane_truth = _action_consequence_episode(
+            execution,
+            action_duration=Fraction(WORLD_BODY_ACTION_MILLISECONDS, 1_000),
+            body_displacement=(Fraction(0),) * DISPLACEMENT_SITE_COUNT,
+            predecessor_retinal_body_axes=predecessor_body_axes,
+            retinal_body_axes=phase.articulated_body_axes,
+        )
+        neck_consequences = tuple(
+            consequence
+            for consequence in phase.articulated_body_consequences
+            if consequence[1] == "neck_yaw"
+        )
+        if len(neck_consequences) > 1:
+            raise RuntimeError("native action carried multiple neck-yaw consequences")
+        vestibular_yaw = None
+        if neck_consequences and neck_consequences[0][5] != 0:
+            neck = neck_consequences[0]
+            before_body = next(
+                body
+                for body in execution.before.bodies
+                if body.body_id == execution.before.self_body_id
+            )
+            after_body = next(
+                body
+                for body in execution.after.bodies
+                if body.body_id == execution.after.self_body_id
+            )
+            predecessor_heading = (
+                before_body.pose.heading_millidegrees + neck[3]
+            ) % 360_000
+            expected_successor_heading = (
+                after_body.pose.heading_millidegrees + neck[4]
+            ) % 360_000
+            successor_heading, trajectory = exact_native_yaw_trajectory(
+                predecessor_heading_millidegrees=predecessor_heading,
+                signed_displacement_millidegrees=neck[5],
+                duration_microseconds=WORLD_BODY_ACTION_MILLISECONDS * 1_000,
+            )
+            if successor_heading != expected_successor_heading:
+                raise RuntimeError("native neck motion lost exact vestibular geometry")
+            vestibular_yaw = (predecessor_heading, trajectory)
+    except BaseException:
+        authority.discard_prepared_action(prepared)
+        raise
+
+    return (
+        authority,
+        prepared,
+        episode,
+        admissions,
+        lane_truth,
+        vestibular_yaw,
+        {
+            "body_effector_bindings": phase.body_effector_bindings,
+            "causal_intent_receipt_sha256": intent,
+            "motor_unit_recruitments": phase.motor_unit_recruitments,
+            "pause_interval_ordinal": phase.pause_interval_ordinal,
+            "schema": "guala.native_action_consequence_interval.v1",
+        },
+    )
+
+
 def _perform_admitted_intake_locked(
     episodes: list[tuple[Any, list[tuple[int, int]]]],
     intake: str,
@@ -8952,7 +8837,7 @@ def _perform_admitted_intake_locked(
 ) -> dict[str, Any]:
     """Body of ``_perform_admitted_intake``; caller holds ``_transition_lock``."""
 
-    global _restored, _last_transition_evidence, _last_self_moved
+    global _restored, _boot_error, _last_transition_evidence, _last_self_moved
     global _last_displacement
     global _last_tested_prediction_evidence, _last_tested_affective_balance_evidence
     global _last_tested_localized_fluid_chemistry_evidence
@@ -9016,6 +8901,9 @@ def _perform_admitted_intake_locked(
     body_proprioceptive_source_receipts: list[
         tuple[str, tuple[int, int, int, int, int]]
     ] = []
+    committed_world_actions: list[tuple[Any, Any]] = []
+    world_predecessor_body: bytes | None = None
+    native_action_intervals: list[dict[str, Any]] = []
 
     def retain_articulated_body_evidence(hop: dict[str, Any]) -> None:
         body_effector_bindings.extend(hop["body_effector_bindings"])
@@ -9057,6 +8945,69 @@ def _perform_admitted_intake_locked(
     completed_causal_motor_traces: dict[str, dict[str, Any]] = {}
     intake_error: BaseException | None = None
     unsealed_token: bytes | None = None
+    direct_token: bytes | None = None
+
+    def drain_native_action_pauses(phase: Any) -> Any:
+        """Commit every exact native discharge consequence before continuing."""
+
+        nonlocal committed_vestibular_tick_count
+        nonlocal unsealed_token, world_predecessor_body
+        while phase.motor_unit_recruitments:
+            if world_predecessor_body is None:
+                world_predecessor_body = _world().encoded_snapshot()
+            (
+                authority,
+                prepared,
+                consequence_episode,
+                consequence_admissions,
+                consequence_lane_truth,
+                action_vestibular_yaw,
+                action_record,
+            ) = _prepare_native_action_consequence(phase)
+            committed = False
+            try:
+                with authority.prepared_action_visibility_transaction(prepared):
+                    execution = authority.commit_prepared_action(prepared)
+                    committed = True
+                    _persist_world_body(
+                        authority.encoded_committed_prepared_action(prepared)
+                    )
+                    phase = organism.resume_unsealed_action_direct(
+                        phase.token,
+                        (consequence_episode,),
+                        (tuple(consequence_admissions),),
+                        vestibular_yaw=action_vestibular_yaw,
+                    )
+            except BaseException:
+                if committed:
+                    with authority.committed_prepared_action_rollback_transaction(
+                        prepared
+                    ) as rollback_world:
+                        rollback_world()
+                    _persist_world_body(authority.encoded_snapshot())
+                else:
+                    authority.discard_prepared_action(prepared)
+                raise
+            committed_world_actions.append((authority, prepared))
+            action_record.update({
+                "authority_receipt_sha256": execution.authority_receipt_sha256,
+                "world_revision_after": execution.after.revision,
+                "world_revision_before": execution.before.revision,
+                "world_state_after_sha256": execution.after.state_sha256,
+                "world_state_before_sha256": execution.before.state_sha256,
+                "sensory_lane_truth": consequence_lane_truth,
+            })
+            native_action_intervals.append(action_record)
+            unsealed_token = phase.token
+            articulatory_unit_recruitments.extend(
+                phase.articulatory_unit_recruitments
+            )
+            if action_vestibular_yaw is not None:
+                committed_vestibular_tick_count += len(
+                    action_vestibular_yaw[1]
+                )
+        return phase
+
     try:
         initial_sources = tuple(episode for episode, _ in episodes)
         initial_intervals = tuple(admissions for _, admissions in episodes)
@@ -9072,6 +9023,7 @@ def _perform_admitted_intake_locked(
         committed_vestibular_tick_count = (
             len(vestibular_yaw[1]) if vestibular_yaw is not None else 0
         )
+        phase = drain_native_action_pauses(phase)
         self_hearing_episodes: tuple[tuple[Any, Any], ...] = ()
         self_hearing_hop_count = 0
         self_hearing_transitioned_neuron_count = 0
@@ -9111,12 +9063,20 @@ def _perform_admitted_intake_locked(
                     articulatory_body=articulatory_body_trajectories,
                 ))
                 self_hearing_hop_count = len(self_hearing_episodes)
-        evidence = organism.finalize_unsealed_intake_direct(
-            phase.token,
-            tuple(episode for episode, _ in self_hearing_episodes),
-            tuple(admissions for _, admissions in self_hearing_episodes),
-        )
+        if self_hearing_episodes:
+            phase = organism.append_unsealed_intake_direct(
+                phase.token,
+                tuple(episode for episode, _ in self_hearing_episodes),
+                tuple(admissions for _, admissions in self_hearing_episodes),
+            )
+            unsealed_token = phase.token
+            articulatory_unit_recruitments.extend(
+                phase.articulatory_unit_recruitments
+            )
+            phase = drain_native_action_pauses(phase)
+        evidence = organism.finalize_unsealed_intake_direct(phase.token)
         unsealed_token = None
+        direct_token = evidence.token
         last_hop = _resident_prepare_hop(
             evidence,
             organism.readiness(),
@@ -9124,6 +9084,21 @@ def _perform_admitted_intake_locked(
                 external_participant_action_receipt
             ),
         )
+        motor_interval_ordinals = tuple(
+            ordinal
+            for ordinal, interval in enumerate(
+                last_hop["causal_interval_evidence"], 1
+            )
+            if interval["motor_unit_recruitments"]
+        )
+        consequence_pause_ordinals = tuple(
+            interval["pause_interval_ordinal"]
+            for interval in native_action_intervals
+        )
+        if consequence_pause_ordinals != motor_interval_ordinals:
+            raise RuntimeError(
+                "native motor discharge and exact world consequence order diverged"
+            )
         affective_balance_trajectories = (
             _advance_bounded_affective_balance_evidence(
                 affective_balance_trajectories,
@@ -9184,13 +9159,7 @@ def _perform_admitted_intake_locked(
             localized_metabolic_strain,
             last_hop,
         )
-        committed_hop_count = sum(
-            int(episode.occurrence_count) for episode, _ in episodes
-        ) + self_hearing_hop_count
-        committed_hop_count += sum(
-            int(extent[3])
-            for extent in last_hop["body_proprioceptive_source_extents"]
-        )
+        committed_hop_count = len(last_hop["causal_interval_evidence"])
         motor_unit_recruitments.extend(last_hop["motor_unit_recruitments"])
         retain_articulated_body_evidence(last_hop)
         emitted_neuron_fractals.extend(last_hop["emitted_neuron_fractals"])
@@ -9264,27 +9233,65 @@ def _perform_admitted_intake_locked(
                 ),
             }
     except BaseException as error:
+        custody_error: BaseException | None = None
+        rollback_world_actions = (
+            unsealed_token is not None or direct_token is not None
+        )
         if unsealed_token is not None:
             try:
                 organism.abort_unsealed_intake(unsealed_token)
             except (RuntimeError, ValueError) as abort_error:
-                raise RuntimeError(
-                    "unsealed intake failed and its predecessor could not be restored"
-                ) from abort_error
+                if "has no unsealed intake" not in str(abort_error):
+                    custody_error = abort_error
+        if direct_token is not None:
+            try:
+                organism.rollback_direct_commit(direct_token)
+                direct_token = None
+            except (RuntimeError, ValueError) as rollback_error:
+                custody_error = rollback_error
+        if rollback_world_actions and committed_world_actions:
+            try:
+                for authority, prepared in reversed(committed_world_actions):
+                    with authority.committed_prepared_action_rollback_transaction(
+                        prepared
+                    ) as rollback_world:
+                        rollback_world()
+                if world_predecessor_body is None:
+                    raise RuntimeError("native action lost its world predecessor")
+                _persist_world_body(world_predecessor_body)
+            except BaseException as rollback_error:
+                custody_error = rollback_error
+        if custody_error is not None:
+            raise RuntimeError(
+                "unsealed native action failed and its predecessor custody "
+                "could not be restored"
+            ) from custody_error
         intake_error = error
+    if intake_error is not None:
+        raise intake_error
     if last_hop is None or (
         committed_hop_count == 0 and committed_vestibular_tick_count == 0
     ):
-        if intake_error is not None:
-            raise intake_error
         raise RuntimeError("admitted intake carried no hop episodes")
     successor_body_observation = organism.readiness()
     successor_body_state_sha256 = (
         successor_body_observation.articulated_body_state_sha256
     )
+    if direct_token is None:
+        raise RuntimeError("native successor lost publication custody")
     published = _publish_committed_organism(
         organism, admission, predecessor.state_sha256
     )
+    try:
+        organism.acknowledge_direct_commit(direct_token)
+        direct_token = None
+    except (RuntimeError, ValueError) as error:
+        _restored = None
+        _boot_error = (
+            "durable native successor could not release predecessor custody: "
+            f"{type(error).__name__}: {error}"
+        )
+        raise HTTPException(status_code=503, detail=_boot_error) from error
     motor_action: dict[str, Any] | None = None
     if articulated_body_consequences:
         canonical_bindings = tuple(sorted(set(body_effector_bindings)))
@@ -9310,6 +9317,8 @@ def _perform_admitted_intake_locked(
             "body_state_before_sha256": predecessor_body_state_sha256,
             "body_state_after_sha256": successor_body_state_sha256,
             "motor_unit_recruitment_count": len(motor_unit_recruitments),
+            "world_consequence_interval_count": len(native_action_intervals),
+            "world_consequence_intervals": tuple(native_action_intervals),
             "body_effector_bindings": [
                 {
                     "motor_lineage": lineage,
@@ -10014,6 +10023,7 @@ def _action_consequence_episode(
     *,
     action_duration: Fraction = Fraction(1, 1_000),
     body_displacement: tuple[Fraction, ...] | None = None,
+    predecessor_retinal_body_axes: tuple[Any, ...] | list[Any] | None = None,
     retinal_body_axes: tuple[Any, ...] | list[Any] | None = None,
 ) -> tuple[Any, list[tuple[int, int]], dict[str, Any]]:
     """One exact joint sensorium caused by one committed 1 ms body action.
@@ -10031,17 +10041,24 @@ def _action_consequence_episode(
     if action_duration <= 0:
         raise ValueError("action consequence duration must be positive")
     times = (Fraction(0), action_duration)
-    retinal_heading = (
+    after_retinal_heading = (
         _current_retinal_heading_offset_millidegrees()
         if retinal_body_axes is None
         else _retinal_heading_offset_millidegrees_from_axes(retinal_body_axes)
+    )
+    before_retinal_heading = (
+        after_retinal_heading
+        if predecessor_retinal_body_axes is None
+        else _retinal_heading_offset_millidegrees_from_axes(
+            predecessor_retinal_body_axes
+        )
     )
     world_streams = physical_receptor_substreams(
         execution.before,
         execution.after,
         causal_transition=True,
-        before_retinal_heading_offset_millidegrees=retinal_heading,
-        after_retinal_heading_offset_millidegrees=retinal_heading,
+        before_retinal_heading_offset_millidegrees=before_retinal_heading,
+        after_retinal_heading_offset_millidegrees=after_retinal_heading,
         source_time_start=times[0],
         source_time_end=times[1],
     )

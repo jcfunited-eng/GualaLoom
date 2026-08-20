@@ -418,6 +418,24 @@ class ResidentUnsealedIntakeEvidence:
 
     token: bytes
     provisional_organism_tick: int
+    pause_interval_ordinal: int | None
+    motor_unit_recruitments: tuple[
+        tuple[
+            str,
+            int,
+            int,
+            tuple[tuple[str, int, str, int, int, int], ...],
+            tuple[tuple[str, str, str, int, int, str, str], ...],
+        ],
+        ...,
+    ]
+    body_effector_bindings: tuple[tuple[str, str, str, int], ...]
+    articulated_body_axes: tuple[
+        tuple[int, str, str, int, int, int, int], ...
+    ]
+    articulated_body_consequences: tuple[
+        tuple[int, str, str, int, int, int, int, int, int, int, int], ...
+    ]
     articulatory_unit_recruitments: tuple[
         tuple[
             str,
@@ -1008,6 +1026,91 @@ def _motor_unit_recruitment_evidence(
                 outward_elementary_carriers,
                 tuple(preparation_transfers),
                 tuple(body_afferent_paths),
+            )
+        )
+    return tuple(observed)
+
+
+def _articulated_body_axis_evidence(
+    value: object,
+) -> tuple[tuple[int, str, str, int, int, int, int], ...]:
+    if not isinstance(value, list) or len(value) != 37:
+        raise RuntimeError("resident articulated body axis count changed")
+    observed: list[tuple[int, str, str, int, int, int, int]] = []
+    for raw in value:
+        if not isinstance(raw, tuple) or len(raw) != 7:
+            raise RuntimeError("resident articulated body axis changed format")
+        ordinal = _nonnegative_integer(raw[0], "body axis ordinal")
+        name, unit = raw[1], raw[2]
+        position = _signed_integer(raw[3], "body axis position")
+        minimum = _signed_integer(raw[4], "body axis minimum")
+        neutral = _signed_integer(raw[5], "body axis neutral")
+        maximum = _signed_integer(raw[6], "body axis maximum")
+        if (
+            ordinal != len(observed)
+            or not isinstance(name, str)
+            or not name
+            or unit not in {"millidegree", "micrometre", "square_millimetre"}
+            or not minimum <= position <= maximum
+            or not minimum <= neutral <= maximum
+        ):
+            raise RuntimeError("resident articulated body anatomy is not canonical")
+        observed.append(
+            (ordinal, name, unit, position, minimum, neutral, maximum)
+        )
+    return tuple(observed)
+
+
+def _articulated_body_consequence_evidence(
+    value: object,
+    *,
+    predecessor_organism_tick: int,
+    organism_tick: int,
+) -> tuple[tuple[int, str, str, int, int, int, int, int, int, int, int], ...]:
+    if not isinstance(value, list):
+        raise RuntimeError("articulated body consequences changed format")
+    observed: list[
+        tuple[int, str, str, int, int, int, int, int, int, int, int]
+    ] = []
+    for raw in value:
+        if not isinstance(raw, tuple) or len(raw) != 11:
+            raise RuntimeError("articulated body consequence changed format")
+        source_tick = _nonnegative_integer(raw[0], "body consequence source tick")
+        axis, unit = raw[1], raw[2]
+        predecessor_position = _signed_integer(raw[3], "body predecessor position")
+        successor_position = _signed_integer(raw[4], "body successor position")
+        signed_displacement = _signed_integer(raw[5], "body signed displacement")
+        toward_minimum = _nonnegative_integer(raw[6], "body toward-minimum carriers")
+        toward_maximum = _nonnegative_integer(raw[7], "body toward-maximum carriers")
+        opposed = _nonnegative_integer(raw[8], "body opposed carriers")
+        applied = _nonnegative_integer(raw[9], "body applied displacement")
+        stalled = _nonnegative_integer(raw[10], "body stalled carriers")
+        net = abs(toward_maximum - toward_minimum)
+        if (
+            source_tick < predecessor_organism_tick
+            or source_tick >= organism_tick
+            or not isinstance(axis, str)
+            or not axis
+            or unit not in {"millidegree", "micrometre", "square_millimetre"}
+            or successor_position - predecessor_position != signed_displacement
+            or opposed != min(toward_minimum, toward_maximum)
+            or applied != abs(signed_displacement)
+            or applied + stalled != net
+        ):
+            raise RuntimeError("articulated body consequence lost exact mechanics")
+        observed.append(
+            (
+                source_tick,
+                axis,
+                unit,
+                predecessor_position,
+                successor_position,
+                signed_displacement,
+                toward_minimum,
+                toward_maximum,
+                opposed,
+                applied,
+                stalled,
             )
         )
     return tuple(observed)
@@ -1634,6 +1737,7 @@ class NativeResidentOrganism:
         "__observation_type",
         "__prepare_type",
         "__unsealed_validation",
+        "__unacknowledged_direct_token",
     )
 
     def __new__(cls, authority: object = None, *args: object, **kwargs: object):
@@ -1663,6 +1767,7 @@ class NativeResidentOrganism:
         self.__unsealed_validation: tuple[
             bytes, NativeResidentObservationView, int, int
         ] | None = None
+        self.__unacknowledged_direct_token: bytes | None = None
 
     def _require_observation(
         self, candidate: object
@@ -2048,7 +2153,7 @@ class NativeResidentOrganism:
 
         The bare source path remains severed by the mandatory-admission law:
         the native runtime refuses it because no occurrence admission is
-        supplied.  Use :meth:`prepare_admitted`.
+        supplied.  Use :meth:`begin_unsealed_intake_direct`.
         """
 
         source_port_count = _nonnegative_integer(
@@ -2060,38 +2165,6 @@ class NativeResidentOrganism:
             candidate, source_port_count, active_before
         )
 
-    def prepare_admitted(
-        self,
-        source: NativeJointSourceView,
-        maximum_causal_intervals: object,
-    ) -> ResidentPrepareEvidence:
-        """Prepare one admitted native candidate and return receipts.
-
-        ``maximum_causal_intervals`` carries one caller-authored maximum
-        causal interval ``(numerator, denominator)`` in source-time units per
-        source occurrence, in exact occurrence order.  It is independent
-        environment/anatomy authority; this boundary never derives it from the
-        occurrence.
-
-        An admitted transition requires NO durable cold-custody directory and
-        writes no file of its own: what a lesson changes is her body, and the
-        caller persists that body once per lesson.
-        """
-
-        source_port_count = _nonnegative_integer(
-            getattr(source, "port_count", None), "source port count"
-        )
-        intervals = _validated_causal_intervals(maximum_causal_intervals)
-        active_before = self.readiness()
-        candidate = self.__runtime.prepare_admitted(source, intervals)
-        return self._validated_prepare_evidence(
-            candidate,
-            source_port_count,
-            active_before,
-            causal_interval_count=1,
-            body_feedback_reentered=False,
-        )
-
     def prepare_articulated_body_observation(self) -> ResidentPrepareEvidence:
         """Prepare one full fixed-capacity observation of the current body."""
 
@@ -2099,98 +2172,99 @@ class NativeResidentOrganism:
         candidate = self.__runtime.prepare_articulated_body_observation()
         return self._validated_prepare_evidence(candidate, 74, active_before)
 
-    def prepare_admitted_trajectory(
+    def _validated_unsealed_phase(
         self,
-        sources: object,
-        maximum_causal_intervals: object,
-    ) -> ResidentPrepareEvidence:
-        """Prepare ordered admitted sensory intervals and seal only once."""
-
-        if not isinstance(sources, tuple) or not sources:
-            raise TypeError("admitted trajectory sources must be a nonempty tuple")
-        if (
-            not isinstance(maximum_causal_intervals, tuple)
-            or len(maximum_causal_intervals) != len(sources)
-        ):
-            raise TypeError(
-                "admitted trajectory intervals must match the source tuple"
-            )
-        source_port_count = sum(
-            _nonnegative_integer(
-                getattr(source, "port_count", None), "trajectory source port count"
-            )
-            for source in sources
-        )
-        intervals = tuple(
-            _validated_causal_intervals(value)
-            for value in maximum_causal_intervals
-        )
-        active_before = self.readiness()
-        source_port_count += 74
-        candidate = self.__runtime.prepare_admitted_trajectory(
-            list(sources), [list(value) for value in intervals]
-        )
-        return self._validated_prepare_evidence(
-            candidate,
-            source_port_count,
-            active_before,
-            causal_interval_count=len(sources) + 1,
-            body_feedback_reentered=True,
-        )
-
-    def commit_admitted_trajectory_direct(
-        self,
-        sources: object,
-        maximum_causal_intervals: object,
-    ) -> ResidentPrepareEvidence:
-        """Commit current body plus zero or more sources without cloning it."""
-
-        if not isinstance(sources, tuple):
-            raise TypeError("admitted trajectory sources must be a tuple")
-        if (
-            not isinstance(maximum_causal_intervals, tuple)
-            or len(maximum_causal_intervals) != len(sources)
-        ):
-            raise TypeError(
-                "admitted trajectory intervals must match the source tuple"
-            )
-        source_port_count = sum(
-            _nonnegative_integer(
-                getattr(source, "port_count", None), "trajectory source port count"
-            )
-            for source in sources
-        )
-        intervals = tuple(
-            _validated_causal_intervals(value)
-            for value in maximum_causal_intervals
-        )
-        active_before = self.readiness()
-        source_port_count += 74
-        candidate = self.__runtime.commit_admitted_trajectory_direct(
-            list(sources), [list(value) for value in intervals]
-        )
+        candidate: object,
+        active_before: NativeResidentObservationView,
+    ) -> ResidentUnsealedIntakeEvidence:
         token = getattr(candidate, "token", None)
-        try:
-            evidence = self._validated_prepare_evidence_body(
-                candidate,
-                source_port_count,
-                active_before,
-                causal_interval_count=len(sources) + 1,
-                body_feedback_reentered=True,
-                candidate_committed=True,
-            )
-            self.__runtime.acknowledge_direct_commit(token)
-            return evidence
-        except BaseException:
-            if isinstance(token, bytes) and len(token) == 32:
-                try:
-                    self.__runtime.rollback_direct_commit(token)
-                except (RuntimeError, ValueError) as rollback_error:
-                    if "has no pending candidate" not in str(rollback_error):
-                        raise RuntimeError(
-                            "resident direct commit validation and rollback both failed"
-                        ) from rollback_error
-            raise
+        if not isinstance(token, bytes) or len(token) != 32:
+            raise RuntimeError("unsealed intake token changed format")
+        provisional_tick = _positive_integer(
+            getattr(candidate, "provisional_organism_tick", None),
+            "unsealed provisional organism tick",
+        )
+        if provisional_tick <= active_before.organism_tick:
+            raise RuntimeError("unsealed intake did not advance one causal interval")
+        motor_recruitments = _motor_unit_recruitment_evidence(
+            getattr(candidate, "motor_unit_recruitments", None)
+        )
+        raw_pause = getattr(candidate, "pause_interval_ordinal", None)
+        pause_interval_ordinal = (
+            None
+            if raw_pause is None
+            else _positive_integer(raw_pause, "unsealed pause interval ordinal")
+        )
+        raw_bindings = getattr(candidate, "body_effector_bindings", None)
+        if not isinstance(raw_bindings, list):
+            raise RuntimeError("unsealed body effector bindings changed format")
+        bindings: list[tuple[str, str, str, int]] = []
+        for raw in raw_bindings:
+            if not isinstance(raw, tuple) or len(raw) != 4:
+                raise RuntimeError("unsealed body effector binding changed format")
+            lineage = _canonical_lineage_hex(raw[0], "unsealed motor lineage")
+            axis, direction = raw[1], raw[2]
+            carriers = _positive_integer(raw[3], "unsealed motor carriers")
+            if (
+                not isinstance(axis, str)
+                or not axis
+                or direction not in {"toward_minimum", "toward_maximum"}
+            ):
+                raise RuntimeError("unsealed body effector binding lost anatomy")
+            bindings.append((lineage, axis, direction, carriers))
+        body_axes = _articulated_body_axis_evidence(
+            getattr(candidate, "articulated_body_axes", None)
+        )
+        body_consequences = _articulated_body_consequence_evidence(
+            getattr(candidate, "articulated_body_consequences", None),
+            predecessor_organism_tick=active_before.organism_tick,
+            organism_tick=provisional_tick,
+        )
+        axes_by_name = {axis[1]: axis for axis in body_axes}
+        if len(axes_by_name) != len(body_axes):
+            raise RuntimeError("resident articulated body axis names are not unique")
+        if any(binding[1] not in axes_by_name for binding in bindings):
+            raise RuntimeError("unsealed motor binding named no resident body axis")
+        consequence_axes: set[str] = set()
+        for consequence in body_consequences:
+            axis = axes_by_name.get(consequence[1])
+            if (
+                axis is None
+                or consequence[1] in consequence_axes
+                or consequence[2] != axis[2]
+                or consequence[4] != axis[3]
+                or not axis[4] <= consequence[3] <= axis[6]
+            ):
+                raise RuntimeError(
+                    "unsealed body consequence disagrees with resident anatomy"
+                )
+            consequence_axes.add(consequence[1])
+        if motor_recruitments:
+            if (
+                pause_interval_ordinal
+                != provisional_tick - active_before.organism_tick
+                or {entry[0] for entry in bindings}
+                != {entry[0] for entry in motor_recruitments}
+            ):
+                raise RuntimeError("unsealed motor pause lost its exact cause")
+        elif pause_interval_ordinal is not None or bindings or body_consequences:
+            raise RuntimeError("unsealed quiescent phase fabricated an action pause")
+        if _observation_signature(self.readiness()) != _observation_signature(
+            active_before
+        ):
+            raise RuntimeError("unsealed intake published before its final seal")
+        return ResidentUnsealedIntakeEvidence(
+            token=token,
+            provisional_organism_tick=provisional_tick,
+            pause_interval_ordinal=pause_interval_ordinal,
+            motor_unit_recruitments=motor_recruitments,
+            body_effector_bindings=tuple(bindings),
+            articulated_body_axes=body_axes,
+            articulated_body_consequences=body_consequences,
+            articulatory_unit_recruitments=_articulatory_unit_recruitments(
+                getattr(candidate, "articulatory_unit_recruitments", None)
+            ),
+        )
 
     def begin_unsealed_intake_direct(
         self,
@@ -2203,6 +2277,8 @@ class NativeResidentOrganism:
 
         if self.__unsealed_validation is not None:
             raise RuntimeError("resident organism already has an unsealed intake")
+        if self.__unacknowledged_direct_token is not None:
+            raise RuntimeError("resident organism has an unpublished direct successor")
         if not isinstance(sources, tuple):
             raise TypeError("unsealed intake sources must be a tuple")
         if (
@@ -2258,46 +2334,30 @@ class NativeResidentOrganism:
             list(sources),
             [list(value) for value in intervals],
         )
-        token = getattr(candidate, "token", None)
-        provisional_tick = _nonnegative_integer(
-            getattr(candidate, "provisional_organism_tick", None),
-            "unsealed provisional organism tick",
-        )
         try:
-            if not isinstance(token, bytes) or len(token) != 32:
-                raise RuntimeError("unsealed intake token changed format")
-            if provisional_tick < active_before.organism_tick + requested_interval_count:
-                raise RuntimeError("unsealed intake omitted a causal interval")
-            recruitments = _articulatory_unit_recruitments(
-                getattr(candidate, "articulatory_unit_recruitments", None)
-            )
-            if _observation_signature(self.readiness()) != _observation_signature(
-                active_before
-            ):
-                raise RuntimeError("unsealed intake published before its final seal")
+            evidence = self._validated_unsealed_phase(candidate, active_before)
         except BaseException:
+            token = getattr(candidate, "token", None)
             if isinstance(token, bytes) and len(token) == 32:
                 self.__runtime.abort_unsealed_intake(token)
             raise
         self.__unsealed_validation = (
-            token,
+            evidence.token,
             active_before,
             requested_source_port_count,
             requested_interval_count,
         )
-        return ResidentUnsealedIntakeEvidence(
-            token=token,
-            provisional_organism_tick=provisional_tick,
-            articulatory_unit_recruitments=recruitments,
-        )
+        return evidence
 
-    def finalize_unsealed_intake_direct(
+    def resume_unsealed_action_direct(
         self,
         token: bytes,
-        sources: object = (),
-        maximum_causal_intervals: object = (),
-    ) -> ResidentPrepareEvidence:
-        """Append optional self-hearing, seal once, and commit the successor."""
+        sources: object,
+        maximum_causal_intervals: object,
+        *,
+        vestibular_yaw: tuple[int, tuple[int, ...]] | None = None,
+    ) -> ResidentUnsealedIntakeEvidence:
+        """Resume one exact motor pause, stopping at any later discharge."""
 
         validation = self.__unsealed_validation
         if validation is None:
@@ -2305,13 +2365,99 @@ class NativeResidentOrganism:
         expected_token, active_before, source_port_count, interval_count = validation
         if token != expected_token:
             raise ValueError("unsealed intake token mismatch")
-        if not isinstance(sources, tuple):
-            raise TypeError("unsealed intake sources must be a tuple")
+        if not isinstance(sources, tuple) or not sources:
+            raise TypeError("unsealed action consequence must be a nonempty tuple")
         if (
             not isinstance(maximum_causal_intervals, tuple)
             or len(maximum_causal_intervals) != len(sources)
         ):
-            raise TypeError("unsealed intake intervals must match the source tuple")
+            raise TypeError("unsealed action consequence intervals changed cardinality")
+        intervals = tuple(
+            _validated_causal_intervals(value)
+            for value in maximum_causal_intervals
+        )
+        predecessor_heading: int | None = None
+        signed_steps: tuple[int, ...] = ()
+        if vestibular_yaw is not None:
+            if not isinstance(vestibular_yaw, tuple) or len(vestibular_yaw) != 2:
+                raise TypeError("unsealed action vestibular trajectory changed format")
+            predecessor_heading = _nonnegative_integer(
+                vestibular_yaw[0], "action vestibular predecessor heading"
+            )
+            if predecessor_heading >= 360_000:
+                raise ValueError("action vestibular predecessor heading is not canonical")
+            signed_steps = vestibular_yaw[1]
+            if (
+                not isinstance(signed_steps, tuple)
+                or not signed_steps
+                or any(
+                    not isinstance(step, int)
+                    or isinstance(step, bool)
+                    or not -(1 << 31) <= step < (1 << 31)
+                    for step in signed_steps
+                )
+            ):
+                raise TypeError("action vestibular steps changed format")
+        source_port_count += sum(
+            _nonnegative_integer(
+                getattr(source, "port_count", None),
+                "unsealed consequence source port count",
+            )
+            for source in sources
+        ) + len(signed_steps)
+        interval_count += len(sources) + len(signed_steps)
+        candidate = None
+        try:
+            candidate = self.__runtime.resume_unsealed_action_direct(
+                token,
+                predecessor_heading,
+                list(signed_steps),
+                list(sources),
+                [list(value) for value in intervals],
+            )
+            evidence = self._validated_unsealed_phase(
+                candidate, active_before
+            )
+        except BaseException:
+            candidate_token = getattr(candidate, "token", None)
+            if isinstance(candidate_token, bytes) and len(candidate_token) == 32:
+                try:
+                    self.__runtime.abort_unsealed_intake(candidate_token)
+                except (RuntimeError, ValueError) as abort_error:
+                    raise RuntimeError(
+                        "unsealed action phase validation and abort both failed"
+                    ) from abort_error
+            self.__unsealed_validation = None
+            raise
+        self.__unsealed_validation = (
+            evidence.token,
+            active_before,
+            source_port_count,
+            interval_count,
+        )
+        return evidence
+
+    def append_unsealed_intake_direct(
+        self,
+        token: bytes,
+        sources: object,
+        maximum_causal_intervals: object,
+    ) -> ResidentUnsealedIntakeEvidence:
+        """Append exact self-hearing without sealing the open successor."""
+
+        validation = self.__unsealed_validation
+        if validation is None:
+            raise RuntimeError("resident organism has no unsealed intake")
+        expected_token, active_before, source_port_count, interval_count = validation
+        if token != expected_token:
+            raise ValueError("unsealed intake token mismatch")
+        if not isinstance(sources, tuple) or not sources:
+            raise TypeError("unsealed appended sources must be a nonempty tuple")
+        if (
+            not isinstance(maximum_causal_intervals, tuple)
+            or len(maximum_causal_intervals) != len(sources)
+        ):
+            raise TypeError("unsealed appended intervals changed cardinality")
         intervals = tuple(
             _validated_causal_intervals(value)
             for value in maximum_causal_intervals
@@ -2325,13 +2471,47 @@ class NativeResidentOrganism:
         )
         interval_count += len(sources)
         candidate = None
-        final_token = None
         try:
-            candidate = self.__runtime.finalize_unsealed_intake_direct(
+            candidate = self.__runtime.append_unsealed_intake_direct(
                 token,
                 list(sources),
                 [list(value) for value in intervals],
             )
+            evidence = self._validated_unsealed_phase(candidate, active_before)
+        except BaseException:
+            candidate_token = getattr(candidate, "token", None)
+            if isinstance(candidate_token, bytes) and len(candidate_token) == 32:
+                try:
+                    self.__runtime.abort_unsealed_intake(candidate_token)
+                except (RuntimeError, ValueError) as abort_error:
+                    raise RuntimeError(
+                        "unsealed appended phase validation and abort both failed"
+                    ) from abort_error
+            self.__unsealed_validation = None
+            raise
+        self.__unsealed_validation = (
+            evidence.token,
+            active_before,
+            source_port_count,
+            interval_count,
+        )
+        return evidence
+
+    def finalize_unsealed_intake_direct(
+        self,
+        token: bytes,
+    ) -> ResidentPrepareEvidence:
+        """Seal once after the causal queue and every action pause drain."""
+
+        validation = self.__unsealed_validation
+        if validation is None:
+            raise RuntimeError("resident organism has no unsealed intake")
+        expected_token, active_before, source_port_count, interval_count = validation
+        if token != expected_token:
+            raise ValueError("unsealed intake token mismatch")
+        final_token = None
+        try:
+            candidate = self.__runtime.finalize_unsealed_intake_direct(token)
             final_token = getattr(candidate, "token", None)
             evidence = self._validated_prepare_evidence_body(
                 candidate,
@@ -2341,7 +2521,7 @@ class NativeResidentOrganism:
                 body_feedback_reentered=True,
                 candidate_committed=True,
             )
-            self.__runtime.acknowledge_direct_commit(final_token)
+            self.__unacknowledged_direct_token = final_token
             return evidence
         except BaseException:
             if isinstance(final_token, bytes) and len(final_token) == 32:
@@ -2355,6 +2535,24 @@ class NativeResidentOrganism:
             raise
         finally:
             self.__unsealed_validation = None
+
+    def acknowledge_direct_commit(self, token: bytes) -> None:
+        """Release rollback custody only after durable CURRENT publication."""
+
+        if token != self.__unacknowledged_direct_token:
+            raise ValueError("unacknowledged direct token mismatch")
+        self.__runtime.acknowledge_direct_commit(token)
+        self.__unacknowledged_direct_token = None
+
+    def rollback_direct_commit(self, token: bytes) -> None:
+        """Restore the authenticated predecessor before CURRENT publication."""
+
+        if token != self.__unacknowledged_direct_token:
+            raise ValueError("unacknowledged direct token mismatch")
+        try:
+            self.__runtime.rollback_direct_commit(token)
+        finally:
+            self.__unacknowledged_direct_token = None
 
     def abort_unsealed_intake(self, token: bytes) -> None:
         """Drop the working successor and restore its authenticated predecessor."""

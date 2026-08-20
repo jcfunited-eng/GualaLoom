@@ -49,8 +49,12 @@ def test_every_lived_trajectory_contains_one_current_body_observation() -> None:
     )
     admissions = (((1, 1),),)
 
-    first = organism.commit_admitted_trajectory_direct((source,), admissions)
-    second = organism.commit_admitted_trajectory_direct((source,), admissions)
+    first_phase = organism.begin_unsealed_intake_direct((source,), admissions)
+    first = organism.finalize_unsealed_intake_direct(first_phase.token)
+    organism.acknowledge_direct_commit(first.token)
+    second_phase = organism.begin_unsealed_intake_direct((source,), admissions)
+    second = organism.finalize_unsealed_intake_direct(second_phase.token)
+    organism.acknowledge_direct_commit(second.token)
 
     assert (first.predecessor_organism_tick, first.organism_tick) == (0, 2)
     assert (second.predecessor_organism_tick, second.organism_tick) == (2, 4)

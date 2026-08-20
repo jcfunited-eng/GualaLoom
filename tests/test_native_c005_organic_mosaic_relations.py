@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 from types import SimpleNamespace
 
 from dsf_ai_service import native_production_app as production
@@ -34,6 +35,20 @@ def _hop(tick: int, relations: tuple[dict[str, object], ...]) -> dict[str, objec
         "predecessor_organism_tick": tick - 1,
         "organism_tick": tick,
         "internally_reassembled_formation_cues": (),
+        "causal_interval_evidence": (
+            {
+                "predecessor_organism_tick": tick - 1,
+                "organism_tick": tick,
+                "externally_perturbed_neuron_lineages": (),
+                "internally_reassembled_formation_cues": (),
+                "externally_reassembled_formation_frontiers": (),
+                "motor_unit_recruitments": (),
+                "emitted_neuron_fractals": (),
+                "changed_contact_channel_states": (),
+                "affective_balance_trajectories": (),
+                "causal_frontier_advances": (),
+            },
+        ),
         "receptor_ingress_sense_counts": {
             sense.value: 0 for sense in production.SENSE_ORDER
         },
@@ -89,34 +104,44 @@ class _UnsealedTestOrganism:
         return SimpleNamespace(
             token=b"u" * 32,
             provisional_organism_tick=self.phase_hop["organism_tick"],
+            motor_unit_recruitments=(),
             articulatory_unit_recruitments=self.phase_hop[
                 "articulatory_unit_recruitments"
             ],
         )
 
-    def finalize_unsealed_intake_direct(
-        self, token, sources, intervals
-    ) -> SimpleNamespace:
-        self.calls.append(("finalize", (token, sources, intervals)))
-        appended = bool(sources)
+    def append_unsealed_intake_direct(self, token, sources, intervals):
+        self.calls.append(("append", (token, sources, intervals)))
         return SimpleNamespace(
+            token=token,
+            provisional_organism_tick=self.final_hop["organism_tick"],
+            motor_unit_recruitments=(),
+            articulatory_unit_recruitments=self.final_hop[
+                "articulatory_unit_recruitments"
+            ],
+        )
+
+    def finalize_unsealed_intake_direct(self, token) -> SimpleNamespace:
+        self.calls.append(("finalize", token))
+        return SimpleNamespace(
+            token=b"f" * 32,
             appended_physically_transitioned_neuron_count=(
                 self.final_hop["physically_transitioned_neuron_count"]
-                if appended
-                else 0
             ),
             appended_complete_neuron_fractal_count=(
                 self.final_hop["complete_neuron_fractal_count"]
-                if appended
-                else 0
             ),
             appended_externally_perturbed_body_receptor_count=(
                 self.final_hop["externally_perturbed_body_receptor_count"]
-                if appended
-                else 0
             ),
             appended_articulatory_unit_recruitment_count=0,
         )
+
+    def acknowledge_direct_commit(self, token):
+        self.calls.append(("acknowledge", token))
+
+    def rollback_direct_commit(self, token):
+        self.calls.append(("rollback", token))
 
     def abort_unsealed_intake(self, token) -> None:
         self.calls.append(("abort", token))
@@ -178,17 +203,34 @@ def test_ordinary_intake_opens_once_appends_self_hearing_and_finalizes_once(
             return SimpleNamespace(
                 token=b"u" * 32,
                 provisional_organism_tick=11,
+                motor_unit_recruitments=(),
                 articulatory_unit_recruitments=(recruitment,),
             )
 
-        def finalize_unsealed_intake_direct(self, token, sources, intervals):
-            calls.append(("finalize", (token, sources, intervals)))
+        def append_unsealed_intake_direct(self, token, sources, intervals):
+            calls.append(("append", (token, sources, intervals)))
             return SimpleNamespace(
+                token=token,
+                provisional_organism_tick=12,
+                motor_unit_recruitments=(),
+                articulatory_unit_recruitments=(),
+            )
+
+        def finalize_unsealed_intake_direct(self, token):
+            calls.append(("finalize", token))
+            return SimpleNamespace(
+                token=b"f" * 32,
                 appended_physically_transitioned_neuron_count=4,
                 appended_complete_neuron_fractal_count=1,
                 appended_externally_perturbed_body_receptor_count=4,
                 appended_articulatory_unit_recruitment_count=0,
             )
+
+        def acknowledge_direct_commit(self, token):
+            calls.append(("acknowledge", token))
+
+        def rollback_direct_commit(self, token):
+            calls.append(("rollback", token))
 
         def abort_unsealed_intake(self, token):
             calls.append(("abort", token))
@@ -241,11 +283,191 @@ def test_ordinary_intake_opens_once_appends_self_hearing_and_finalizes_once(
         "a009-one-seal",
     )
 
-    assert [name for name, _ in calls] == ["begin", "finalize"]
+    assert [name for name, _ in calls] == [
+        "begin", "append", "finalize", "acknowledge"
+    ]
     _, (_, appended_sources, appended_intervals) = calls[1]
     assert appended_sources == (self_hearing[0],)
     assert appended_intervals == (self_hearing[1],)
     assert result["observation"]["articulation"]["self_hearing_hop_count"] == 1
+
+
+def test_motor_pause_commits_exact_world_interval_before_native_resume(
+    monkeypatch,
+) -> None:
+    motor = ("12" * 16, 0, 7, (), ())
+    binding = ("12" * 16, "neck_pitch", "toward_maximum", 7)
+    consequence = (
+        1,
+        "neck_pitch",
+        "millidegrees",
+        0,
+        1,
+        1,
+        0,
+        7,
+        0,
+        1,
+        0,
+    )
+    events: list[str] = []
+
+    class Organism:
+        def readiness(self):
+            return SimpleNamespace(articulated_body_state_sha256="44" * 32)
+
+        def begin_unsealed_intake_direct(
+            self, sources, intervals, *, vestibular_yaw=None
+        ):
+            events.append("begin")
+            return SimpleNamespace(
+                token=b"u" * 32,
+                provisional_organism_tick=11,
+                pause_interval_ordinal=1,
+                motor_unit_recruitments=(motor,),
+                body_effector_bindings=(binding,),
+                articulated_body_consequences=(consequence,),
+                articulatory_unit_recruitments=(),
+            )
+
+        def resume_unsealed_action_direct(
+            self, token, sources, intervals, *, vestibular_yaw=None
+        ):
+            events.append("resume")
+            assert events[-3:] == ["world_commit", "world_persist", "resume"]
+            assert token == b"u" * 32
+            assert len(sources) == len(intervals) == 1
+            return SimpleNamespace(
+                token=token,
+                provisional_organism_tick=12,
+                pause_interval_ordinal=None,
+                motor_unit_recruitments=(),
+                body_effector_bindings=(),
+                articulated_body_consequences=(),
+                articulatory_unit_recruitments=(),
+            )
+
+        def finalize_unsealed_intake_direct(self, token):
+            events.append("finalize")
+            return SimpleNamespace(
+                token=b"f" * 32,
+                appended_physically_transitioned_neuron_count=0,
+                appended_complete_neuron_fractal_count=0,
+                appended_externally_perturbed_body_receptor_count=0,
+                appended_articulatory_unit_recruitment_count=0,
+            )
+
+        def acknowledge_direct_commit(self, token):
+            events.append("acknowledge")
+            assert token == b"f" * 32
+
+        def rollback_direct_commit(self, _token):
+            events.append("rollback")
+
+        def abort_unsealed_intake(self, _token):
+            events.append("abort")
+
+    execution = SimpleNamespace(
+        authority_receipt_sha256="55" * 32,
+        before=SimpleNamespace(revision=3, state_sha256="66" * 32),
+        after=SimpleNamespace(revision=4, state_sha256="77" * 32),
+    )
+
+    class World:
+        def encoded_snapshot(self):
+            return b"world-before"
+
+        def prepared_action_visibility_transaction(self, _prepared):
+            return nullcontext()
+
+        def commit_prepared_action(self, _prepared):
+            events.append("world_commit")
+            return execution
+
+        def encoded_committed_prepared_action(self, _prepared):
+            return b"world-after"
+
+    organism = Organism()
+    world = World()
+    final_hop = _hop(12, ())
+    final_hop["causal_interval_evidence"] = (
+        {"motor_unit_recruitments": (motor,)},
+        {"motor_unit_recruitments": ()},
+    )
+    final_hop["motor_unit_recruitments"] = (motor,)
+    final_hop["body_effector_bindings"] = (binding,)
+    final_hop["articulated_body_consequences"] = (consequence,)
+    monkeypatch.setattr(
+        production,
+        "_runtime",
+        lambda: (
+            SimpleNamespace(
+                organism=organism,
+                pointer=SimpleNamespace(state_sha256="aa" * 32),
+            ),
+            SimpleNamespace(),
+        ),
+    )
+    monkeypatch.setattr(production, "_world", lambda: world)
+    monkeypatch.setattr(
+        production,
+        "_prepare_native_action_consequence",
+        lambda _phase: (
+            world,
+            object(),
+            object(),
+            [],
+            {"exact": True},
+            None,
+            {"pause_interval_ordinal": 1},
+        ),
+    )
+    monkeypatch.setattr(
+        production,
+        "_persist_world_body",
+        lambda _body: events.append("world_persist"),
+    )
+    monkeypatch.setattr(
+        production,
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: final_hop,
+    )
+    monkeypatch.setattr(
+        production,
+        "_advance_causal_motor_traces",
+        lambda *_args, **_kwargs: ({}, {}),
+    )
+
+    def publish(*_args):
+        events.append("publish")
+        return SimpleNamespace(
+            pointer=SimpleNamespace(
+                organism_tick=12,
+                state_bytes=100,
+                state_sha256="bb" * 32,
+            )
+        )
+
+    monkeypatch.setattr(production, "_publish_committed_organism", publish)
+    monkeypatch.setattr(production, "_refresh_public_observation_cache", lambda: None)
+
+    result = production._perform_admitted_intake_locked(
+        [(_episode(), [])],
+        "a009-action-pause-resume",
+    )
+
+    assert events == [
+        "begin",
+        "world_commit",
+        "world_persist",
+        "resume",
+        "finalize",
+        "publish",
+        "acknowledge",
+    ]
+    assert result["observation"]["motor_action"][
+        "world_consequence_interval_count"
+    ] == 1
 
 
 def test_working_causal_evidence_keeps_one_path_until_that_cause_settles() -> None:
@@ -371,7 +593,9 @@ def test_admitted_experience_preserves_relation_from_nonfinal_hop(
     assert result["totals"]["rest_recovered_neuron_count"] == 5
     assert "unmet_dissipation_quanta" not in result["totals"]
     assert result["observation"]["unmet_dissipation_quanta"] == 0
-    assert [name for name, _ in organism.calls] == ["begin", "finalize"]
+    assert [name for name, _ in organism.calls] == [
+        "begin", "finalize", "acknowledge"
+    ]
     _, (sources, intervals, vestibular_yaw) = organism.calls[0]
     assert vestibular_yaw is None
     assert len(sources) == 2
@@ -508,7 +732,9 @@ def test_self_hearing_hops_share_one_native_trajectory_boundary(monkeypatch) -> 
         "self-hearing-trajectory-boundary-test",
     )
 
-    assert [name for name, _ in organism.calls] == ["begin", "finalize"]
+    assert [name for name, _ in organism.calls] == [
+        "begin", "append", "finalize", "acknowledge"
+    ]
     _, (_, self_hearing_sources, self_hearing_intervals) = organism.calls[1]
     assert len(self_hearing_sources) == 4
     assert len(self_hearing_intervals) == 4

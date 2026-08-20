@@ -191,6 +191,23 @@ def _observe_c024_cognitive_capital(
     }
 
 
+def _commit_unsealed_sources(
+    organism: object,
+    episodes: tuple[tuple[object, object], ...],
+) -> object:
+    """Commit admitted sources through the sole production intake boundary."""
+
+    if not episodes:
+        raise ValueError("unsealed source transaction must not be empty")
+    phase = organism.begin_unsealed_intake_direct(
+        tuple(episode for episode, _ in episodes),
+        tuple(admissions for _, admissions in episodes),
+    )
+    evidence = organism.finalize_unsealed_intake_direct(phase.token)
+    organism.acknowledge_direct_commit(evidence.token)
+    return evidence
+
+
 def _rehearse_native_physical_rest_and_wake(
     current_envelope: bytes,
     budget: dict[str, int],
@@ -221,8 +238,11 @@ def _rehearse_native_physical_rest_and_wake(
         qualifying: tuple[int, object, object, object] | None = None
         for interval_ordinal in range(1, 17):
             before = organism.readiness()
-            candidate = organism.prepare_admitted(quiet_episode, quiet_admissions)
-            after = organism.commit(candidate.token)
+            candidate = _commit_unsealed_sources(
+                organism,
+                ((quiet_episode, quiet_admissions),),
+            )
+            after = organism.readiness()
             capacity_before = _exact_energy(
                 before.dissipation_capacity_energy_zeptojoules,
                 "pre-rest dissipation capacity",
@@ -402,8 +422,11 @@ def _rehearse_native_internal_consolidation(
         initial = organism.readiness()
         for interval_ordinal in range(1, 33):
             before = organism.readiness()
-            candidate = organism.prepare_admitted(quiet_episode, quiet_admissions)
-            after = organism.commit(candidate.token)
+            candidate = _commit_unsealed_sources(
+                organism,
+                ((quiet_episode, quiet_admissions),),
+            )
+            after = organism.readiness()
             current = snapshot(organism)
             prior_by_identity = {
                 (formation[1], formation[2]): formation for formation in prior
@@ -961,14 +984,10 @@ def _rehearse_articulation_and_self_hearing(
     hop_count = len(episodes)
     if not episodes:
         raise RuntimeError("articulatory pressure produced no self-hearing interval")
-    heard = organism.prepare_admitted_trajectory(
-        tuple(episode for episode, _ in episodes),
-        tuple(admissions for _, admissions in episodes),
-    )
+    heard = _commit_unsealed_sources(organism, episodes)
     transitioned = heard.physically_transitioned_neuron_count
     fractals = heard.complete_neuron_fractal_count
     body_perturbed = heard.externally_perturbed_body_receptor_count
-    organism.commit(heard.token)
     return {
         "applied_motor_quanta": applied_motor_quanta,
         "glottal_open_samples_at_apex": glottal_open_samples_at_apex,
@@ -1134,61 +1153,6 @@ def _rehearse_contact_local_junction(
     }
 
 
-def _rehearse_a013_articulated_body(
-    organism: object,
-) -> dict[str, object]:
-    """Exercise the restored live anatomy once without cloning or publishing it."""
-
-    before = organism.readiness()
-    before_axes = tuple(before.articulated_body_axes)
-    if len(before_axes) != 37 or before.articulated_body_state_bytes != 195:
-        raise RuntimeError("A-013 restored body anatomy changed")
-
-    prepared = organism.commit_admitted_trajectory_direct((), ())
-    hot = organism.readiness()
-    if (
-        prepared.predecessor_state_sha256 != before.state_sha256
-        or prepared.predecessor_organism_tick != before.organism_tick
-        or prepared.organism_tick != before.organism_tick + 1
-        or prepared.receptor_ingress_sense_counts != (0, 0, 0, 0, 0, 74)
-        or prepared.python_callback_count != 0
-        or prepared.successor_seal_count != 1
-        or prepared.motor_unit_recruitments
-        or prepared.body_effector_bindings
-        or prepared.articulated_body_consequences
-        or prepared.body_proprioceptive_sources
-    ):
-        raise RuntimeError("A-013 neutral body observation changed its causal boundary")
-
-    if (
-        hot.identity != before.identity
-        or hot.organism_tick != before.organism_tick + 1
-        or hot.state_sha256 != prepared.prepared_state_sha256
-        or tuple(hot.articulated_body_axes) != before_axes
-        or len(hot.articulated_body_axes) != 37
-        or hot.articulated_body_state_bytes != 195
-        or hot.articulated_body_proprioception_initialized is not True
-    ):
-        raise RuntimeError("A-013 articulated body live-copy transition changed")
-    return {
-        "a013_articulated_body_rehearsed": True,
-        "a013_articulated_body_predecessor_state_sha256": before.state_sha256,
-        "a013_articulated_body_successor_state_sha256": hot.state_sha256,
-        "a013_articulated_body_predecessor_tick": before.organism_tick,
-        "a013_articulated_body_successor_tick": hot.organism_tick,
-        "a013_articulated_body_axis_count": len(hot.articulated_body_axes),
-        "a013_articulated_body_terminal_count": 74,
-        "a013_articulated_body_state_bytes": hot.articulated_body_state_bytes,
-        "a013_articulated_body_state_sha256": (
-            hot.articulated_body_state_sha256
-        ),
-        "a013_articulated_body_proprioception_initialized": True,
-        "a013_articulated_body_neutral_observation": True,
-        "a013_articulated_body_live_transition_discarded": True,
-        "a013_articulated_body_python_callback_count": 0,
-    }
-
-
 def _rehearse_a013_thermal_body(expected_identity: str) -> dict[str, object]:
     """Exercise the production heat circuit and native receptors once.
 
@@ -1255,9 +1219,8 @@ def _rehearse_a013_thermal_body(expected_identity: str) -> dict[str, object]:
             unsealed = organism.begin_unsealed_intake_direct(
                 (episode,), (admissions,)
             )
-            evidence = organism.finalize_unsealed_intake_direct(
-                unsealed.token, (), ()
-            )
+            evidence = organism.finalize_unsealed_intake_direct(unsealed.token)
+            organism.acknowledge_direct_commit(evidence.token)
             hop = production._resident_prepare_hop(
                 evidence, organism.readiness()
             )

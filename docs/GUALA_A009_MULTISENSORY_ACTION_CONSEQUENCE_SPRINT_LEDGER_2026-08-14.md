@@ -391,3 +391,151 @@ Third immutable rehearsal result:
   an exact body-ingress count of 84;
 - the exact rebuilt-native cold fixture passes locally: fresh complete roster,
   111-port consequence, begin/finalize, and byte-exact cold restore.
+
+## Task 6B live closure and Task 6C native action continuation
+
+Task `dsf-ai-task:1145`, commit
+`6d41c584c5ac68945653e39fabfa43af5926d6a3`, and image
+`sha256:e7085eb92be0a686fdec0098333a6f36bff4a373fac466537e8e7fc963801c0b`
+live-closed `A-009-CADENCE-6B` on 2026-08-20.  The controller verified one
+cutover, exact native state, one desired/running task, zero pending tasks, and
+one completed deployment.  The legacy `_commit_admitted_hop` helper and every
+reference to it are absent.  Ordinary intake now owns one unsealed native
+successor and performs exactly one final whole-organism seal.
+
+Active item: `A-009-CADENCE-6C`.
+
+Acceptance condition: each actual layer-12 discharge pauses the same unsealed
+native trajectory immediately after the existing articulated-body settlement.
+The exact carrier-derived world action is applied at most once; one complete
+world/body consequence occurrence and its exact vestibular trajectory re-enter
+that same unsealed organism before its pending native body feedback and before
+any later original source.  A consequence-caused later discharge repeats the
+same boundary.  The transaction seals and publishes once only after no action
+or causal source remains.
+
+Implementation contract:
+
+- input: one authenticated active organism, the already ordered Task-6B source
+  trajectory, and the exact native motor recruitments emitted by each settled
+  causal interval;
+- output: the existing final resident observation plus a bounded action record
+  whose causal-intent receipt binds the exact recruitment, world predecessor
+  and successor, consequence source, vestibular steps, and final organism
+  successor;
+- physical authorities: native `BodyEffectorTerminal` mounts and exact 37-axis
+  body settlement remain in `organism_runtime.rs`; the persistent world advances
+  its exact one-millisecond material interval; `_action_consequence_episode`
+  carries its before/after field; and only an actual `neck_yaw` consequence
+  enters `exact_native_yaw_trajectory` and the mounted vestibular law;
+- conserved state: one organism identity, one native predecessor, one world
+  predecessor, exact body carrier/material settlement, world revision, exact
+  sensory source evidence, full seven-field DSF delivery, and current-only
+  persistence;
+- preparation and mutation order: native interval settlement occurs first and
+  returns a custody-only pause; world preparation is fallible and precedes its
+  action commit; exact consequence construction precedes native resume; no
+  later native source executes while a pause is outstanding;
+- rollback: before final publication, native abort restores its authenticated
+  predecessor and committed in-memory world actions reverse in exact reverse
+  order.  A refused prepared world action is discarded and produces no sensory
+  substitute;
+- cold restore: no pause or intermediate body is persisted.  Restart restores
+  the old complete current or the one final complete successor;
+- work: one native interval, one reached body frontier, one world action, and
+  one fixed complete consequence roster per discharge.  No population scan,
+  action history, retry, or intermediate whole-organism seal is introduced;
+- retired path: the former post-seal `_prepare_motor_yaw_action` arrangement is
+  not restored.  No helper may apply or infer a motor action after native has
+  already continued past that discharge.
+
+Authorized files:
+`native/guala_core/src/organism_runtime.rs`,
+`dsf_ai_service/glew_runtime/native_resident_organism.py`,
+`dsf_ai_service/native_production_app.py`, this ledger, and one focused
+action-pause/continue test file.  No neuron, DSF, formation, persistence-schema,
+world-law, UI, curriculum, or observer redesign is authorized.
+
+Acceptance evidence map:
+
+| Fact | Producer | Required crossing | Final proof |
+|---|---|---|---|
+| Native action cause | layer-12 `MotorUnitRecruitment` | Rust pause -> FFI -> Python transport | exact recruitment carriers and pause ordinal |
+| Applied world action | persistent world `PreparedActionExecution` | prepared -> committed once | before/after revision, pose, state and intent receipts |
+| Complete consequence | `_action_consequence_episode` | Python source -> native resume | fixed roster, changed/quiescent lane truth and matching action receipt |
+| Vestibular return | actual native `neck_yaw` displacement + `exact_native_yaw_trajectory` + mounted canal | native resume before later source | exact ordered signed steps and reached vestibular intervals |
+| Local body return | native articulated-body settlement | pending feedback -> native resume | exact source tick/body-source extent before later original source |
+| Causal continuation | unsealed native transaction | pause/resume until empty -> one seal | interval order, one successor seal, exact cold restore |
+| Durable action | final world and organism publication | existing current-only stores | one live action, matching world/organism receipt, restart continuity |
+
+The full explicit `D_k`, `M_k`, `R_rev,k`, `U*_k`, `C_k`, `P_k`, and `B_k`
+field remains authoritative for every admitted occurrence.  Task 6C adds no
+field reduction and changes no neuron equation.
+
+Legacy-entry retirement before Task 6C implementation:
+
+- `prepare_admitted`, `prepare_admitted_trajectory`, and
+  `commit_admitted_trajectory_direct` were publicly reachable alternatives to
+  the unsealed transaction.  None had an ordinary production caller, but each
+  could seal or commit an admitted interval without the required native action
+  pause;
+- their Python wrapper methods, PyO3 exports, Rust runtime implementations, and
+  the private full-trajectory builder are deleted rather than retained as
+  compatibility paths;
+- the only remaining valid cold rehearsal caller now uses
+  `begin_unsealed_intake_direct` -> `finalize_unsealed_intake_direct`, and the
+  obsolete body-only direct rehearsal is deleted;
+- the unsealed begin/finalize boundary is therefore the sole production-facing
+  admitted-source route before the Task 6C pause/resume extension is mounted.
+
+Task 6C source cutover:
+
+- `advance_unsealed_until_pause` now stops immediately after exact native
+  articulated-body settlement whenever a causal interval emits a layer-12
+  motor recruitment.  It retains the untouched later-source queue, the exact
+  recruitment, the exact per-axis body consequence, and the deferred 74-terminal
+  body source under one changing custody token;
+- `resume_unsealed_action_direct` accepts one complete consequence source plus
+  only the exact vestibular trajectory physically implied by a changed
+  `neck_yaw` axis.  It orders consequence, vestibular return, deferred native
+  body feedback, then the suspended later sources, and pauses again on any
+  later discharge;
+- live Python intake commits one authenticated one-millisecond persistent-world
+  interval inside the world visibility transaction, constructs the fixed
+  complete sensor roster from its before/after state and the native predecessor
+  and successor body axes, and resumes native before revealing the world;
+- the final causal interval evidence is checked against the ordered pause
+  ordinals.  Every and only motor-producing interval must have one committed
+  world consequence before publication;
+- final sealing retains the native predecessor.  Production validates the
+  entire action/consequence chain, publishes durable CURRENT, and only then
+  acknowledges the direct successor.  Any earlier failure reverses native and
+  every committed world interval to their authenticated predecessors;
+- the unused `_insert_native_action_consequences`, `_commit_vestibular_tick`,
+  and `_commit_vestibular_trajectory` production helpers are deleted.  The
+  legacy admitted definitions and production calls are mechanically required
+  to remain at zero matches before this item can be called retired;
+- no topology parity, motor index, fabricated yaw, Python action choice,
+  intermediate organism seal, DSF reduction, or neuron-law change is present.
+
+Task 6C source boundary on 2026-08-20:
+
+- production search is zero for `prepare_admitted_trajectory`,
+  `commit_admitted_trajectory_direct`, `prepare_admitted`,
+  `_insert_native_action_consequences`, `_commit_vestibular_tick`, and
+  `_commit_vestibular_trajectory`;
+- `cargo check --lib` passes; Python compilation passes for every changed
+  production and focused test file;
+- the four focused native unsealed-intake tests pass, including exact abort
+  rollback, one complete body observation per intake, combined vestibular plus
+  admitted plus self-hearing custody, and one final byte-exact seal;
+- the focused production-order proof passes and observes exactly
+  world-commit -> world-persist -> native-resume -> native-finalize ->
+  organism-publish -> native-acknowledge;
+- the release-native wheel builds successfully; the complete focused A-009
+  action-consequence file passes 4/4 against that exact wheel, and the focused
+  production orchestration file passes 14/14;
+- the retired-helper absence proof passes.  These are focused source, package,
+  and behavior boundaries, not a live-production claim.
+
+Task 6C has not yet been packaged, deployed, or live-verified at this entry.

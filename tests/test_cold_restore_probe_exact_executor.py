@@ -271,20 +271,24 @@ def test_articulation_rehearsal_reads_tick_through_native_observation(
         def readiness(self) -> SimpleNamespace:
             return SimpleNamespace(organism_tick=37)
 
-        def prepare_admitted_trajectory(
+        def begin_unsealed_intake_direct(
             self, episodes, admissions
         ) -> SimpleNamespace:
             assert len(episodes) == 1
             assert len(admissions) == 1
+            return SimpleNamespace(token=b"u" * 32)
+
+        def finalize_unsealed_intake_direct(self, token) -> SimpleNamespace:
+            assert token == b"u" * 32
             return SimpleNamespace(
-                token="heard",
+                token=b"f" * 32,
                 physically_transitioned_neuron_count=2,
                 complete_neuron_fractal_count=1,
                 externally_perturbed_body_receptor_count=1,
             )
 
-        def commit(self, token: str) -> None:
-            assert token == "heard"
+        def acknowledge_direct_commit(self, token: bytes) -> None:
+            assert token == b"f" * 32
 
     monkeypatch.setattr(
         probe,

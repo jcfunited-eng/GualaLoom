@@ -192,12 +192,15 @@ def _organism(anatomy_episode):
 
 
 def _admitted_step(organism, episode, cold_root):
-    prepared = organism.prepare_admitted(
-        episode,
-        tuple(FIXTURE_ADMISSION for _ in range(episode.occurrence_count)),
-        cold_root,
+    del cold_root
+    phase = organism.begin_unsealed_intake_direct(
+        (episode,),
+        (tuple(FIXTURE_ADMISSION for _ in range(episode.occurrence_count)),),
     )
-    return prepared, organism.commit(prepared.token)
+    prepared = organism.finalize_unsealed_intake_direct(phase.token)
+    observed = organism.readiness()
+    organism.acknowledge_direct_commit(prepared.token)
+    return prepared, observed
 
 
 def _tone(sample_count: int = 320, sample_rate: int = 16_000):
@@ -354,15 +357,13 @@ def test_virtual_material_and_body_senses_reach_resident_neurons(
         max_fabric_bytes=67_108_000,
         max_logical_peak_bytes=536_870_912,
     )
-    prepared = organism.prepare_admitted(
-        built.native_joint_source_episode,
-        tuple(
-            (1, 5)
-            for _ in range(episode.occurrence_count)
-        ),
-        tmp_path / "hippocampal-cold",
+    phase = organism.begin_unsealed_intake_direct(
+        (built.native_joint_source_episode,),
+        (tuple((1, 5) for _ in range(episode.occurrence_count)),),
     )
-    observed = organism.commit(prepared.token)
+    prepared = organism.finalize_unsealed_intake_direct(phase.token)
+    observed = organism.readiness()
+    organism.acknowledge_direct_commit(prepared.token)
 
     assert states == {
         "body": "observed",

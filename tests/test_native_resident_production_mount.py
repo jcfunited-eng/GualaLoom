@@ -249,7 +249,13 @@ def test_native_body_trajectory_exports_local_metabolic_afference() -> None:
         signed_displacement_millidegrees=90_000,
         duration_microseconds=250_000,
     )
-    result = production._commit_vestibular_trajectory(organism, 0, trajectory)
+    phase = organism.begin_unsealed_intake_direct(
+        (), (), vestibular_yaw=(0, trajectory)
+    )
+    assert not phase.motor_unit_recruitments
+    prepared = organism.finalize_unsealed_intake_direct(phase.token)
+    result = production._resident_prepare_hop(prepared, organism.readiness())
+    organism.acknowledge_direct_commit(prepared.token)
     assert result["metabolically_perturbed_body_receptor_count"] > 0
     assert result["metabolically_perturbed_body_receptor_count"] <= len(trajectory)
     committed = organism.readiness()

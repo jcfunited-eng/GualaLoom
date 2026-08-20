@@ -1859,9 +1859,10 @@ def main() -> int:
         )
     ):
         raise RuntimeError("native CURRENT cold restore changed")
-    articulated_body_proof = _rehearse_a013_articulated_body(
-        restored.organism,
-    )
+    # A-013's mature-body transition was accepted and live-closed before this
+    # release. Replaying it here makes every unrelated deployment perform a
+    # full mature-organism successor transition. Current continuity is proved
+    # above; the fresh exact action/consequence transaction remains below.
     thermal_body_proof = _rehearse_a013_thermal_body(before.identity)
     record = {
         "baseline_observed_state_sha256": values.expected_state_sha256,
@@ -1889,7 +1890,6 @@ def main() -> int:
         "source_mount_read_only": True,
         "tick": before.organism_tick,
         **motor_proof,
-        **articulated_body_proof,
         **thermal_body_proof,
     }
     proof = {

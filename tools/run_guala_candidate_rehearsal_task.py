@@ -1019,7 +1019,10 @@ def main() -> int:
     expected_native_physical_rest_wake_rehearsal = False
     expected_native_internal_consolidation_rehearsal = False
     expected_native_causal_cross_context_rehearsal = False
-    expected_a013_articulated_body_rehearsal = values.mode == "cold-restore"
+    # A-013 is live-closed. Generic cold restore proves current continuity and
+    # the fresh action/consequence boundary without replaying a mature-body
+    # successor transition on every deployment.
+    expected_a013_articulated_body_rehearsal = False
     task_input = probe_task_definition(
         source,
         mode=values.mode,

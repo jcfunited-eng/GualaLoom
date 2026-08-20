@@ -347,25 +347,6 @@ def test_cold_probe_uses_only_binary_current(monkeypatch, capsys) -> None:
     )
     monkeypatch.setattr(
         cold_restore_probe,
-        "_rehearse_a013_articulated_body",
-        lambda *_args, **_kwargs: {
-            "a013_articulated_body_rehearsed": True,
-            "a013_articulated_body_predecessor_state_sha256": STATE_SHA,
-            "a013_articulated_body_successor_state_sha256": "c" * 64,
-            "a013_articulated_body_predecessor_tick": 23_723_846,
-            "a013_articulated_body_successor_tick": 23_723_847,
-            "a013_articulated_body_axis_count": 37,
-            "a013_articulated_body_terminal_count": 74,
-            "a013_articulated_body_state_bytes": 195,
-            "a013_articulated_body_state_sha256": "d" * 64,
-            "a013_articulated_body_proprioception_initialized": True,
-            "a013_articulated_body_neutral_observation": True,
-            "a013_articulated_body_live_transition_discarded": True,
-            "a013_articulated_body_python_callback_count": 0,
-        },
-    )
-    monkeypatch.setattr(
-        cold_restore_probe,
         "_rehearse_a013_thermal_body",
         lambda *_args, **_kwargs: {
             "a013_thermal_body_rehearsed": True,

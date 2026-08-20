@@ -184,21 +184,6 @@ def test_probe_reads_saves_and_reobserves_without_advancing_state(
     capsys,
 ) -> None:
     restored = _Restored()
-    body_proof = {
-        "a013_articulated_body_rehearsed": True,
-        "a013_articulated_body_predecessor_state_sha256": STATE_SHA,
-        "a013_articulated_body_successor_state_sha256": "c" * 64,
-        "a013_articulated_body_predecessor_tick": 23_723_846,
-        "a013_articulated_body_successor_tick": 23_723_847,
-        "a013_articulated_body_axis_count": 37,
-        "a013_articulated_body_terminal_count": 74,
-        "a013_articulated_body_state_bytes": 195,
-        "a013_articulated_body_state_sha256": "d" * 64,
-        "a013_articulated_body_proprioception_initialized": True,
-        "a013_articulated_body_neutral_observation": True,
-        "a013_articulated_body_live_transition_discarded": True,
-        "a013_articulated_body_python_callback_count": 0,
-    }
     thermal_proof = {
         "a013_thermal_body_rehearsed": True,
         "a013_thermal_body_receptor_count": 2,
@@ -213,11 +198,6 @@ def test_probe_reads_saves_and_reobserves_without_advancing_state(
         probe,
         "restore_current_native_organism",
         lambda *_args, **_kwargs: restored,
-    )
-    monkeypatch.setattr(
-        probe,
-        "_rehearse_a013_articulated_body",
-        lambda *_args, **_kwargs: body_proof,
     )
     monkeypatch.setattr(
         probe,
@@ -252,7 +232,6 @@ def test_probe_reads_saves_and_reobserves_without_advancing_state(
         "source_advanced_after_baseline": False,
         "source_mount_read_only": True,
         "tick": 23_723_846,
-        **body_proof,
         **thermal_proof,
     }
     assert receipt == hashlib.sha256(probe._canonical(proof)).hexdigest()

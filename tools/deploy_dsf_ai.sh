@@ -759,22 +759,11 @@ print(json.dumps(predecessor, separators=(",", ":"), sort_keys=True))
     printf '%s' "${REHEARSAL_PROOF}" | python3 -c '
 import json, re, sys
 proof = json.load(sys.stdin)
-# Every earlier transient witness is live-closed and is not replayed.  This
-# release gate proves only A-013 against the exact restored living predecessor.
+# Earlier transient witnesses are live-closed and are not replayed.  This gate
+# proves exact current continuity plus the fresh full-roster action/consequence
+# transaction used by A-009-CADENCE-6B.
 if (
-    proof.get("a013_articulated_body_rehearsed") is not True
-    or proof.get("a013_articulated_body_predecessor_state_sha256")
-    != proof.get("resident_state_sha256")
-    or proof.get("a013_articulated_body_predecessor_tick") != proof.get("tick")
-    or proof.get("a013_articulated_body_successor_tick") != proof.get("tick") + 1
-    or proof.get("a013_articulated_body_axis_count") != 37
-    or proof.get("a013_articulated_body_terminal_count") != 74
-    or proof.get("a013_articulated_body_state_bytes") != 195
-    or proof.get("a013_articulated_body_proprioception_initialized") is not True
-    or proof.get("a013_articulated_body_neutral_observation") is not True
-    or proof.get("a013_articulated_body_live_transition_discarded") is not True
-    or proof.get("a013_articulated_body_python_callback_count") != 0
-    or proof.get("a013_thermal_body_rehearsed") is not True
+    proof.get("a013_thermal_body_rehearsed") is not True
     or proof.get("a013_thermal_body_world_revision_before") != 0
     or proof.get("a013_thermal_body_world_revision_after") != 1
     or proof.get("a013_thermal_body_receptor_count") != 2
@@ -787,13 +776,6 @@ if (
     or proof.get("a013_thermal_body_cold_restore_exact") is not True
     or proof.get("a013_fresh_complete_roster_cold_restore_exact") is not True
     or proof.get("a013_thermal_body_python_callback_count") != 0
-    or not re.fullmatch(
-        r"[0-9a-f]{64}",
-        proof.get("a013_articulated_body_successor_state_sha256", ""),
-    )
-    or not re.fullmatch(
-        r"[0-9a-f]{64}", proof.get("a013_articulated_body_state_sha256", "")
-    )
     or any(
         not re.fullmatch(r"[0-9a-f]{64}", proof.get(name, ""))
         for name in (
@@ -804,7 +786,7 @@ if (
         )
     )
 ):
-    raise SystemExit("A-013 articulated and thermal body rehearsal changed")
+    raise SystemExit("A-009 fresh action/consequence rehearsal changed")
 '
         GIT_SHA="${GIT_SHA}" IMAGE_DIGEST="${IMAGE_DIGEST}" \
             CANDIDATE_TASK_DEFINITION="${CANDIDATE_TASK_DEFINITION}" \

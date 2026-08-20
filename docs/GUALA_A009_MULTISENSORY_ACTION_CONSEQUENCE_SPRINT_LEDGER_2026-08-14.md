@@ -358,3 +358,22 @@ First immutable rehearsal result:
   cgroup/persistence-derived;
 - the exact rebuilt-native 111-port A-009 consequence proof passes 1/1 through
   begin/finalize.  There are zero remaining `_commit_admitted_hop` references.
+
+Second immutable rehearsal result:
+
+- corrected image
+  `sha256:6041b7a9b8518cb513b2cd696088c2aaeb76490983c4fd92bb13fb13211e199a`
+  built and preflight passed; production again remained on task 1140;
+- the isolated task exceeded the controller's 15-minute stop window while
+  executing the generic mature-body A-013 successor replay.  This replay was
+  unrelated to current-state continuity, contradicted the controller's own
+  live-closed-witness rule, and repeated a population-scale transition on
+  every release;
+- generic cold rehearsal now proves the current identity/state byte-exactly,
+  then runs only the fresh full-roster A-009 action/consequence transaction.
+  It no longer mutates the mature restored body to replay closed A-013 proof;
+- focused cold-probe/controller validation passed 33 checks.  One pre-existing
+  deterministic-controller assertion still expects two ECS service-update
+  command sites although the accepted task-1140 controller already contains
+  four; this correction added none and does not treat that stale assertion as
+  A-009 evidence.

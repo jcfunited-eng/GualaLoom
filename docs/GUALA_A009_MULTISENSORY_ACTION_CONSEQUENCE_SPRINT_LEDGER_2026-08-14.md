@@ -232,3 +232,112 @@ action/sensorium checks pass 6/6.
 
 Status: **Live-Closed 2026-08-14 on production task 1056. A-010 is next and is
 not claimed by A-009 evidence.**
+
+## 2026-08-20 bounded-cadence correction
+
+New live evidence reopened only A-009's execution boundary: the same lawful
+action/consequence circuit remained causal, but ordinary settlement copied
+population-sized resident state and one accepted Python intake could seal the
+whole organism once for vestibular motion, once for admitted sources, and once
+again for generated self-hearing.  The behavioral closure above is not
+reopened; this correction makes its already-accepted circuit bounded enough to
+remain usable for L-005/L-006 education.
+
+Live production corrections already delivered:
+
+- tasks 1135-1138 removed the selected-cohort predecessor copy, dense gate
+  evidence, and retained full-cohort physical evidence while preserving the
+  unchanged seven-field DSF and exact current-state cold restore;
+- task 1139, commit `4f05c0b5`, derives resident lineage/layer/contact/bond
+  topology only at genesis, cold restore, or actual topology growth and reuses
+  it during ordinary reached-frontier settlement;
+- task 1140, commit `e0d4a593`, submits every ordinary admitted source in one
+  ordered native trajectory, including exact native body feedback before later
+  sources, and seals that trajectory once.
+
+Active item: `A-009-CADENCE-6B`.
+
+Acceptance condition: one external intake containing optional vestibular
+motion, ordered admitted sources, data-dependent motor/body return, and
+data-dependent articulatory self-hearing owns one native working successor and
+performs exactly one final whole-organism encode/seal before the existing
+atomic publication.  The active predecessor remains byte-identical until
+final commit; discard releases the working successor; rollback restores the
+authenticated predecessor; cold restore accepts only the final sealed body.
+
+Authorized files: `native/guala_core/src/organism_runtime.rs`,
+`dsf_ai_service/glew_runtime/native_resident_organism.py`,
+`dsf_ai_service/native_production_app.py`, and focused boundary tests.  No
+neuron/DSF equation, retained formation law, persistence schema, world law,
+observer schema, database, overlay, owner service, retry mechanism, or Python
+cognitive decision is authorized.
+
+Implementation contract:
+
+- input: the authenticated active organism, optional exact vestibular steps,
+  ordered admitted native sources, and at most one subsequently generated
+  exact self-hearing source batch;
+- physical authority: existing vestibular, admitted-neuron, articulated-body,
+  and receptor laws execute unchanged and in causal order;
+- custody: an unsealed native transaction exclusively owns its typed cognitive,
+  vestibular, and articulated-body successor plus bounded interval evidence;
+- mutation order: the typed active cognition moves into exclusive transaction
+  custody before physical preparation, while the published active observation
+  and authenticated predecessor envelope remain unchanged; final commit is
+  token-validated owner motion and abort cold-restores that exact predecessor;
+- discard/rollback: discard drops the unsealed successor without touching the
+  active predecessor; a committed-but-unpublished successor retains the one
+  authenticated predecessor envelope for exact rollback;
+- crash/restart: no `CURRENT` changes before the one final envelope is durably
+  published; restart therefore restores either the old current or the one
+  complete successor, never an intermediate hop;
+- work bound: physical work is the sum of exact reached frontiers and whole-body
+  encoding occurs once, independent of the number of causal sub-intervals;
+- retired path: production intake no longer calls separate vestibular,
+  admitted, and self-hearing commit/seal operations.
+
+Current evidence: task 1140 is live with one verified cutover, native state
+verified, no rollback, and zero sub-agents.
+
+Source implementation boundary on 2026-08-20:
+
+- native begin moves the typed cognitive body into one exclusive unsealed
+  intake and settles optional vestibular intervals first, then the current
+  body, ordered admitted sources, and every exact body-feedback interval;
+- the only pre-seal FFI output is a 32-byte transaction token, provisional
+  tick, and exact layer-13 articulatory recruitments needed by the existing
+  non-cognitive body/acoustic transport;
+- native finalize optionally appends the one generated self-hearing batch to
+  that same typed successor, performs one cognitive encode, one fabric encode,
+  and one envelope seal, then installs the successor under the existing direct
+  predecessor acknowledgement boundary;
+- native abort and every begin/finalize failure restore the authenticated
+  predecessor envelope; durable `CURRENT` is untouched by this slice;
+- production `_perform_admitted_intake_locked_body` now invokes exactly one
+  begin and one finalize.  It no longer invokes the separate vestibular,
+  admitted, or self-hearing commit helpers;
+- exact field map: vestibular source and admitted sources enter the unchanged
+  native transition functions; initial layer-13 recruitments cross FFI to the
+  existing exact articulatory body solver; generated sound/body sources return
+  through finalize; final native evidence crosses the existing prepare
+  validator and production observation projection without defaults;
+- self-hearing-only transitioned-neuron, fractal, body-receptor, and deferred
+  articulation counts are retained from the appended native observation, not
+  inferred by subtracting aggregate counters;
+- source-only review found no duplicate physical settlement, DSF reduction,
+  intermediate full-organism seal, Python cognition, or durable intermediate
+  successor.  Under the explicit one-agent resource constraint, the same owner
+  performed this source review; no sub-agent or parallel reviewer was started.
+
+Focused candidate evidence on 2026-08-20:
+
+- `cargo check --lib` passed;
+- the two native unsealed-intake falsifiers passed, covering one combined
+  vestibular/admitted/appended-source seal and exact abort restoration;
+- the complete related Python boundary file passed 13/13, including exact
+  begin/finalize cardinality, one appended self-hearing batch, vestibular
+  inclusion, and abort on non-cancellation failure;
+- Python compilation and `git diff --check` passed.
+
+Evidence level: source-complete, source-reviewed, and focused-execution passed.
+Immutable packaging and live verification remain pending.

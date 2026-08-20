@@ -69,6 +69,59 @@ def _quiescent_body_organism() -> SimpleNamespace:
     )
 
 
+class _UnsealedTestOrganism:
+    def __init__(
+        self,
+        phase_hop: dict[str, object],
+        final_hop: dict[str, object],
+    ) -> None:
+        self.phase_hop = phase_hop
+        self.final_hop = final_hop
+        self.calls: list[tuple[str, object]] = []
+
+    def readiness(self) -> SimpleNamespace:
+        return SimpleNamespace(articulated_body_state_sha256="44" * 32)
+
+    def begin_unsealed_intake_direct(
+        self, sources, intervals, *, vestibular_yaw=None
+    ) -> SimpleNamespace:
+        self.calls.append(("begin", (sources, intervals, vestibular_yaw)))
+        return SimpleNamespace(
+            token=b"u" * 32,
+            provisional_organism_tick=self.phase_hop["organism_tick"],
+            articulatory_unit_recruitments=self.phase_hop[
+                "articulatory_unit_recruitments"
+            ],
+        )
+
+    def finalize_unsealed_intake_direct(
+        self, token, sources, intervals
+    ) -> SimpleNamespace:
+        self.calls.append(("finalize", (token, sources, intervals)))
+        appended = bool(sources)
+        return SimpleNamespace(
+            appended_physically_transitioned_neuron_count=(
+                self.final_hop["physically_transitioned_neuron_count"]
+                if appended
+                else 0
+            ),
+            appended_complete_neuron_fractal_count=(
+                self.final_hop["complete_neuron_fractal_count"]
+                if appended
+                else 0
+            ),
+            appended_externally_perturbed_body_receptor_count=(
+                self.final_hop["externally_perturbed_body_receptor_count"]
+                if appended
+                else 0
+            ),
+            appended_articulatory_unit_recruitment_count=0,
+        )
+
+    def abort_unsealed_intake(self, token) -> None:
+        self.calls.append(("abort", token))
+
+
 def _episode() -> SimpleNamespace:
     return SimpleNamespace(occurrence_count=1)
 
@@ -101,6 +154,98 @@ def test_frontier_evidence_keeps_only_current_and_preceding_distinct_sets() -> N
     assert current == second
     assert preceding == first
     assert reached_and_foregone == second
+
+
+def test_ordinary_intake_opens_once_appends_self_hearing_and_finalizes_once(
+    monkeypatch,
+) -> None:
+    recruitment = (
+        "13" * 16,
+        0,
+        13,
+        (("12" * 16, 12, "13" * 16, 13, 0, 13),),
+    )
+    calls: list[tuple[str, object]] = []
+
+    class Organism:
+        def readiness(self):
+            return SimpleNamespace(articulated_body_state_sha256="44" * 32)
+
+        def begin_unsealed_intake_direct(
+            self, sources, intervals, *, vestibular_yaw=None
+        ):
+            calls.append(("begin", (sources, intervals, vestibular_yaw)))
+            return SimpleNamespace(
+                token=b"u" * 32,
+                provisional_organism_tick=11,
+                articulatory_unit_recruitments=(recruitment,),
+            )
+
+        def finalize_unsealed_intake_direct(self, token, sources, intervals):
+            calls.append(("finalize", (token, sources, intervals)))
+            return SimpleNamespace(
+                appended_physically_transitioned_neuron_count=4,
+                appended_complete_neuron_fractal_count=1,
+                appended_externally_perturbed_body_receptor_count=4,
+                appended_articulatory_unit_recruitment_count=0,
+            )
+
+        def abort_unsealed_intake(self, token):
+            calls.append(("abort", token))
+
+    organism = Organism()
+    predecessor = SimpleNamespace(state_sha256="aa" * 32)
+    monkeypatch.setattr(
+        production,
+        "_runtime",
+        lambda: (
+            SimpleNamespace(organism=organism, pointer=predecessor),
+            SimpleNamespace(),
+        ),
+    )
+    final_hop = _hop(12, ())
+    final_hop["articulatory_unit_recruitments"] = (recruitment,)
+    monkeypatch.setattr(
+        production,
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: final_hop,
+    )
+    monkeypatch.setattr(
+        production,
+        "exact_articulatory_unit_trajectory",
+        lambda **_kwargs: (16_000, [1] * 16_000, b"\x01\x00" * 64_000, 1, 1, 1, 1, 13, 0, 1),
+    )
+    self_hearing = (object(), [])
+    monkeypatch.setattr(
+        production,
+        "_mono_pcm_hop_episodes",
+        lambda **_kwargs: [self_hearing],
+    )
+    monkeypatch.setattr(
+        production,
+        "_publish_committed_organism",
+        lambda *_args: SimpleNamespace(
+            pointer=SimpleNamespace(
+                organism_tick=12,
+                state_bytes=100,
+                state_sha256="bb" * 32,
+            )
+        ),
+    )
+    monkeypatch.setattr(
+        production, "_refresh_public_observation_cache", lambda: None
+    )
+
+    result = production._perform_admitted_intake_locked(
+        [(_episode(), [])],
+        "a009-one-seal",
+    )
+
+    assert [name for name, _ in calls] == ["begin", "finalize"]
+    _, (_, appended_sources, appended_intervals) = calls[1]
+    assert appended_sources == (self_hearing[0],)
+    assert appended_intervals == (self_hearing[1],)
+    assert result["observation"]["articulation"]["self_hearing_hop_count"] == 1
 
 
 def test_working_causal_evidence_keeps_one_path_until_that_cause_settles() -> None:
@@ -184,7 +329,9 @@ def test_admitted_experience_preserves_relation_from_nonfinal_hop(
         "ordered_physical_paths": (),
         "ordered_path_relations": (),
     }
-    organism = _quiescent_body_organism()
+    trajectory_hop = _hop(12, (relation,))
+    trajectory_hop["rest_recovered_neuron_count"] = 5
+    organism = _UnsealedTestOrganism(trajectory_hop, trajectory_hop)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
@@ -194,15 +341,10 @@ def test_admitted_experience_preserves_relation_from_nonfinal_hop(
             SimpleNamespace(),
         ),
     )
-    trajectory_hop = _hop(12, (relation,))
-    trajectory_hop["rest_recovered_neuron_count"] = 5
-    received = []
     monkeypatch.setattr(
         production,
-        "_commit_admitted_hop",
-        lambda _organism, episodes, intervals, **_kwargs: (
-            received.append((episodes, intervals)) or trajectory_hop
-        ),
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: trajectory_hop,
     )
     monkeypatch.setattr(
         production,
@@ -229,9 +371,11 @@ def test_admitted_experience_preserves_relation_from_nonfinal_hop(
     assert result["totals"]["rest_recovered_neuron_count"] == 5
     assert "unmet_dissipation_quanta" not in result["totals"]
     assert result["observation"]["unmet_dissipation_quanta"] == 0
-    assert len(received) == 1
-    assert len(received[0][0]) == 2
-    assert len(received[0][1]) == 2
+    assert [name for name, _ in organism.calls] == ["begin", "finalize"]
+    _, (sources, intervals, vestibular_yaw) = organism.calls[0]
+    assert vestibular_yaw is None
+    assert len(sources) == 2
+    assert len(intervals) == 2
 
 
 def test_layer_thirteen_discharge_commits_its_own_pressure_as_self_hearing(
@@ -254,7 +398,7 @@ def test_layer_thirteen_discharge_commits_its_own_pressure_as_self_hearing(
     # The production boundary deliberately exposes no direct ``organism_tick``
     # method.  The exact committed hop already carries the causal tick used to
     # name its self-hearing occurrence.
-    organism = _quiescent_body_organism()
+    organism = _UnsealedTestOrganism(first, heard)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
@@ -264,11 +408,10 @@ def test_layer_thirteen_discharge_commits_its_own_pressure_as_self_hearing(
             SimpleNamespace(),
         ),
     )
-    hops = iter((first, heard))
     monkeypatch.setattr(
         production,
-        "_commit_admitted_hop",
-        lambda *_args, **_kwargs: next(hops),
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: heard,
     )
     monkeypatch.setattr(
         production,
@@ -326,7 +469,7 @@ def test_self_hearing_hops_share_one_native_trajectory_boundary(monkeypatch) -> 
     heard["physically_transitioned_neuron_count"] = 40
     heard["complete_neuron_fractal_count"] = 3
     heard["externally_perturbed_body_receptor_count"] = 16
-    organism = _quiescent_body_organism()
+    organism = _UnsealedTestOrganism(first, heard)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
@@ -336,13 +479,11 @@ def test_self_hearing_hops_share_one_native_trajectory_boundary(monkeypatch) -> 
             SimpleNamespace(),
         ),
     )
-    committed = []
-
-    def commit(_organism, episodes, admissions, **_kwargs):
-        committed.append((episodes, admissions))
-        return first if len(committed) == 1 else heard
-
-    monkeypatch.setattr(production, "_commit_admitted_hop", commit)
+    monkeypatch.setattr(
+        production,
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: heard,
+    )
     self_hearing = tuple((object(), []) for _ in range(4))
     monkeypatch.setattr(
         production,
@@ -367,9 +508,10 @@ def test_self_hearing_hops_share_one_native_trajectory_boundary(monkeypatch) -> 
         "self-hearing-trajectory-boundary-test",
     )
 
-    assert len(committed) == 2
-    assert len(committed[1][0]) == 4
-    assert len(committed[1][1]) == 4
+    assert [name for name, _ in organism.calls] == ["begin", "finalize"]
+    _, (_, self_hearing_sources, self_hearing_intervals) = organism.calls[1]
+    assert len(self_hearing_sources) == 4
+    assert len(self_hearing_intervals) == 4
     articulation = result["observation"]["articulation"]
     assert articulation["self_hearing_hop_count"] == 4
     assert articulation["self_hearing_transitioned_neuron_count"] == 40
@@ -425,7 +567,7 @@ def test_exact_retained_path_is_bound_to_articulation_and_self_hearing(
     heard = _hop(12, ())
     heard["physically_transitioned_neuron_count"] = 4
     heard["externally_perturbed_body_receptor_count"] = 4
-    organism = _quiescent_body_organism()
+    organism = _UnsealedTestOrganism(first, heard)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
@@ -435,11 +577,10 @@ def test_exact_retained_path_is_bound_to_articulation_and_self_hearing(
             SimpleNamespace(),
         ),
     )
-    hops = iter((first, heard))
     monkeypatch.setattr(
         production,
-        "_commit_admitted_hop",
-        lambda *_args, **_kwargs: next(hops),
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: heard,
     )
     monkeypatch.setattr(
         production,
@@ -518,7 +659,7 @@ def test_exact_antagonist_cancellation_is_a_lawful_no_vocal_act(
             (("12" * 16, 12, "14" * 16, 13, 0, 5),),
         ),
     )
-    organism = _quiescent_body_organism()
+    organism = _UnsealedTestOrganism(cancelled, cancelled)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
@@ -530,7 +671,7 @@ def test_exact_antagonist_cancellation_is_a_lawful_no_vocal_act(
     )
     monkeypatch.setattr(
         production,
-        "_commit_admitted_hop",
+        "_resident_prepare_hop",
         lambda *_args, **_kwargs: cancelled,
     )
 
@@ -576,20 +717,21 @@ def test_non_cancellation_articulation_error_still_refuses_intake(
     failed["articulatory_unit_recruitments"] = (
         ("13" * 16, 0, 5, ()),
     )
+    organism = _UnsealedTestOrganism(failed, failed)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
         "_runtime",
         lambda: (
             SimpleNamespace(
-                organism=_quiescent_body_organism(), pointer=predecessor
+                organism=organism, pointer=predecessor
             ),
             SimpleNamespace(),
         ),
     )
     monkeypatch.setattr(
         production,
-        "_commit_admitted_hop",
+        "_resident_prepare_hop",
         lambda *_args, **_kwargs: failed,
     )
 
@@ -624,7 +766,8 @@ def test_non_cancellation_articulation_error_still_refuses_intake(
             "non-cancellation-articulation-error-test",
         )
     except ValueError as error:
-        assert str(error).startswith("ArithmeticWidth [1 hop(s)")
+        assert str(error) == "ArithmeticWidth"
+        assert [name for name, _ in organism.calls] == ["begin", "abort"]
     else:
         raise AssertionError("non-cancellation articulation failure was hidden")
 
@@ -646,7 +789,7 @@ def test_vestibular_trajectory_articulation_reaches_the_ordinary_aggregate(
     heard["physically_transitioned_neuron_count"] = 3
     heard["complete_neuron_fractal_count"] = 2
     heard["externally_perturbed_body_receptor_count"] = 4
-    organism = _quiescent_body_organism()
+    organism = _UnsealedTestOrganism(trajectory, heard)
     predecessor = SimpleNamespace(state_sha256="aa" * 32)
     monkeypatch.setattr(
         production,
@@ -658,13 +801,8 @@ def test_vestibular_trajectory_articulation_reaches_the_ordinary_aggregate(
     )
     monkeypatch.setattr(
         production,
-        "_commit_vestibular_trajectory",
-        lambda *_args: trajectory,
-    )
-    monkeypatch.setattr(
-        production,
-        "_commit_admitted_hop",
-        lambda *_args: heard,
+        "_resident_prepare_hop",
+        lambda *_args, **_kwargs: heard,
     )
     monkeypatch.setattr(
         production,

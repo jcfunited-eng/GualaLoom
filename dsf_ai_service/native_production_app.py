@@ -7497,6 +7497,21 @@ def _commit_admitted_hop(
             maximum_causal_intervals,
         )
         observed = organism.commit(evidence.token)
+    return _resident_prepare_hop(
+        evidence,
+        observed,
+        external_participant_action_receipt=external_participant_action_receipt,
+    )
+
+
+def _resident_prepare_hop(
+    evidence: ResidentPrepareEvidence,
+    observed: Any,
+    *,
+    external_participant_action_receipt: str | None = None,
+) -> dict[str, Any]:
+    """Project one already-committed native successor without new physics."""
+
     ingress_sense_counts = {
         sense.value: count
         for sense, count in zip(
@@ -9075,183 +9090,29 @@ def _perform_admitted_intake_locked(
         dict[str, tuple[tuple[str, str, int, int], ...]],
     ] = dict(_active_external_participant_causal_motor_traces)
     completed_causal_motor_traces: dict[str, dict[str, Any]] = {}
-    intake_error: Exception | None = None
+    intake_error: BaseException | None = None
+    unsealed_token: bytes | None = None
     try:
-        if vestibular_yaw is not None:
-            heading, signed_steps = vestibular_yaw
-            last_hop = _commit_vestibular_trajectory(
-                organism,
-                heading,
-                signed_steps,
-            )
-            affective_balance_trajectories = (
-                _advance_bounded_affective_balance_evidence(
-                    affective_balance_trajectories,
-                    last_hop,
-                )
-            )
-            (
-                active_causal_motor_traces,
-                completed_causal_motor_traces,
-            ) = _advance_causal_motor_traces(
-                organism,
-                active_causal_motor_traces,
-                completed_causal_motor_traces,
-                last_hop,
-                affective_balance_trajectories,
-            )
-            (
-                physical_frontier_routes,
-                preceding_distinct_physical_frontier_routes,
-                reached_and_foregone_physical_frontier_routes,
-            ) = _advance_bounded_frontier_evidence(
-                physical_frontier_routes,
-                preceding_distinct_physical_frontier_routes,
-                reached_and_foregone_physical_frontier_routes,
-                last_hop,
-            )
-            attention_motor_binding = _advance_bounded_attention_motor_binding(
-                attention_motor_binding,
-                last_hop,
-            )
-            (
-                working_causal_continuations,
-                settled_working_frontier,
-            ) = _advance_bounded_working_causal_evidence(
-                working_causal_continuations,
-                settled_working_frontier,
-                last_hop,
-            )
-            (
-                physical_prediction_alternatives,
-                body_consequence_transfers,
-            ) = _advance_bounded_prediction_evidence(
-                physical_prediction_alternatives,
-                body_consequence_transfers,
-                last_hop,
-            )
-            localized_fluid_chemistry = (
-                _advance_bounded_localized_fluid_chemistry_evidence(
-                    localized_fluid_chemistry,
-                    last_hop,
-                )
-            )
-            (
-                localized_metabolic_strain_evaluated_body_receptor_lineages,
-                localized_metabolic_strain,
-            ) = _advance_bounded_localized_metabolic_strain_evidence(
-                localized_metabolic_strain_evaluated_body_receptor_lineages,
-                localized_metabolic_strain,
-                last_hop,
-            )
-            committed_vestibular_tick_count = len(signed_steps)
-            articulatory_unit_recruitments.extend(
-                last_hop["articulatory_unit_recruitments"]
-            )
-            retain_articulated_body_evidence(last_hop)
-            emitted_neuron_fractals.extend(last_hop["emitted_neuron_fractals"])
-            organic_mosaic_relations.extend(
-                last_hop["organic_mosaic_relations"]
-            )
-            for key in totals:
-                totals[key] += last_hop[key]
-        if episodes:
-            last_hop = _commit_admitted_hop(
-                organism,
-                tuple(episode for episode, _ in episodes),
-                tuple(admissions for _, admissions in episodes),
-                external_participant_action_receipt=(
-                    external_participant_action_receipt
-                ),
-            )
-            affective_balance_trajectories = (
-                _advance_bounded_affective_balance_evidence(
-                    affective_balance_trajectories,
-                    last_hop,
-                )
-            )
-            (
-                active_causal_motor_traces,
-                completed_causal_motor_traces,
-            ) = _advance_causal_motor_traces(
-                organism,
-                active_causal_motor_traces,
-                completed_causal_motor_traces,
-                last_hop,
-                affective_balance_trajectories,
-            )
-            (
-                physical_frontier_routes,
-                preceding_distinct_physical_frontier_routes,
-                reached_and_foregone_physical_frontier_routes,
-            ) = _advance_bounded_frontier_evidence(
-                physical_frontier_routes,
-                preceding_distinct_physical_frontier_routes,
-                reached_and_foregone_physical_frontier_routes,
-                last_hop,
-            )
-            attention_motor_binding = _advance_bounded_attention_motor_binding(
-                attention_motor_binding,
-                last_hop,
-            )
-            (
-                working_causal_continuations,
-                settled_working_frontier,
-            ) = _advance_bounded_working_causal_evidence(
-                working_causal_continuations,
-                settled_working_frontier,
-                last_hop,
-            )
-            (
-                physical_prediction_alternatives,
-                body_consequence_transfers,
-            ) = _advance_bounded_prediction_evidence(
-                physical_prediction_alternatives,
-                body_consequence_transfers,
-                last_hop,
-            )
-            localized_fluid_chemistry = (
-                _advance_bounded_localized_fluid_chemistry_evidence(
-                    localized_fluid_chemistry,
-                    last_hop,
-                )
-            )
-            (
-                localized_metabolic_strain_evaluated_body_receptor_lineages,
-                localized_metabolic_strain,
-            ) = _advance_bounded_localized_metabolic_strain_evidence(
-                localized_metabolic_strain_evaluated_body_receptor_lineages,
-                localized_metabolic_strain,
-                last_hop,
-            )
-            committed_hop_count += sum(
-                int(episode.occurrence_count) for episode, _ in episodes
-            )
-            committed_hop_count += sum(
-                int(extent[3])
-                for extent in last_hop["body_proprioceptive_source_extents"]
-            )
-            motor_unit_recruitments.extend(last_hop["motor_unit_recruitments"])
-            articulatory_unit_recruitments.extend(
-                last_hop["articulatory_unit_recruitments"]
-            )
-            retain_articulated_body_evidence(last_hop)
-            emitted_neuron_fractals.extend(last_hop["emitted_neuron_fractals"])
-            organic_mosaic_relations.extend(
-                last_hop["organic_mosaic_relations"]
-            )
-            for key in totals:
-                totals[key] += last_hop[key]
-            for sense, count in last_hop[
-                "receptor_ingress_sense_counts"
-            ].items():
-                receptor_ingress_sense_counts[sense] += count
-            receptor_ingress_changing_count += last_hop[
-                "receptor_ingress_changing_count"
-            ]
-            receptor_ingress_quiescent_count += last_hop[
-                "receptor_ingress_quiescent_count"
-            ]
+        initial_sources = tuple(episode for episode, _ in episodes)
+        initial_intervals = tuple(admissions for _, admissions in episodes)
+        phase = organism.begin_unsealed_intake_direct(
+            initial_sources,
+            initial_intervals,
+            vestibular_yaw=vestibular_yaw,
+        )
+        unsealed_token = phase.token
+        articulatory_unit_recruitments.extend(
+            phase.articulatory_unit_recruitments
+        )
+        committed_vestibular_tick_count = (
+            len(vestibular_yaw[1]) if vestibular_yaw is not None else 0
+        )
+        self_hearing_episodes: tuple[tuple[Any, Any], ...] = ()
+        self_hearing_hop_count = 0
+        self_hearing_transitioned_neuron_count = 0
+        self_hearing_fractal_count = 0
+        self_articulatory_body_perturbed_neuron_count = 0
+        deferred_recurrent_articulation_count = 0
         if articulatory_unit_recruitments:
             try:
                 (
@@ -9274,73 +9135,124 @@ def _perform_admitted_intake_locked(
             except ValueError as error:
                 if error.args != ("CancelledRecruitment",):
                     raise
-                raise _ExactArticulatoryAntagonistCancellation from None
-            self_hearing_episodes = tuple(_mono_pcm_hop_episodes(
-                assembly_prefix=(
-                    f"native-self-articulation-{last_hop['organism_tick']}"
-                ),
-                samples=pressure_pcm,
-                sample_rate_hz=sample_rate_hz,
-                articulatory_body=articulatory_body_trajectories,
-            ))
-            self_hearing_hop_count = len(self_hearing_episodes)
-            self_hearing_transitioned_neuron_count = 0
-            self_hearing_fractal_count = 0
-            self_articulatory_body_perturbed_neuron_count = 0
-            deferred_recurrent_articulation_count = 0
-            if self_hearing_episodes:
-                last_hop = _commit_admitted_hop(
-                    organism,
-                    tuple(episode for episode, _ in self_hearing_episodes),
-                    tuple(admissions for _, admissions in self_hearing_episodes),
-                )
-                affective_balance_trajectories = (
-                    _advance_bounded_affective_balance_evidence(
-                        affective_balance_trajectories,
-                        last_hop,
-                    )
-                )
-                (
-                    active_causal_motor_traces,
-                    completed_causal_motor_traces,
-                ) = _advance_causal_motor_traces(
-                    organism,
-                    active_causal_motor_traces,
-                    completed_causal_motor_traces,
-                    last_hop,
-                    affective_balance_trajectories,
-                )
-                committed_hop_count += self_hearing_hop_count
-                self_hearing_transitioned_neuron_count = last_hop[
-                    "physically_transitioned_neuron_count"
-                ]
-                self_hearing_fractal_count = last_hop[
-                    "complete_neuron_fractal_count"
-                ]
-                self_articulatory_body_perturbed_neuron_count = last_hop[
-                    "externally_perturbed_body_receptor_count"
-                ]
-                deferred_recurrent_articulation_count = len(
-                    last_hop["articulatory_unit_recruitments"]
-                )
-                emitted_neuron_fractals.extend(
-                    last_hop["emitted_neuron_fractals"]
-                )
-                organic_mosaic_relations.extend(
-                    last_hop["organic_mosaic_relations"]
-                )
-                for key in totals:
-                    totals[key] += last_hop[key]
-                for sense, count in last_hop[
-                    "receptor_ingress_sense_counts"
-                ].items():
-                    receptor_ingress_sense_counts[sense] += count
-                receptor_ingress_changing_count += last_hop[
-                    "receptor_ingress_changing_count"
-                ]
-                receptor_ingress_quiescent_count += last_hop[
-                    "receptor_ingress_quiescent_count"
-                ]
+                articulatory_unit_recruitments.clear()
+            else:
+                self_hearing_episodes = tuple(_mono_pcm_hop_episodes(
+                    assembly_prefix=(
+                        f"native-self-articulation-{phase.provisional_organism_tick}"
+                    ),
+                    samples=pressure_pcm,
+                    sample_rate_hz=sample_rate_hz,
+                    articulatory_body=articulatory_body_trajectories,
+                ))
+                self_hearing_hop_count = len(self_hearing_episodes)
+        evidence = organism.finalize_unsealed_intake_direct(
+            phase.token,
+            tuple(episode for episode, _ in self_hearing_episodes),
+            tuple(admissions for _, admissions in self_hearing_episodes),
+        )
+        unsealed_token = None
+        last_hop = _resident_prepare_hop(
+            evidence,
+            organism.readiness(),
+            external_participant_action_receipt=(
+                external_participant_action_receipt
+            ),
+        )
+        affective_balance_trajectories = (
+            _advance_bounded_affective_balance_evidence(
+                affective_balance_trajectories,
+                last_hop,
+            )
+        )
+        (
+            active_causal_motor_traces,
+            completed_causal_motor_traces,
+        ) = _advance_causal_motor_traces(
+            organism,
+            active_causal_motor_traces,
+            completed_causal_motor_traces,
+            last_hop,
+            affective_balance_trajectories,
+        )
+        (
+            physical_frontier_routes,
+            preceding_distinct_physical_frontier_routes,
+            reached_and_foregone_physical_frontier_routes,
+        ) = _advance_bounded_frontier_evidence(
+            physical_frontier_routes,
+            preceding_distinct_physical_frontier_routes,
+            reached_and_foregone_physical_frontier_routes,
+            last_hop,
+        )
+        attention_motor_binding = _advance_bounded_attention_motor_binding(
+            attention_motor_binding,
+            last_hop,
+        )
+        (
+            working_causal_continuations,
+            settled_working_frontier,
+        ) = _advance_bounded_working_causal_evidence(
+            working_causal_continuations,
+            settled_working_frontier,
+            last_hop,
+        )
+        (
+            physical_prediction_alternatives,
+            body_consequence_transfers,
+        ) = _advance_bounded_prediction_evidence(
+            physical_prediction_alternatives,
+            body_consequence_transfers,
+            last_hop,
+        )
+        localized_fluid_chemistry = (
+            _advance_bounded_localized_fluid_chemistry_evidence(
+                localized_fluid_chemistry,
+                last_hop,
+            )
+        )
+        (
+            localized_metabolic_strain_evaluated_body_receptor_lineages,
+            localized_metabolic_strain,
+        ) = _advance_bounded_localized_metabolic_strain_evidence(
+            localized_metabolic_strain_evaluated_body_receptor_lineages,
+            localized_metabolic_strain,
+            last_hop,
+        )
+        committed_hop_count = sum(
+            int(episode.occurrence_count) for episode, _ in episodes
+        ) + self_hearing_hop_count
+        committed_hop_count += sum(
+            int(extent[3])
+            for extent in last_hop["body_proprioceptive_source_extents"]
+        )
+        motor_unit_recruitments.extend(last_hop["motor_unit_recruitments"])
+        retain_articulated_body_evidence(last_hop)
+        emitted_neuron_fractals.extend(last_hop["emitted_neuron_fractals"])
+        organic_mosaic_relations.extend(last_hop["organic_mosaic_relations"])
+        for key in totals:
+            totals[key] += last_hop[key]
+        for sense, count in last_hop["receptor_ingress_sense_counts"].items():
+            receptor_ingress_sense_counts[sense] += count
+        receptor_ingress_changing_count += last_hop[
+            "receptor_ingress_changing_count"
+        ]
+        receptor_ingress_quiescent_count += last_hop[
+            "receptor_ingress_quiescent_count"
+        ]
+        self_hearing_transitioned_neuron_count = (
+            evidence.appended_physically_transitioned_neuron_count
+        )
+        self_hearing_fractal_count = (
+            evidence.appended_complete_neuron_fractal_count
+        )
+        self_articulatory_body_perturbed_neuron_count = (
+            evidence.appended_externally_perturbed_body_receptor_count
+        )
+        deferred_recurrent_articulation_count = (
+            evidence.appended_articulatory_unit_recruitment_count
+        )
+        if articulatory_unit_recruitments:
             articulation = {
                 "layer_13_recruitment_count": len(
                     articulatory_unit_recruitments
@@ -9386,9 +9298,14 @@ def _perform_admitted_intake_locked(
                     deferred_recurrent_articulation_count
                 ),
             }
-    except _ExactArticulatoryAntagonistCancellation:
-        pass
-    except (RuntimeError, TypeError, ValueError) as error:
+    except BaseException as error:
+        if unsealed_token is not None:
+            try:
+                organism.abort_unsealed_intake(unsealed_token)
+            except (RuntimeError, ValueError) as abort_error:
+                raise RuntimeError(
+                    "unsealed intake failed and its predecessor could not be restored"
+                ) from abort_error
         intake_error = error
     if last_hop is None or (
         committed_hop_count == 0 and committed_vestibular_tick_count == 0

@@ -413,6 +413,23 @@ class ResidentCausalIntervalEvidence:
 
 
 @dataclass(frozen=True, slots=True)
+class ResidentUnsealedIntakeEvidence:
+    """Bounded projection from an open native intake before its sole seal."""
+
+    token: bytes
+    provisional_organism_tick: int
+    articulatory_unit_recruitments: tuple[
+        tuple[
+            str,
+            int,
+            int,
+            tuple[tuple[str, int, str, int, int, int], ...],
+        ],
+        ...,
+    ]
+
+
+@dataclass(frozen=True, slots=True)
 class ResidentPrepareEvidence:
     """Fixed receipt and causal evidence for one native pending candidate."""
 
@@ -478,6 +495,10 @@ class ResidentPrepareEvidence:
         ],
         ...,
     ] = ()
+    appended_physically_transitioned_neuron_count: int = 0
+    appended_complete_neuron_fractal_count: int = 0
+    appended_externally_perturbed_body_receptor_count: int = 0
+    appended_articulatory_unit_recruitment_count: int = 0
     body_effector_bindings: tuple[tuple[str, str, str, int], ...] = ()
     articulated_body_consequences: tuple[
         tuple[int, str, str, int, int, int, int, int, int, int, int], ...
@@ -634,6 +655,95 @@ def _canonical_lineage_hex(value: object, label: str) -> str:
     ):
         raise RuntimeError(f"resident organism {label} is not canonical")
     return value
+
+
+def _articulatory_unit_recruitments(
+    value: object,
+) -> tuple[
+    tuple[
+        str,
+        int,
+        int,
+        tuple[tuple[str, int, str, int, int, int], ...],
+    ],
+    ...,
+]:
+    """Validate the exact native layer-12/layer-13 transfer projection."""
+
+    if not isinstance(value, list):
+        raise RuntimeError("articulatory-unit recruitments changed format")
+    validated: list[
+        tuple[
+            str,
+            int,
+            int,
+            tuple[tuple[str, int, str, int, int, int], ...],
+        ]
+    ] = []
+    for raw in value:
+        if not isinstance(raw, tuple) or len(raw) != 4:
+            raise RuntimeError("articulatory-unit recruitment changed format")
+        lineage = _canonical_lineage_hex(raw[0], "articulatory-unit lineage")
+        topology_index = _nonnegative_integer(
+            raw[1], "articulatory-unit topology index"
+        )
+        outward_elementary_carriers = _positive_integer(
+            raw[2], "articulatory-unit outward elementary carriers"
+        )
+        if not isinstance(raw[3], list) or not raw[3]:
+            raise RuntimeError("articulatory-unit motor transfers changed format")
+        motor_transfers: list[tuple[str, int, str, int, int, int]] = []
+        for transfer in raw[3]:
+            if not isinstance(transfer, tuple) or len(transfer) != 6:
+                raise RuntimeError("articulatory-unit motor transfer changed format")
+            sender = _canonical_lineage_hex(
+                transfer[0], "articulatory motor sender"
+            )
+            sender_layer = _nonnegative_integer(
+                transfer[1], "articulatory motor sender layer"
+            )
+            receiver = _canonical_lineage_hex(
+                transfer[2], "articulatory motor receiver"
+            )
+            receiver_layer = _nonnegative_integer(
+                transfer[3], "articulatory motor receiver layer"
+            )
+            parallel_ordinal = _nonnegative_integer(
+                transfer[4], "articulatory motor parallel ordinal"
+            )
+            transferred_whole_carriers = _positive_integer(
+                transfer[5], "articulatory motor transferred whole carriers"
+            )
+            if sender == receiver or not (
+                sender == lineage
+                and sender_layer == 13
+                and receiver_layer == 12
+                or receiver == lineage
+                and receiver_layer == 13
+                and sender_layer == 12
+            ):
+                raise RuntimeError(
+                    "articulatory-unit preparation is not an exact layer 12/layer 13 contact transfer"
+                )
+            motor_transfers.append(
+                (
+                    sender,
+                    sender_layer,
+                    receiver,
+                    receiver_layer,
+                    parallel_ordinal,
+                    transferred_whole_carriers,
+                )
+            )
+        validated.append(
+            (
+                lineage,
+                topology_index,
+                outward_elementary_carriers,
+                tuple(motor_transfers),
+            )
+        )
+    return tuple(validated)
 
 
 def _physical_frontier_route_evidence(
@@ -1523,6 +1633,7 @@ class NativeResidentOrganism:
         "__runtime_type",
         "__observation_type",
         "__prepare_type",
+        "__unsealed_validation",
     )
 
     def __new__(cls, authority: object = None, *args: object, **kwargs: object):
@@ -1549,6 +1660,9 @@ class NativeResidentOrganism:
         self.__runtime_type = runtime_type
         self.__observation_type = observation_type
         self.__prepare_type = prepare_type
+        self.__unsealed_validation: tuple[
+            bytes, NativeResidentObservationView, int, int
+        ] | None = None
 
     def _require_observation(
         self, candidate: object
@@ -2077,6 +2191,183 @@ class NativeResidentOrganism:
                             "resident direct commit validation and rollback both failed"
                         ) from rollback_error
             raise
+
+    def begin_unsealed_intake_direct(
+        self,
+        sources: object,
+        maximum_causal_intervals: object,
+        *,
+        vestibular_yaw: tuple[int, tuple[int, ...]] | None = None,
+    ) -> ResidentUnsealedIntakeEvidence:
+        """Advance one intake in native memory without encoding its successor."""
+
+        if self.__unsealed_validation is not None:
+            raise RuntimeError("resident organism already has an unsealed intake")
+        if not isinstance(sources, tuple):
+            raise TypeError("unsealed intake sources must be a tuple")
+        if (
+            not isinstance(maximum_causal_intervals, tuple)
+            or len(maximum_causal_intervals) != len(sources)
+        ):
+            raise TypeError("unsealed intake intervals must match the source tuple")
+        intervals = tuple(
+            _validated_causal_intervals(value)
+            for value in maximum_causal_intervals
+        )
+        predecessor_heading: int | None = None
+        signed_steps: tuple[int, ...] = ()
+        if vestibular_yaw is not None:
+            if not isinstance(vestibular_yaw, tuple) or len(vestibular_yaw) != 2:
+                raise TypeError("unsealed vestibular trajectory changed format")
+            predecessor_heading = _nonnegative_integer(
+                vestibular_yaw[0], "vestibular predecessor heading"
+            )
+            if predecessor_heading >= 360_000:
+                raise ValueError(
+                    "vestibular predecessor heading must be below 360000"
+                )
+            signed_steps = vestibular_yaw[1]
+            if not isinstance(signed_steps, tuple) or not signed_steps:
+                raise TypeError("vestibular trajectory must be a nonempty tuple")
+            if any(
+                not isinstance(step, int)
+                or isinstance(step, bool)
+                or not -(1 << 31) <= step < (1 << 31)
+                for step in signed_steps
+            ):
+                raise TypeError(
+                    "vestibular trajectory steps must be signed 32-bit integers"
+                )
+        if not sources and not signed_steps:
+            raise ValueError("unsealed intake must contain a physical source")
+        active_before = self.readiness()
+        requested_source_port_count = len(signed_steps) + sum(
+            _nonnegative_integer(
+                getattr(source, "port_count", None),
+                "unsealed trajectory source port count",
+            )
+            for source in sources
+        )
+        requested_interval_count = len(signed_steps) + len(sources)
+        if sources:
+            requested_source_port_count += 74
+            requested_interval_count += 1
+        candidate = self.__runtime.begin_unsealed_intake_direct(
+            predecessor_heading,
+            list(signed_steps),
+            list(sources),
+            [list(value) for value in intervals],
+        )
+        token = getattr(candidate, "token", None)
+        provisional_tick = _nonnegative_integer(
+            getattr(candidate, "provisional_organism_tick", None),
+            "unsealed provisional organism tick",
+        )
+        try:
+            if not isinstance(token, bytes) or len(token) != 32:
+                raise RuntimeError("unsealed intake token changed format")
+            if provisional_tick < active_before.organism_tick + requested_interval_count:
+                raise RuntimeError("unsealed intake omitted a causal interval")
+            recruitments = _articulatory_unit_recruitments(
+                getattr(candidate, "articulatory_unit_recruitments", None)
+            )
+            if _observation_signature(self.readiness()) != _observation_signature(
+                active_before
+            ):
+                raise RuntimeError("unsealed intake published before its final seal")
+        except BaseException:
+            if isinstance(token, bytes) and len(token) == 32:
+                self.__runtime.abort_unsealed_intake(token)
+            raise
+        self.__unsealed_validation = (
+            token,
+            active_before,
+            requested_source_port_count,
+            requested_interval_count,
+        )
+        return ResidentUnsealedIntakeEvidence(
+            token=token,
+            provisional_organism_tick=provisional_tick,
+            articulatory_unit_recruitments=recruitments,
+        )
+
+    def finalize_unsealed_intake_direct(
+        self,
+        token: bytes,
+        sources: object = (),
+        maximum_causal_intervals: object = (),
+    ) -> ResidentPrepareEvidence:
+        """Append optional self-hearing, seal once, and commit the successor."""
+
+        validation = self.__unsealed_validation
+        if validation is None:
+            raise RuntimeError("resident organism has no unsealed intake")
+        expected_token, active_before, source_port_count, interval_count = validation
+        if token != expected_token:
+            raise ValueError("unsealed intake token mismatch")
+        if not isinstance(sources, tuple):
+            raise TypeError("unsealed intake sources must be a tuple")
+        if (
+            not isinstance(maximum_causal_intervals, tuple)
+            or len(maximum_causal_intervals) != len(sources)
+        ):
+            raise TypeError("unsealed intake intervals must match the source tuple")
+        intervals = tuple(
+            _validated_causal_intervals(value)
+            for value in maximum_causal_intervals
+        )
+        source_port_count += sum(
+            _nonnegative_integer(
+                getattr(source, "port_count", None),
+                "unsealed appended source port count",
+            )
+            for source in sources
+        )
+        interval_count += len(sources)
+        candidate = None
+        final_token = None
+        try:
+            candidate = self.__runtime.finalize_unsealed_intake_direct(
+                token,
+                list(sources),
+                [list(value) for value in intervals],
+            )
+            final_token = getattr(candidate, "token", None)
+            evidence = self._validated_prepare_evidence_body(
+                candidate,
+                source_port_count,
+                active_before,
+                causal_interval_count=interval_count,
+                body_feedback_reentered=True,
+                candidate_committed=True,
+            )
+            self.__runtime.acknowledge_direct_commit(final_token)
+            return evidence
+        except BaseException:
+            if isinstance(final_token, bytes) and len(final_token) == 32:
+                try:
+                    self.__runtime.rollback_direct_commit(final_token)
+                except (RuntimeError, ValueError) as rollback_error:
+                    if "has no pending candidate" not in str(rollback_error):
+                        raise RuntimeError(
+                            "unsealed intake validation and rollback both failed"
+                        ) from rollback_error
+            raise
+        finally:
+            self.__unsealed_validation = None
+
+    def abort_unsealed_intake(self, token: bytes) -> None:
+        """Drop the working successor and restore its authenticated predecessor."""
+
+        validation = self.__unsealed_validation
+        if validation is None:
+            raise RuntimeError("resident organism has no unsealed intake")
+        if token != validation[0]:
+            raise ValueError("unsealed intake token mismatch")
+        try:
+            self.__runtime.abort_unsealed_intake(token)
+        finally:
+            self.__unsealed_validation = None
 
     def prepare_vestibular_tick(
         self,
@@ -2845,92 +3136,29 @@ class NativeResidentOrganism:
         raw_articulatory_recruitments = getattr(
             candidate, "articulatory_unit_recruitments", []
         )
-        if not isinstance(raw_articulatory_recruitments, list):
-            raise RuntimeError("articulatory-unit recruitments changed format")
-        articulatory_unit_recruitments: list[
-            tuple[
-                str,
-                int,
-                int,
-                tuple[tuple[str, int, str, int, int, int], ...],
-            ]
-        ] = []
-        for raw in raw_articulatory_recruitments:
-            if not isinstance(raw, tuple) or len(raw) != 4:
-                raise RuntimeError("articulatory-unit recruitment changed format")
-            lineage = _canonical_lineage_hex(raw[0], "articulatory-unit lineage")
-            topology_index = _nonnegative_integer(
-                raw[1], "articulatory-unit topology index"
-            )
-            outward_elementary_carriers = _positive_integer(
-                raw[2], "articulatory-unit outward elementary carriers"
-            )
-            if not isinstance(raw[3], list) or not raw[3]:
-                raise RuntimeError(
-                    "articulatory-unit motor transfers changed format"
-                )
-            motor_transfers: list[
-                tuple[str, int, str, int, int, int]
-            ] = []
-            for transfer in raw[3]:
-                if not isinstance(transfer, tuple) or len(transfer) != 6:
-                    raise RuntimeError(
-                        "articulatory-unit motor transfer changed format"
-                    )
-                sender = _canonical_lineage_hex(
-                    transfer[0], "articulatory motor sender"
-                )
-                sender_layer = _nonnegative_integer(
-                    transfer[1], "articulatory motor sender layer"
-                )
-                receiver = _canonical_lineage_hex(
-                    transfer[2], "articulatory motor receiver"
-                )
-                receiver_layer = _nonnegative_integer(
-                    transfer[3], "articulatory motor receiver layer"
-                )
-                parallel_ordinal = _nonnegative_integer(
-                    transfer[4], "articulatory motor parallel ordinal"
-                )
-                transferred_whole_carriers = _positive_integer(
-                    transfer[5], "articulatory motor transferred whole carriers"
-                )
-                if (
-                    sender == receiver
-                    or not (
-                        (
-                            sender == lineage
-                            and sender_layer == 13
-                            and receiver_layer == 12
-                        )
-                        or (
-                            receiver == lineage
-                            and receiver_layer == 13
-                            and sender_layer == 12
-                        )
-                    )
-                ):
-                    raise RuntimeError(
-                        "articulatory-unit preparation is not an exact layer 12/layer 13 contact transfer"
-                    )
-                motor_transfers.append(
-                    (
-                        sender,
-                        sender_layer,
-                        receiver,
-                        receiver_layer,
-                        parallel_ordinal,
-                        transferred_whole_carriers,
-                    )
-                )
-            articulatory_unit_recruitments.append(
-                (
-                    lineage,
-                    topology_index,
-                    outward_elementary_carriers,
-                    tuple(motor_transfers),
-                )
-            )
+        articulatory_unit_recruitments = _articulatory_unit_recruitments(
+            raw_articulatory_recruitments
+        )
+        appended_physically_transitioned_neuron_count = _nonnegative_integer(
+            getattr(candidate, "appended_physically_transitioned_neuron_count", 0),
+            "appended physically transitioned neuron count",
+        )
+        appended_complete_neuron_fractal_count = _nonnegative_integer(
+            getattr(candidate, "appended_complete_neuron_fractal_count", 0),
+            "appended complete-neuron fractal count",
+        )
+        appended_externally_perturbed_body_receptor_count = _nonnegative_integer(
+            getattr(
+                candidate,
+                "appended_externally_perturbed_body_receptor_count",
+                0,
+            ),
+            "appended externally perturbed body receptor count",
+        )
+        appended_articulatory_unit_recruitment_count = _nonnegative_integer(
+            getattr(candidate, "appended_articulatory_unit_recruitment_count", 0),
+            "appended articulatory-unit recruitment count",
+        )
         # A mounted joint cohort exists only where at least two ports share
         # one exact source clock, so a lawful episode can evaluate zero
         # mounted cohorts (cognition still receives its occurrences).
@@ -3080,6 +3308,18 @@ class NativeResidentOrganism:
             ),
             articulatory_unit_recruitments=tuple(
                 articulatory_unit_recruitments
+            ),
+            appended_physically_transitioned_neuron_count=(
+                appended_physically_transitioned_neuron_count
+            ),
+            appended_complete_neuron_fractal_count=(
+                appended_complete_neuron_fractal_count
+            ),
+            appended_externally_perturbed_body_receptor_count=(
+                appended_externally_perturbed_body_receptor_count
+            ),
+            appended_articulatory_unit_recruitment_count=(
+                appended_articulatory_unit_recruitment_count
             ),
             emitted_neuron_fractals=tuple(emitted_neuron_fractals),
             active_physical_bonds=tuple(active_physical_bonds),
@@ -3698,6 +3938,7 @@ __all__ = (
     "RUNTIME_SCHEMA",
     "ResidentCausalIntervalEvidence",
     "ResidentPrepareEvidence",
+    "ResidentUnsealedIntakeEvidence",
     "create_native_resident_organism",
     "exact_articulatory_unit_trajectory",
     "exact_native_yaw_trajectory",

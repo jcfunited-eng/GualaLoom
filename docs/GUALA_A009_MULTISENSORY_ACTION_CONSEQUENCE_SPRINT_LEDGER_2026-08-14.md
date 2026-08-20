@@ -377,3 +377,17 @@ Second immutable rehearsal result:
   command sites although the accepted task-1140 controller already contains
   four; this correction added none and does not treat that stale assertion as
   A-009 evidence.
+
+Third immutable rehearsal result:
+
+- image `sha256:317f5b3906282dd3add617dc8c34b8bfbea572c5092488948db2494b10277501`
+  built and the focused rehearsal exited promptly; production remained task
+  1140;
+- the fresh fixture still performed a separate articulated-body prepare/commit
+  before begin/finalize.  That duplicated the current-body interval and seal,
+  raising the successor requirement to 80,711,831 bytes;
+- the redundant prepare/commit is deleted.  The one unsealed transaction now
+  carries 74 current-body terminals plus the ten consequence-body ports, for
+  an exact body-ingress count of 84;
+- the exact rebuilt-native cold fixture passes locally: fresh complete roster,
+  111-port consequence, begin/finalize, and byte-exact cold restore.

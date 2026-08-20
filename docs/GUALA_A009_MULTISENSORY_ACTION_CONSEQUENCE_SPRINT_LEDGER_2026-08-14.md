@@ -341,3 +341,20 @@ Focused candidate evidence on 2026-08-20:
 
 Evidence level: source-complete, source-reviewed, and focused-execution passed.
 Immutable packaging and live verification remain pending.
+
+First immutable rehearsal result:
+
+- image `sha256:c03beb0cd25d5fd74015dd2c1ea00fbff887cf3f7bf0b30129fdde143a66848c`
+  built and preflight passed; production remained on task 1140;
+- cold rehearsal rejected before cutover because the legacy single-source
+  `_commit_admitted_hop` path required 78,641,443 cognitive bytes while its
+  old fresh-body fixture admitted 73,398,909 bytes;
+- that helper had no production caller.  It was deleted rather than extended;
+  cold rehearsal and the A-009 consequence proof now use the same unsealed
+  begin/finalize transaction as ordinary production;
+- the fresh fixture now admits the smallest whole-MiB envelope tier above the
+  exact measured requirement: 75 MiB, with 78,642,336 cognitive/fabric bytes
+  and 893 bytes of exact headroom.  Production admission remains unchanged and
+  cgroup/persistence-derived;
+- the exact rebuilt-native 111-port A-009 consequence proof passes 1/1 through
+  begin/finalize.  There are zero remaining `_commit_admitted_hop` references.

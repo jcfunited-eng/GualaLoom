@@ -35,12 +35,13 @@ _DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 
 # The complete production receptor roster plus 74 articulated-body terminals
-# requires 72,666,394 successor bytes.  The fresh A-013 rehearsal admits the
-# smallest whole-MiB tier above that measured exact boundary.  These constants
-# do not govern the resident organism, whose bounds remain cgroup-derived.
-_A013_FRESH_MAX_ENVELOPE_BYTES = 73_400_320
-_A013_FRESH_MAX_FABRIC_BYTES = 73_399_456
-_A013_FRESH_MAX_LOGICAL_PEAK_BYTES = 587_202_560
+# requires 78,641,443 successor cognitive bytes through the current unsealed
+# intake boundary.  The fresh A-013 rehearsal admits the smallest whole-MiB
+# envelope tier above that measured exact boundary.  These constants do not
+# govern the resident organism, whose bounds remain cgroup-derived.
+_A013_FRESH_MAX_ENVELOPE_BYTES = 78_643_200
+_A013_FRESH_MAX_FABRIC_BYTES = 78_642_336
+_A013_FRESH_MAX_LOGICAL_PEAK_BYTES = 629_145_600
 
 
 def _canonical(value: object) -> bytes:
@@ -1253,8 +1254,14 @@ def _rehearse_a013_thermal_body(expected_identity: str) -> dict[str, object]:
                 execution,
                 retinal_body_axes=organism.readiness().articulated_body_axes,
             )
-            hop = production._commit_admitted_hop(
-                organism, episode, admissions
+            unsealed = organism.begin_unsealed_intake_direct(
+                (episode,), (admissions,)
+            )
+            evidence = organism.finalize_unsealed_intake_direct(
+                unsealed.token, (), ()
+            )
+            hop = production._resident_prepare_hop(
+                evidence, organism.readiness()
             )
             reached = tuple(
                 organism.observe_reached_source_site_count(

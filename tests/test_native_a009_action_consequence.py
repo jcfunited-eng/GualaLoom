@@ -60,15 +60,17 @@ organism = create_native_resident_organism(
     organism_identity="1cc4e70a-f2a0-44c5-a111-f4a5bc915cc1",
     organism_tick=0,
     growth_dna=production._authored_growth_dna(),
-    max_envelope_bytes=73_400_320,
-    max_fabric_bytes=73_399_456,
-    max_logical_peak_bytes=587_202_560,
+    max_envelope_bytes=78_643_200,
+    max_fabric_bytes=78_642_336,
+    max_logical_peak_bytes=629_145_600,
 )
 episode, admissions, lanes = production._action_consequence_episode(
     execution,
     retinal_body_axes=organism.readiness().articulated_body_axes,
 )
-hop = production._commit_admitted_hop(organism, episode, admissions)
+unsealed = organism.begin_unsealed_intake_direct((episode,), (admissions,))
+prepared = organism.finalize_unsealed_intake_direct(unsealed.token, (), ())
+hop = production._resident_prepare_hop(prepared, organism.readiness())
 print(json.dumps({
     "admissions": admissions,
     "body": lanes["proprioceptive"],

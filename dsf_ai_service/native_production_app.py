@@ -7469,41 +7469,6 @@ def _causal_interval_hops(
     )
 
 
-def _commit_admitted_hop(
-    organism: Any,
-    episode: Any,
-    maximum_causal_intervals: Any,
-    *,
-    external_participant_action_receipt: str | None = None,
-) -> dict[str, Any]:
-    """Prepare and commit one admitted hop or one ordered native trajectory.
-
-    No persistence happens here.  The caller holds ``_transition_lock`` and
-    must durably publish the committed body before any observation surface
-    reports it.  Returns only what the native observation actually says.
-    """
-
-    if isinstance(episode, tuple):
-        evidence: ResidentPrepareEvidence = (
-            organism.commit_admitted_trajectory_direct(
-                episode,
-                tuple(maximum_causal_intervals),
-            )
-        )
-        observed = organism.readiness()
-    else:
-        evidence = organism.prepare_admitted(
-            episode,
-            maximum_causal_intervals,
-        )
-        observed = organism.commit(evidence.token)
-    return _resident_prepare_hop(
-        evidence,
-        observed,
-        external_participant_action_receipt=external_participant_action_receipt,
-    )
-
-
 def _resident_prepare_hop(
     evidence: ResidentPrepareEvidence,
     observed: Any,

@@ -835,7 +835,7 @@ def test_vestibular_trajectory_articulation_reaches_the_ordinary_aggregate(
     assert articulation["self_hearing_fractal_count"] == 2
 
 
-def test_admitted_hop_carries_native_structure_receipt_after_commit() -> None:
+def test_committed_native_evidence_carries_structure_receipt() -> None:
     receipts = ("11" * 32, "22" * 32)
     left_members = ("01" * 16, "02" * 16, "03" * 16)
     right_members = ("04" * 16, "05" * 16, "06" * 16)
@@ -898,19 +898,7 @@ def test_admitted_hop_carries_native_structure_receipt_after_commit() -> None:
         state_sha256="aa" * 32,
     )
 
-    class Organism:
-        committed = False
-
-        @staticmethod
-        def prepare_admitted(_episode, _intervals):
-            return evidence
-
-        def commit(self, token):
-            assert token == "commit-token"
-            self.committed = True
-            return observed
-
-    hop = production._commit_admitted_hop(Organism(), object(), [])
+    hop = production._resident_prepare_hop(evidence, observed)
 
     assert hop["organic_mosaic_relations"][0]["structural_relation_sha256"] == (
         "33" * 32

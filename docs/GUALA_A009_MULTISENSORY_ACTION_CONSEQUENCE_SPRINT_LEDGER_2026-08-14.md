@@ -539,3 +539,28 @@ Task 6C source boundary on 2026-08-20:
   and behavior boundaries, not a live-production claim.
 
 Task 6C has not yet been packaged, deployed, or live-verified at this entry.
+
+Task 6C production deployment on 2026-08-21:
+
+- reviewed code commit:
+  `1f95a9f85c1d232592e282cf4eec315e43632fb5`;
+- task definition: `dsf-ai-task:1146`;
+- immutable image:
+  `sha256:940dc7e6960bfe718188060cdcc52b02c832ff99339fcf440ae31bec5faaa51b`;
+- the deterministic controller reported one verified cutover, verified native
+  state, and no automatic legacy rollback;
+- independent post-cutover census proved desired/running/pending `1/1/0`, one
+  completed PRIMARY deployment, one RUNNING/HEALTHY task on the exact task
+  definition and image, deep readiness on the exact commit, native tick
+  `147954`, native state receipt
+  `25548e85c33cb471948ceb1ed1519d28af3a3c04ca21b0c791d40e82a2f4efd6`,
+  and zero Python cognition callbacks;
+- `gualaloom.html` and `loomscan.html` both returned HTTP 200;
+- the checked Slack completion notification succeeded in `#general`.
+
+The new process reported `no_transition_this_process` immediately after
+cutover.  This proves that the corrected action pause/consequence/resume code
+is the sole deployed production code, but it does not claim that the mature
+organism has already emitted a post-cutover motor discharge.  That behavioral
+witness remains the final live observation needed to call the full Task 6C
+action path live-exercised; it must not be fabricated by a test action.

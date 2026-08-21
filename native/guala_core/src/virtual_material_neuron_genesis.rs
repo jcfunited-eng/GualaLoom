@@ -686,29 +686,29 @@ fn build_quiescent_virtual_material_neuron(
     .map_err(VirtualMaterialGenesisError::Neuron)?;
     let carriers_per_compartment = definitive_virtual_carriers_for_place(place)
         .map_err(VirtualMaterialGenesisError::DeclaredGeometry)?;
-    let state = NeuronPhysicalState {
-        psi: PsiKrimelackState::genesis(&psi),
-        gate: TwoStateGateState::genesis(0),
-        membrane: LocalMembraneConductanceState::genesis(0),
-        carriers: CarrierReservoirs::new(carriers_per_compartment, carriers_per_compartment),
-        recovery: RecoveryState::new(
+    let state = NeuronPhysicalState::new(
+        PsiKrimelackState::genesis(&psi),
+        TwoStateGateState::genesis(0),
+        LocalMembraneConductanceState::genesis(0),
+        CarrierReservoirs::new(carriers_per_compartment, carriers_per_compartment),
+        RecoveryState::new(
             vec![RecoveryLaneState::new(1); ring_count],
             RecoveryLaneState::new(gate_dissipation_capacity_quanta),
             RecoveryLaneState::new(receptor_population),
         ),
-        dna_expression: DnaExpressionState::new(1, 1),
-        plastic: PlasticSupportState::new(ratio(
+        DnaExpressionState::new(1, 1),
+        PlasticSupportState::new(ratio(
             PLASTIC_GENESIS_REST_LENGTH_NUMERATOR.into(),
             PLASTIC_GENESIS_REST_LENGTH_DENOMINATOR as u128,
         )?)
         .map_err(VirtualMaterialGenesisError::Plasticity)?,
         // Quantized-light law (ratified 2026-08-05): a newborn receptor has
         // integrated no light, so its retained sub-quantum residue is zero.
-        receptor_quantum_residue: ratio(0, 1)?,
+        ratio(0, 1)?,
         // Exact rest-cost law (2026-08-06): a newborn neuron has done no
         // membrane-return work, so it owes no sub-quantum remainder.
-        membrane_return_work_residue: ratio(0, 1)?,
-    };
+        ratio(0, 1)?,
+    );
     Ok(VirtualMaterialNeuronGenesis {
         anatomy,
         state,

@@ -31,6 +31,9 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use std::collections::HashMap;
+use std::fmt;
+use std::ops::{Deref, DerefMut};
+use std::sync::Arc;
 
 type Exact = BigRational;
 
@@ -1224,8 +1227,11 @@ fn legacy_independent_yielded_population(
     Ok(population)
 }
 
+#[derive(Clone, Eq, PartialEq)]
+pub(crate) struct NeuronPhysicalState(Arc<NeuronPhysicalStateBody>);
+
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) struct NeuronPhysicalState {
+pub(crate) struct NeuronPhysicalStateBody {
     pub(crate) psi: PsiKrimelackState,
     pub(crate) gate: TwoStateGateState,
     pub(crate) membrane: LocalMembraneConductanceState<1>,
@@ -1262,6 +1268,72 @@ pub(crate) struct NeuronPhysicalState {
     /// authenticated state-format migration may remove the bytes, but runtime
     /// physics must never resurrect them as energy or gradient authority.
     pub(crate) membrane_return_work_residue: ExactRational,
+}
+
+impl NeuronPhysicalState {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn new(
+        psi: PsiKrimelackState,
+        gate: TwoStateGateState,
+        membrane: LocalMembraneConductanceState<1>,
+        carriers: CarrierReservoirs,
+        recovery: RecoveryState,
+        dna_expression: DnaExpressionState,
+        plastic: PlasticSupportState,
+        receptor_quantum_residue: ExactRational,
+        membrane_return_work_residue: ExactRational,
+    ) -> Self {
+        Self(Arc::new(NeuronPhysicalStateBody {
+            psi,
+            gate,
+            membrane,
+            carriers,
+            recovery,
+            dna_expression,
+            plastic,
+            receptor_quantum_residue,
+            membrane_return_work_residue,
+        }))
+    }
+
+    #[cfg(test)]
+    pub(crate) fn shares_physical_body_with(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+impl Deref for NeuronPhysicalState {
+    type Target = NeuronPhysicalStateBody;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.as_ref()
+    }
+}
+
+impl DerefMut for NeuronPhysicalState {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        Arc::make_mut(&mut self.0)
+    }
+}
+
+impl fmt::Debug for NeuronPhysicalState {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("NeuronPhysicalState")
+            .field("psi", &self.psi)
+            .field("gate", &self.gate)
+            .field("membrane", &self.membrane)
+            .field("carriers", &self.carriers)
+            .field("recovery", &self.recovery)
+            .field("dna_expression", &self.dna_expression)
+            .field("plastic", &self.plastic)
+            .field("receptor_quantum_residue", &self.receptor_quantum_residue)
+            .field(
+                "membrane_return_work_residue",
+                &self.membrane_return_work_residue,
+            )
+            .finish()
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -1535,7 +1607,7 @@ impl NeuronPhysicalState {
     }
 
     pub(crate) fn resident_bytes(&self) -> Option<usize> {
-        core::mem::size_of::<Self>()
+        core::mem::size_of::<NeuronPhysicalStateBody>()
             .checked_add(
                 self.psi
                     .rings
@@ -2703,8 +2775,8 @@ pub(crate) fn decode_neuron_physical_state(
     {
         return Err(NeuronStateCodecError::AnatomyMismatch);
     }
-    Ok(NeuronPhysicalState {
-        psi: PsiKrimelackState {
+    Ok(NeuronPhysicalState::new(
+        PsiKrimelackState {
             rings: rings.into_boxed_slice(),
         },
         gate,
@@ -2715,7 +2787,7 @@ pub(crate) fn decode_neuron_physical_state(
         plastic,
         receptor_quantum_residue,
         membrane_return_work_residue,
-    })
+    ))
 }
 
 fn encode_recovery_lane(
@@ -2997,21 +3069,21 @@ pub(crate) fn settle_neuron_physical_interval_with_contact(
         interval_microseconds,
         inter_neuron_outward_elementary_charges,
     )?;
-    let successor = NeuronPhysicalState {
-        psi: psi.successor.clone(),
-        gate: gate_membrane.successor_gate.clone(),
-        membrane: gate_membrane.membrane.successor,
-        carriers: gate_membrane.successor_carriers,
-        recovery: predecessor.recovery.clone(),
-        dna_expression: predecessor.dna_expression,
-        plastic: predecessor.plastic.clone(),
-        receptor_quantum_residue: predecessor.receptor_quantum_residue,
+    let successor = NeuronPhysicalState::new(
+        psi.successor.clone(),
+        gate_membrane.successor_gate.clone(),
+        gate_membrane.membrane.successor,
+        gate_membrane.successor_carriers,
+        predecessor.recovery.clone(),
+        predecessor.dna_expression,
+        predecessor.plastic.clone(),
+        predecessor.receptor_quantum_residue,
         // A stimulus interval does no membrane-RETURN work — the return path
         // is the rest metabolism's — so it neither adds to nor erases the
         // retained sub-quantum remainder, exactly as a dark interval leaves
         // the receptor accumulator alone.
-        membrane_return_work_residue: predecessor.membrane_return_work_residue,
-    };
+        predecessor.membrane_return_work_residue,
+    );
     Ok(NeuronPhysicalInterval {
         psi,
         gate_membrane,
@@ -4065,6 +4137,7 @@ fn settle_recovery(
     {
         return Err(RecoveryError::AnatomyWidth);
     }
+    let state = Arc::make_mut(&mut state.0);
     let mut total_extent = 0_u128;
     for lane_index in 0..anatomy.psi_lanes.len() {
         let extent = settle_recovery_lane(
@@ -6578,21 +6651,21 @@ mod tests {
             plastic,
         )
         .unwrap();
-        let state = NeuronPhysicalState {
-            psi: PsiKrimelackState::genesis(&psi),
-            gate: TwoStateGateState::genesis(0),
-            membrane: LocalMembraneConductanceState::genesis(0),
-            carriers: CarrierReservoirs::new(1_000_000, 1_000_000),
-            recovery: RecoveryState::new(
+        let state = NeuronPhysicalState::new(
+            PsiKrimelackState::genesis(&psi),
+            TwoStateGateState::genesis(0),
+            LocalMembraneConductanceState::genesis(0),
+            CarrierReservoirs::new(1_000_000, 1_000_000),
+            RecoveryState::new(
                 vec![RecoveryLaneState::new(100_000); ring_count],
                 RecoveryLaneState::new(100_000),
                 RecoveryLaneState::new(100_000),
             ),
-            dna_expression: DnaExpressionState::new(100_000, 100_000),
-            plastic: PlasticSupportState::new(r(1, 1)).unwrap(),
-            receptor_quantum_residue: r(0, 1),
-            membrane_return_work_residue: r(0, 1),
-        };
+            DnaExpressionState::new(100_000, 100_000),
+            PlasticSupportState::new(r(1, 1)).unwrap(),
+            r(0, 1),
+            r(0, 1),
+        );
         Fixture {
             anatomy,
             state,
@@ -6660,6 +6733,34 @@ mod tests {
         assert_eq!(
             encode_neuron_physical_state(&fixture.anatomy, &negative_debt),
             Err(NeuronStateCodecError::AnatomyMismatch)
+        );
+    }
+
+    #[test]
+    fn physical_state_clone_shares_until_exact_mutation_and_preserves_codec_bytes() {
+        let fixture = scaled_physical_fixture(2_048, 7);
+        let original_bytes =
+            encode_neuron_physical_state(&fixture.anatomy, &fixture.state).unwrap();
+        let mut successor = fixture.state.clone();
+
+        assert!(fixture.state.shares_physical_body_with(&successor));
+        assert_eq!(
+            encode_neuron_physical_state(&fixture.anatomy, &successor).unwrap(),
+            original_bytes
+        );
+
+        successor.receptor_quantum_residue = r(1, 2);
+
+        assert!(!fixture.state.shares_physical_body_with(&successor));
+        assert_eq!(fixture.state.receptor_quantum_residue, r(0, 1));
+        assert_eq!(successor.receptor_quantum_residue, r(1, 2));
+        assert_eq!(
+            encode_neuron_physical_state(&fixture.anatomy, &fixture.state).unwrap(),
+            original_bytes
+        );
+        assert_eq!(
+            decode_neuron_physical_state(&fixture.anatomy, &original_bytes).unwrap(),
+            fixture.state
         );
     }
 

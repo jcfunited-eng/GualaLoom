@@ -564,3 +564,55 @@ is the sole deployed production code, but it does not claim that the mature
 organism has already emitted a post-cutover motor discharge.  That behavioral
 witness remains the final live observation needed to call the full Task 6C
 action path live-exercised; it must not be fabricated by a test action.
+
+## Task 6C.1 mature-state clone obstruction
+
+Task 6C.1 is open.  It is one bounded ownership correction, not a claim that
+all reached-frontier cadence work is complete.
+
+Live production evidence from `dsf-ai-task:1146` on 2026-08-21 showed the
+native tick and state receipt remained fixed at `147954` and
+`25548e85c33cb471948ceb1ed1519d28af3a3c04ca21b0c791d40e82a2f4efd6`
+while one native worker consumed approximately one complete CPU core for more
+than twenty-two minutes.  No unattended interval committed.  The deployed
+Task 6C action pause/consequence/resume boundary is present, but its first
+mature interval is blocked before that behavioral witness can occur.
+
+Committed-source reachability proves the immediate obstruction.  The live
+cohort interval, membrane-pump, and dark-rest settlers call
+`predecessor.neurons.to_vec()`, and the interval settler then clones the full
+recovered neuron vector again.  `NeuronPhysicalState::clone` currently deep
+copies every Psi ring, recovery lane, and exact-rational heap even when the
+neuron is unchanged.  Thus a selected mature cohort duplicates its complete
+resident physical state before sparse physical mutation.
+
+The exact Task 6C.1 correction is to make the complete mutable physical state
+of one neuron safe copy-on-write resident custody.  A predecessor/successor
+clone must share the unchanged state body; the first actual mutation of that
+neuron must detach its own exact body.  Full seven-field DSF delivery, every
+physics equation, equality, logical resident-byte accounting, and canonical
+state encoding must remain unchanged.  No sparse index, database, event log,
+persistence-format change, Python cognition, or fabricated input is
+authorized by this item.
+
+Acceptance requires source proof that the three production settlers no longer
+deep-copy large unchanged neuron bodies, a focused clone/detach and codec-byte
+identity falsifier, a compiled native boundary, one reviewed commit, one
+production cutover, and a live unattended generation advance.  Until those
+facts exist, Task 6C.1 and the final natural Task 6C behavioral witness remain
+open.
+
+Task 6C.1 source boundary on 2026-08-21:
+
+- `NeuronPhysicalState` now owns one `Arc`-shared exact physical body and uses
+  `Arc::make_mut` for the first actual mutation;
+- the three existing production cohort copies therefore retain one pointer per
+  unchanged neuron instead of duplicating its Psi rings, recovery lanes, and
+  exact-rational heaps;
+- value equality, debug fields, canonical encoding order, decoded values, and
+  logical resident-byte accounting remain value-exact;
+- `cargo check --lib` passed; and
+- the focused large-state clone/detach/codec falsifier passed 1/1.
+
+This source boundary is not yet committed or deployed at this ledger entry.
+The live generation-advance requirement remains open.

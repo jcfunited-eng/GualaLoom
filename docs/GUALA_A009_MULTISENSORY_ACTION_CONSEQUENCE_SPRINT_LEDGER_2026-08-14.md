@@ -657,3 +657,20 @@ production cutover/live generation observation.
 Task 6C.2 source boundary on 2026-08-21: `cargo check --lib` passed, and the
 focused large-state shared-zero/detached-nonzero delta plus codec proof passed
 1/1.  The candidate is not yet committed or deployed at this entry.
+
+Task 6C.2 production result on 2026-08-21:
+
+- reviewed and pushed commit:
+  `cc7cc3dfbcb6010aba2cb37567c19caf0a865ed2`;
+- production task: `dsf-ai-task:1148`;
+- immutable image:
+  `sha256:5d1d8ea296777240112e64e29dc69171c2502c7d8daf74f56f8357fd49ffa835`;
+- the deterministic controller completed one verified cutover with no
+  automatic legacy rollback; and
+- the healthy process started at `2026-08-21T01:30:40.537Z`, but public
+  observations through `2026-08-21T01:35:55Z` remained at generation
+  `147954`, `no_transition_this_process`.
+
+The exact unchanged-state delta traversal is delivered, but the five-minute
+live generation requirement did not pass.  Therefore the dominant remaining
+stall precedes or lies outside that delta traversal; A-009 remains open.

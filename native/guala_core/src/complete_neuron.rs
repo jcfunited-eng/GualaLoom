@@ -1296,7 +1296,6 @@ impl NeuronPhysicalState {
         }))
     }
 
-    #[cfg(test)]
     pub(crate) fn shares_physical_body_with(&self, other: &Self) -> bool {
         Arc::ptr_eq(&self.0, &other.0)
     }
@@ -4652,6 +4651,9 @@ pub(crate) fn sparse_physical_state_delta(
     predecessor: &NeuronPhysicalState,
     successor: &NeuronPhysicalState,
 ) -> Result<Option<SparsePhysicalStateDelta>, NeuronPhysicalError> {
+    if predecessor.shares_physical_body_with(successor) {
+        return Ok(None);
+    }
     if predecessor.psi.rings.len() != successor.psi.rings.len()
         || predecessor.recovery.psi_lanes.len() != successor.recovery.psi_lanes.len()
     {
@@ -6745,6 +6747,10 @@ mod tests {
 
         assert!(fixture.state.shares_physical_body_with(&successor));
         assert_eq!(
+            sparse_physical_state_delta(&fixture.state, &successor).unwrap(),
+            None
+        );
+        assert_eq!(
             encode_neuron_physical_state(&fixture.anatomy, &successor).unwrap(),
             original_bytes
         );
@@ -6752,6 +6758,11 @@ mod tests {
         successor.receptor_quantum_residue = r(1, 2);
 
         assert!(!fixture.state.shares_physical_body_with(&successor));
+        assert!(
+            sparse_physical_state_delta(&fixture.state, &successor)
+                .unwrap()
+                .is_some()
+        );
         assert_eq!(fixture.state.receptor_quantum_residue, r(0, 1));
         assert_eq!(successor.receptor_quantum_residue, r(1, 2));
         assert_eq!(

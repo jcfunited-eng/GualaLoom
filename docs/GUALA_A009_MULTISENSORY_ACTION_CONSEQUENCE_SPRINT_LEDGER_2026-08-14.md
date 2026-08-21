@@ -635,3 +635,25 @@ Therefore the named deep-copy correction is delivered, but the required live
 generation advance did not occur in the first five minutes and Task 6C.1 is
 not live-accepted.  This result must not be widened into a claim that the
 remaining population scans, evidence work, or final whole-body seal are fixed.
+
+## Task 6C.2 unchanged-state delta traversal
+
+Task 6C.2 is the next bounded correction.  The Task 6C.1 representation proves
+that an unchanged predecessor/successor neuron pair shares one exact physical
+state body.  The current `sparse_physical_state_delta` nevertheless allocates
+for, then compares, every Psi and recovery coordinate before returning no
+delta.  Ordinary evidence settlement invokes that function across the entire
+selected cohort, so unchanged mature neurons still contribute work
+proportional to their resident physical bytes.
+
+The exact correction is an identity fast path: shared physical-state custody
+returns the exact empty delta before allocation or coordinate traversal;
+distinct bodies still execute the complete existing exact delta law.  No
+physics equation, retained coordinate, evidence meaning, codec, or schema is
+changed.  Acceptance is a focused large-state proof of shared-body zero delta
+and detached-body exact nonzero delta, followed by one compiled commit and one
+production cutover/live generation observation.
+
+Task 6C.2 source boundary on 2026-08-21: `cargo check --lib` passed, and the
+focused large-state shared-zero/detached-nonzero delta plus codec proof passed
+1/1.  The candidate is not yet committed or deployed at this entry.

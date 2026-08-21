@@ -3681,6 +3681,33 @@ impl ResidentCognitiveFormationState {
         }
     }
 
+    /// Structural counts needed while an owned causal trajectory is still
+    /// unsealed.  The exact whole-organism energy observation is deliberately
+    /// deferred to the single final seal: evaluating it here would walk every
+    /// Psi and recovery lane after every internal/body-feedback interval.
+    fn unsealed_structural_summary(&self) -> CognitiveFormationSummary {
+        CognitiveFormationSummary {
+            cognitive_ordinal: self.generation,
+            trace_count: 0,
+            mosaic_count: self
+                .mosaics
+                .iter()
+                .filter(|retained| retained.mosaic.carries_only_retained_neuron_structure())
+                .count(),
+            complete_neuron_count: self
+                .cohorts
+                .iter()
+                .map(|cohort| cohort.anatomy.neuron_count())
+                .sum(),
+            resting_neuron_count: self
+                .resting_population
+                .as_ref()
+                .and_then(|population| usize::try_from(population.resting_cell_count()).ok())
+                .unwrap_or(0),
+            energy: ReachedCohortEnergyState::default(),
+        }
+    }
+
     /// Read-only structural observation of the retained distributed
     /// formations: one entry per admitted mosaic as the stable member
     /// lineages and the retained recurrence-bond count.  Structure only —
@@ -5468,12 +5495,20 @@ impl ResidentCognitiveFormationState {
         } else {
             Vec::new()
         };
-        let summary = successor.summary();
+        let summary = if seal_successor {
+            successor.summary()
+        } else {
+            successor.unsealed_structural_summary()
+        };
         let successor_energy = summary.energy;
         let complete_neuron_count = summary.complete_neuron_count;
         let physically_transitioned_neuron_count = physically_transitioned_neuron_lineages.len();
         let complete_neuron_fractal_count = emitted_neuron_fractals.len();
-        let mosaic_of_mosaics_count = successor.mosaic_of_mosaics_count()?;
+        let mosaic_of_mosaics_count = if seal_successor {
+            successor.mosaic_of_mosaics_count()?
+        } else {
+            0
+        };
         Ok(PreparedCognitiveFormationTransition {
             predecessor_generation: predecessor_generation_authority,
             predecessor_hippocampal: predecessor_hippocampal_authority,

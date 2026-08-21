@@ -3556,9 +3556,26 @@ impl ResidentOrganismRuntime {
             .fabric_generation
             .checked_add(interval_count)
             .ok_or(RuntimeError::FabricGenerationOverflow)?;
-        let cognitive_observation = intake.cognitive_observation.take().ok_or_else(|| {
+        let mut cognitive_observation = intake.cognitive_observation.take().ok_or_else(|| {
             RuntimeError::CognitiveFormation("unsealed intake carried no cognitive interval".into())
         })?;
+        // Intermediate owned hops intentionally omit the population-wide
+        // energy observation.  Observe it exactly once here, at the one final
+        // causal seal, and replace only the global fields that describe the
+        // final resident state.  Interval-local physical evidence accumulated
+        // above remains unchanged.
+        let final_cognitive_summary = intake.cognitive.summary();
+        cognitive_observation.cognitive_ordinal = final_cognitive_summary.cognitive_ordinal;
+        cognitive_observation.trace_count = final_cognitive_summary.trace_count;
+        cognitive_observation.mosaic_count = final_cognitive_summary.mosaic_count;
+        cognitive_observation.complete_neuron_count =
+            final_cognitive_summary.complete_neuron_count;
+        cognitive_observation.resting_neuron_count = final_cognitive_summary.resting_neuron_count;
+        cognitive_observation.energy = final_cognitive_summary.energy;
+        cognitive_observation.mosaic_of_mosaics_count = intake
+            .cognitive
+            .mosaic_of_mosaics_count()
+            .map_err(|error| RuntimeError::CognitiveFormation(error.to_string()))?;
         let (mounted, _) = restore_resident_mounted_state(
             &joint_state,
             derived_budget.max_joint_state_bytes,

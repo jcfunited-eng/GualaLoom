@@ -616,3 +616,22 @@ Task 6C.1 source boundary on 2026-08-21:
 
 This source boundary is not yet committed or deployed at this ledger entry.
 The live generation-advance requirement remains open.
+
+Task 6C.1 production result on 2026-08-21:
+
+- reviewed and pushed commit:
+  `635805a184e20c68523302350ed03c71e5fe6e21`;
+- production task: `dsf-ai-task:1147`;
+- immutable image:
+  `sha256:5e7f6d3e328cb5a1eaaab9289638d75bd38074d63c6b984541adfda3b27a33e2`;
+- the deterministic controller completed one verified cutover with no
+  automatic legacy rollback; ECS settled healthy at desired/running/pending
+  `1/1/0` with one completed PRIMARY deployment; and
+- the process started at `2026-08-21T01:01:48.858Z`, but repeated public
+  observations through `2026-08-21T01:06:37Z` remained at generation
+  `147954`, with `no_transition_this_process` and no unattended pause.
+
+Therefore the named deep-copy correction is delivered, but the required live
+generation advance did not occur in the first five minutes and Task 6C.1 is
+not live-accepted.  This result must not be widened into a claim that the
+remaining population scans, evidence work, or final whole-body seal are fixed.
